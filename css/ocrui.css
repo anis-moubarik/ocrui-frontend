@@ -1,0 +1,29 @@
+#facsimile {
+    display: inline-block;
+    width:40%;
+    height:80%;
+}
+
+#editor {
+    display: inline-block;
+    width:40%;
+    height:80%;
+}
+
+#toolbar {
+    width:100%;
+    background:#668855;
+}
+
+#vkeyboard {
+    width:100%;
+    background:#668855;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+}
+
+#toolbar div, #vkeyboard div {
+    margin: 1px;
+}
+
