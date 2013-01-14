@@ -1,0 +1,21 @@
+#facsimile {
+    overflow:hidden;
+}
+
+#editor {
+}
+
+#toolbar {
+}
+
+#vkeyboard {
+}
+
+#facsimile-canvas {
+    background-image: url(../img/canvas-bg.png);
+}
+
+body {
+    padding-top: 40px;
+    overflow:hidden;
+}

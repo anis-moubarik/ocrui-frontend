@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<mets:mets TYPE="KK-v1" xmlns:MARC="http://www.loc.gov/MARC21/slim" xmlns:mets="http://www.loc.gov/METS/">
+	<mets:dmdSec ID="dmd-marc">
+		<mets:mdWrap>
+			<mets:xmlData>
+				<MARC:record>
+					<MARC:datafield tag="245">
+						<MARC:subfield code="a">p7.pdf</MARC:subfield>
+					</MARC:datafield>
+				</MARC:record>
+			</mets:xmlData>
+		</mets:mdWrap>
+	</mets:dmdSec>
+	<mets:structMap>
+		<mets:fptr FILEID="pdf001"/>
+		<mets:div CONTENTIDS="xxx-img0001" ID="img0001" ORDER="1" ORDERLABEL="1" TYPE="PAGE">
+			<mets:fptr>
+				<mets:par>
+					<mets:area FILEID="img0001-access"/>
+					<mets:area FILEID="img0001-thumb"/>
+					<mets:area FILEID="img0001-alto"/>
+				</mets:par>
+			</mets:fptr>
+		</mets:div>
+	</mets:structMap>
+</mets:mets>
