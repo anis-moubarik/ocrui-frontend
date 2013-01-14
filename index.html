@@ -2,20 +2,34 @@
 
     <head>
         <title>OCR editor</title>
-        <script data-main="js/main" src="js/require-jquery.js"></script>
+        <script data-main="js/main" src="lib/require-jquery.js"></script>
 
-        <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-        <link href="codemirror/lib/codemirror.css" rel="stylesheet">
+        <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+        <link href="lib/codemirror-3.0/lib/codemirror.css" rel="stylesheet">
 
         <link rel="stylesheet" href="css/ocrui.css" type="text/css" />
 
     </head>
 
     <body>
-        <div id="toolbar"> </div>
-        <div id="facsimile"> </div>
-        <div id="editor"> </div>
-        <div id="vkeyboard"> </div>
+        <div class="container-fluid">
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <ul id="toolbar" class="nav">
+                    </ul>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6" id="facsimile"> </div>
+                <div class="span6" id="editor"> </div>
+            </div>
+            <div class="navbar navbar-fixed-bottom">
+                <div class="navbar-inner">
+                    <ul id="vkeyboard" class="nav">
+                    </ul>
+                </div>
+            </div>
+        </div>
     </body>
 
 </html>

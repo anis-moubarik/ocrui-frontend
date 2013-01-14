@@ -1,35 +1,20 @@
-var Router = Backbone.Router.extend({
+define(['backbone','ocrui'],function (backbone,ocrui) {
 
-    routes:{
-        "": "default",
-        "koe": "default",
-        ":id": "document",
-        ":id/:page": "page",
-    }
-});
-
-var router = new Router();
-
-router.on("route:default",function() {
-
-        facsimileView.render();
-        editorView.render();
-
-    });
-
-router.on("route:document",function(id) {
-
-        router.navigate("page",{replace:true,trigger:tru});
-
-    });
-
-router.on("route:page",function(id,page) {
-        var options = {
-            id: id,
-            page: page,
+    var Router = Backbone.Router.extend({
+        routes:{
+            "": "default",
+            ":id": "document",
+            ":id/:page": "page",
         }
-
-        facsimileView.render(options)
-        editorView.render(options)
     });
 
+    var router = new Router();
+    router.on("route:default",ocrui.empty);
+    router.on("route:document",ocrui.doc);
+    router.on("route:page",ocrui.page);
+
+    return {
+        router:router,
+    };
+
+});

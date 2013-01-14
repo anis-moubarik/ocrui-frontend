@@ -1,25 +1,26 @@
-var vkeyboard = undefined;
+define(['backbone'],function () {
 
+    var View = Backbone.View.extend({
+        el: '#vkeyboard',
+        render: function() {
 
-$.fn.vkeyboard = function() {
-
-    $vkeyboard = this;
-    registerLanguage();
-
-};
-
-function registerLanguage(lang) {
-    var chars = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',
-        'p','q','r','s','t','u','v','w','x','y','z'];
-    _.each(chars,function(v) {
-        var $b = $('<div />');
-        $b.attr("class","btn");
-        $b.text(v);
-        $vkeyboard.append($b);
+            var chars = ['a','b','c','d','e','f','g','h','i',
+                'j','k','l','m','n','o','p','q','r','s','t',
+                'u','v','w','x','y','z'];
+            var $div = $('<div class="btn-group"/>');
+            this.$el.html();
+            this.$el.append($div);
+            _.each(chars,function(v) {
+                var $a = $('<a />');
+                $a.attr("href","#");
+                $a.attr("class","btn");
+                $a.text(v);
+                $div.append($a);
+            });
+        }
     });
 
-}
-
-function changeKeyboardLanguage(lang) {
-};
-
+    return {
+        view: new(View)
+    }
+});

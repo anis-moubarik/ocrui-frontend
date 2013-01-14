@@ -1,29 +1,21 @@
 #facsimile {
-    display: inline-block;
-    width:40%;
-    height:80%;
+    overflow:hidden;
 }
 
 #editor {
-    display: inline-block;
-    width:40%;
-    height:80%;
 }
 
 #toolbar {
-    width:100%;
-    background:#668855;
 }
 
 #vkeyboard {
-    width:100%;
-    background:#668855;
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
 }
 
-#toolbar div, #vkeyboard div {
-    margin: 1px;
+#facsimile-canvas {
+    background-image: url(../img/canvas-bg.png);
 }
 
+body {
+    padding-top: 40px;
+    overflow:hidden;
+}
