@@ -1,4 +1,4 @@
-define(['events','codemirror','backbone'],function (events) {
+define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -32,8 +32,43 @@ define(['events','codemirror','backbone'],function (events) {
             this.cMirror.setCursor(line,ch);
             this.$el.find('.CodeMirror').focus();
         },
+        changed: function (instance) {
+            var content = instance.getValue().split(/\s+/);
+            var original = this.alto.getStringSequence();
+            var out = jsdiff.diff(original,content);
+            console.log(out);
+
+        },
+        cursorActivity: function (instance) {
+            var content = instance.getValue();
+            var cursor = instance.getCursor();
+            var line = cursor.line;
+            var ch = cursor.ch;
+            var wordIndex = 0;
+            var inMiddleOfWord = false;
+            for (var i in content) {
+                var c = content[i];
+                if (c == '\n') line --;
+                if (c.match(/\S/)) {
+                    if (inMiddleOfWord) wordIndex ++;
+                    inMiddleOfWord = false;
+                } else {
+                    inMiddleOfWord = true;
+                }
+                if (line == 0) {
+                    ch --;
+                    if (ch == 0) {
+                        break;
+                    }
+                }
+            }
+            word = this.alto.getNthWord(wordIndex);
+            events.trigger('changeCoordinates',word);
+        },
         render: function(options) {
             var s = options.alto.getString();
+            var that = this;
+            this.alto = options.alto;
             if (options.alto.get('status') == 'success') {
                 var element = this.$el.get(0);
                 this.cMirror = CodeMirror(element, {
@@ -42,35 +77,11 @@ define(['events','codemirror','backbone'],function (events) {
                     mode: 'html'
                 });
                 this.cMirror.on('cursorActivity',function (instance) {
-                    var content = instance.getValue();
-                    var cursor = instance.getCursor();
-                    var line = cursor.line;
-                    var ch = cursor.ch;
-                    var wordIndex = 0;
-                    var inMiddleOfWord = false;
-                    for (var i in content) {
-                        var c = content[i];
-                        if (c == '\n') line --;
-                        if (c.match(/\S/)) {
-                            if (inMiddleOfWord) wordIndex ++;
-                            inMiddleOfWord = false;
-                        } else {
-                            inMiddleOfWord = true;
-                        }
-                        if (line == 0) {
-                            ch --;
-                            if (ch == 0) {
-                                break;
-                            }
-                        }
-                    }
-                    word = options.alto.getNthWord(wordIndex);
-                    console.log(JSON.stringify(word));
-                    events.trigger('changeCoordinates',word);
+                    that.cursorActivity(instance);
                 });
-//                var $t = $('<textarea> ' + s + ' </textarea>');
- //               $t.css('width','100%');
-  //              $t.css('height','100%');
+                this.cMirror.on('change',function (instance) {
+                    that.changed(instance);
+                });
             } else {
             
                 var $e = $('<div> ' + alto.get('status') + '. </div>');

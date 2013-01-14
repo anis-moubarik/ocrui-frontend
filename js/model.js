@@ -82,11 +82,15 @@ define(['backbone'],function (backbone) {
                 height: dom.getAttribute('HEIGHT'),
             }
         },
-        getString: function() {
+        getStringSequence: function() {
             xx = [];
             return $(this.data).find('String').map(
                 function() {xx.push(this);return this.getAttribute('CONTENT');}
-            ).get().join(' ');
+            ).get();
+        },
+
+        getString: function() {
+            return this.getStringSequence().join(' ');
         },
         fetch: function (options,callback) {
             url = 'items/'+this.docId+'/alto/img'+this.pageId+'-alto.xml';
