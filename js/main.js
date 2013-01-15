@@ -10,6 +10,7 @@ require.config({
         "jquery-ui": "../lib/jquery-ui.min",
         "backbone": "../lib/backbone-min",
         "jsdiff": "../lib/jsdiff",
+        "underscore.string": "../lib/aganov-underscore-strings-edba03c/vendor/underscore",
     },
     'shim': {
         'backbone': {deps:['jquery','underscore']},

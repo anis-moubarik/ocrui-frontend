@@ -2,14 +2,14 @@ define(['events','backbone'],function (events) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
-        render: function(options) {
+        render: function() {
             this.$el.html("<div>empty</div>");
         }
     });
 
     Thumbnails = Backbone.View.extend({
         el: '#facsimile',
-        render: function(options) {
+        render: function() {
             var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>')
             $canvas.attr('width',500);
             $canvas.attr('height',500);
@@ -21,10 +21,11 @@ define(['events','backbone'],function (events) {
     View = Backbone.View.extend({
 
         initialize: function() {
+            var that = this;
             events.on('changeCoordinates',function(data) {
                 //BUG
-                renderOptions.highlight = data;
-                facsimile.view.render(renderOptions);
+                that.setHighlight(data);
+                that.render();
 
             });
         },
@@ -52,8 +53,13 @@ define(['events','backbone'],function (events) {
                 y: coords.y * this.vRatio, 
             }
         },
-
-        render: function(options) {
+        setImage: function(image) {
+            this.image = image;
+        },
+        setHighlight: function(highlight) {
+            this.highlight = highlight;
+        },
+        render: function() {
             var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>')
             $canvas.attr('width',500);
             $canvas.attr('height',500);
@@ -62,18 +68,18 @@ define(['events','backbone'],function (events) {
 
             var canvas = $canvas.get(0);
             var ctx = canvas.getContext("2d");
-            ctx.drawImage(options.image.image,0,0,500,500);
+            ctx.drawImage(this.image.image,0,0,500,500);
 
-            this.hRatio = 500 / options.image.width;
-            this.vRatio = 500 / options.image.height;
-            if (options.highlight) {
+            this.hRatio = 500 / this.image.width;
+            this.vRatio = 500 / this.image.height;
+            if (this.highlight) {
 
                 //Draw semi transparent highlight box. won't work. BUG?
 
-                var x = Math.round(options.highlight.hpos * this.hRatio);
-                var y = Math.round(options.highlight.vpos * this.vRatio);
-                var w = Math.round(options.highlight.width * this.hRatio);
-                var h = Math.round(options.highlight.height * this.vRatio);
+                var x = Math.round(this.highlight.hpos * this.hRatio);
+                var y = Math.round(this.highlight.vpos * this.vRatio);
+                var w = Math.round(this.highlight.width * this.hRatio);
+                var h = Math.round(this.highlight.height * this.vRatio);
 
                 // Start with what is already there.
                 var imgd = ctx.getImageData(x,y,w,h);

@@ -1,27 +1,65 @@
-define(['backbone'],function (backbone) {
+define(['backbone'],function () {
 
 
     DocumentModel = Backbone.Model.extend({
         initialize: function (options) {
-            this.id = options.docId;
+            this.id = options.id;
+            this.urlBase = 'items/'+this.id;
         },
-        fetch: function (options,callback) {
-            var url = 'items/'+this.id+'/mets.xml';
+        pageInfo: [],
+        getNumberOfPages : function () {
+            return this.pageInfo.length;
+        },
+        getImageUrl : function (pageNumber) {
+            var page = this.pageInfo[pageNumber];
+            if (page == undefined) return undefined;
+            return this.urlBase + '/' + page[0];
+        },
+        getAltoUrl : function (pageNumber) {
+            var page = this.pageInfo[pageNumber];
+            if (page == undefined) return undefined;
+            return this.urlBase + '/' + page[1];
+        },
+        parsePageInfo : function (data) {
+
             var that = this;
-            $.get(url,
-                function(data) {
-                    that.data = data;
-                    that.set('status','');
-                    callback(that);
-                });
+
+            // loop through image files
+            $(data).find('fileGrp[ID="IMGGRP"] file').each(function() {
+                var seq = parseInt(this.getAttribute('SEQ'));
+                var element = $(this).find('FLocat').get(0)
+                var imageFilename = element.getAttribute('xlink:href');
+                imageFilename = imageFilename.replace(/^file:\/\//,'').replace(/.\//,'');
+                that.pageInfo[seq] = [imageFilename,undefined];
+            });
+
+            // loop through alto files
+            $(data).find('fileGrp[ID="ALTOGRP"] file').each(function() {
+                var seq = parseInt(this.getAttribute('SEQ'));
+                var element = $(this).find('FLocat').get(0)
+                var altoFilename = element.getAttribute('xlink:href');
+                altoFilename = altoFilename.replace(/^file:\/\//,'').replace(/.\//,'');
+                if (that.pageInfo[seq] == undefined) {
+                    that.pageInfo[seq] = [undefined,undefined];
+                }
+                that.pageInfo[seq][1] = altoFilename;
+            });
+        },
+        fetch: function (callback) {
+            var url = this.urlBase+'/mets.xml';
+            var that = this;
+            $.get(url, function(data) {
+                that.data = data;
+                that.parsePageInfo(data);
+                that.set('status','');
+                callback(that);
+            });
         }
     });
 
     AltoModel = Backbone.Model.extend({
         initialize: function (options) {
-            this.id = options.id;
-            this.docId = options.docId;
-            this.pageId = options.pageId;
+            this.url = options.url;
         },
         getWordAt: function(x,y) {
             var selection = undefined;
@@ -92,10 +130,9 @@ define(['backbone'],function (backbone) {
         getString: function() {
             return this.getStringSequence().join(' ');
         },
-        fetch: function (options,callback) {
-            url = 'items/'+this.docId+'/alto/img'+this.pageId+'-alto.xml';
+        fetch: function (callback) {
             var that = this;
-            var jqxhr = $.ajax(url).always(function(data,textStatus) {
+            var jqxhr = $.ajax(this.url).always(function(data,textStatus) {
                     that.data = data,
                     that.set('status',textStatus);
                     callback(that);
@@ -105,14 +142,12 @@ define(['backbone'],function (backbone) {
 
     ImageModel = Backbone.Model.extend({
         initialize: function (options) {
-            this.id = options.id;
-            this.docId = options.docId;
-            this.pageId = options.pageId;
+            this.url = options.url;
         },
-        fetch: function (options,callback) {
+        fetch: function (callback) {
             var that = this;
             this.image = new Image();
-            this.image.src = 'items/'+this.docId+'/access_img/img'+this.pageId+'-access.jpg';
+            this.image.src = this.url;
             this.image.onload = function() { 
                 that.width = this.width;
                 that.height = this.height;
@@ -130,7 +165,7 @@ define(['backbone'],function (backbone) {
             callback(documents[options.id]);
         } else {
             var doc = new DocumentModel(options);
-            doc.fetch({},callback);
+            doc.fetch(callback);
             documents[options.id] = doc;
         }
     }
@@ -140,7 +175,7 @@ define(['backbone'],function (backbone) {
             callback(altos[options.id]);
         } else {
             var alto = new AltoModel(options);
-            alto.fetch({},callback);
+            alto.fetch(callback);
             altos[options.id] = alto;
         }
     }
@@ -150,7 +185,7 @@ define(['backbone'],function (backbone) {
             callback(images[options.id]);
         } else {
             var image = new ImageModel(options);
-            image.fetch({},callback);
+            image.fetch(callback);
             images[options.id] = image;
         }
     }

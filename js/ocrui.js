@@ -1,7 +1,6 @@
-define(['events','model','backbone','facsimile','editor'],function (events,model,backbone,facsimile,editor) {
+define(['events','model','facsimile','editor'],function (events,model,facsimile,editor) {
 
-
-    var renderOptions = {};
+    var doc = undefined; // this is used to store mets currently being edited
 
     function empty() {
 
@@ -12,46 +11,39 @@ define(['events','model','backbone','facsimile','editor'],function (events,model
 
     function doc(id) {
 
-        renderOptions = {
-            id: id,
-            docId: id,
-            pageId: undefined,
-        }
-        model.loadDocument(renderOptions,function(doc) {
-            renderOptions.doc = doc;
-            facsimile.thumbnails.render(renderOptions);
-            editor.empty.render(renderOptions);
+        model.loadDocument({id:id},function(doc) {
+            facsimile.setDoc(doc);
+            facsimile.thumbnails.render();
+            editor.empty.render();
             $(window).resize();
         });
     };
 
-    function page(id,page) {
-        renderOptions = {
-            id: id + '/' + page,
-            docId: id,
-            pageId: page,
-        }
-        var progressCounter;
+    function page(id,pageNumber) {
 
-        model.loadDocument(renderOptions,function(doc) {
-            renderOptions.doc = doc;
-            progressCounter ++ ;
-            if (progressCounter == 3) doneLoading();
+        model.loadDocument({id:id},function(_doc) {
 
-        });
+            var progressCounter;
+            var pages = _doc.getNumberOfPages();
 
-        model.loadImage(renderOptions,function(image) {
-            renderOptions.image = image;
-            facsimile.view.render(renderOptions);
-            progressCounter ++ ;
-            if (progressCounter == 3) doneLoading();
-        });
+            doc = _doc;
 
-        model.loadAlto(renderOptions,function(alto) {
-            renderOptions.alto = alto;
-            editor.view.render(renderOptions);
-            progressCounter ++ ;
-            if (progressCounter == 3) doneLoading();
+            var url = _doc.getImageUrl(parseInt(pageNumber));
+            model.loadImage({url:url},function(image) {
+                facsimile.view.setImage(image);
+                facsimile.view.render();
+                progressCounter ++ ;
+                if (progressCounter == 2) doneLoading();
+            });
+
+            var url = _doc.getAltoUrl(parseInt(pageNumber));
+            model.loadAlto({url:url},function(alto) {
+                editor.view.setAlto(alto);
+                editor.view.render();
+                progressCounter ++ ;
+                if (progressCounter == 2) doneLoading();
+            });
+
         });
 
         function doneLoading() {

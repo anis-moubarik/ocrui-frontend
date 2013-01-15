@@ -2,7 +2,7 @@ define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
-        render: function(options) {
+        render: function() {
             this.$el.html("<div>empty</div>");
         }
     });
@@ -11,8 +11,8 @@ define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
         initialize: function () {
             events.on('cursorToCoordinate',function(data) {
 
-                if (renderOptions.alto) {
-                    var index = renderOptions.alto.getWordAt(data.x,data.y)
+                if (this.alto) {
+                    var index = this.alto.getWordAt(data.x,data.y)
                     editor.view.moveCursorToWord(index);    
                 }
 
@@ -76,11 +76,13 @@ define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
             word = this.alto.getNthWord(wordIndex);
             events.trigger('changeCoordinates',word);
         },
-        render: function(options) {
-            var s = options.alto.getString();
+        setAlto: function(alto) {
+            this.alto = alto;
+        },
+        render: function() {
+            var s = this.alto.getString();
             var that = this;
-            this.alto = options.alto;
-            if (options.alto.get('status') == 'success') {
+            if (this.alto.get('status') == 'success') {
                 var element = this.$el.get(0);
                 this.cMirror = CodeMirror(element, {
                     value: s,
@@ -95,7 +97,7 @@ define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
                 });
             } else {
             
-                var $e = $('<div> ' + alto.get('status') + '. </div>');
+                var $e = $('<div> ' + this.alto.get('status') + '. </div>');
                 $e.css('width','100%');
                 $e.css('height','100%');
                 this.$el.html($e);
