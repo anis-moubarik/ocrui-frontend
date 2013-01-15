@@ -62,10 +62,10 @@ define(['events','backbone'],function (events) {
 
                 //Draw semi transparent highlight box. won't work. BUG?
 
-                var x = options.highlight.hpos * this.hRatio;
-                var y = options.highlight.vpos * this.vRatio;
-                var w = options.highlight.width * this.hRatio;
-                var h = options.highlight.height * this.vRatio;
+                var x = Math.round(options.highlight.hpos * this.hRatio);
+                var y = Math.round(options.highlight.vpos * this.vRatio);
+                var w = Math.round(options.highlight.width * this.hRatio);
+                var h = Math.round(options.highlight.height * this.vRatio);
 
                 // Start with what is already there.
                 var imgd = ctx.getImageData(x,y,w,h);
@@ -73,9 +73,17 @@ define(['events','backbone'],function (events) {
 
                 // Loop over each pixel and set rgba
                 for (var i = 0; n = pix.length, i < n; i += 4) {
-                    pix[i  ] = (pix[i  ] + 244) / 2; // red
-                    pix[i+1] = (pix[i+1] + 233) / 2; // green
-                    pix[i+2] = (pix[i+2] + 111) / 2; // blue
+                    var ix = Math.floor(i / 4) % w;
+                    var iy = Math.floor(i / 4 / w);
+                    if ((ix == 0) || (ix == w-1) || (iy == 0) || (iy == h-1)) {
+                        pix[i  ] = (pix[i  ] + 144) / 2; // red
+                        pix[i+1] = (pix[i+1] + 133) / 2; // green
+                        pix[i+2] = (pix[i+2] +  88) / 2; // blue
+                    } else {
+                        pix[i  ] = (pix[i  ] + 244) / 2; // red
+                        pix[i+1] = (pix[i+1] + 233) / 2; // green
+                        pix[i+2] = (pix[i+2] + 111) / 2; // blue
+                    }
                 }
 
                 ctx.putImageData(imgd,x,y);
