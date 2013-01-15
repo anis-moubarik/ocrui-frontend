@@ -22,7 +22,7 @@ define(['events','backbone'],function (events) {
 
         initialize: function() {
             events.on('changeCoordinates',function(data) {
-
+                //BUG
                 renderOptions.highlight = data;
                 facsimile.view.render(renderOptions);
 
