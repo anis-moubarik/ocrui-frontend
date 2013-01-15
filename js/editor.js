@@ -7,6 +7,17 @@ define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
         }
     });
     View = Backbone.View.extend({
+
+        initialize: function () {
+            events.on('cursorToCoordinate',function(data) {
+
+                if (renderOptions.alto) {
+                    var index = renderOptions.alto.getWordAt(data.x,data.y)
+                    editor.view.moveCursorToWord(index);    
+                }
+
+            });
+        },
         el: '#editor',
         moveCursorToWord: function(wordIndex) {
             var content = this.cMirror.getValue();

@@ -70,22 +70,6 @@ define(['events','model','backbone','facsimile','editor'],function (events,model
         }
     });
 
-    events.on('cursorToCoordinate',function(data) {
-
-        if (renderOptions.alto) {
-            var index = renderOptions.alto.getWordAt(data.x,data.y)
-            editor.view.moveCursorToWord(index);    
-        }
-
-    });
-
-    events.on('changeCoordinates',function(data) {
-
-        renderOptions.highlight = data;
-        facsimile.view.render(renderOptions);
-
-    });
-
     return {
         empty:empty,
         doc:doc,

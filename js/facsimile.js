@@ -20,6 +20,14 @@ define(['events','backbone'],function (events) {
 
     View = Backbone.View.extend({
 
+        initialize: function() {
+            events.on('changeCoordinates',function(data) {
+
+                renderOptions.highlight = data;
+                facsimile.view.render(renderOptions);
+
+            });
+        },
         el: '#facsimile',
         events: {
             'click #facsimile-canvas': 'propagateClick'
