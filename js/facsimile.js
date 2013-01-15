@@ -103,6 +103,10 @@ define(['events','backbone'],function (events) {
                 ctx.putImageData(imgd,x,y);
 
             }
+
+            // Call the geometry handler:
+            // TODO: get rid of this. handle geometry otherwise
+            $(window).resize();
         }
     });
 

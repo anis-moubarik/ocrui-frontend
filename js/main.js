@@ -31,7 +31,8 @@ require(
         "editor",
         "vkeyboard",
         "router",
-    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router) {
+        "geometry",
+    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry) {
         $(function() {
             $.get('templates.html',function(html) {
                 $templates = $(html);
@@ -42,21 +43,9 @@ require(
                     Backbone.history.start();
 
                     // keep element sizes ok, when window size changes
-                    $(window).resize(function (ev) {
-                        var topHeight = $('#toolbar').outerHeight();
-                        var bottomHeight = $('#vkeyboard').outerHeight();
-                        var wHeight = $(window).innerHeight();
-                        var availableH = wHeight - topHeight - bottomHeight;
-                        $('#editor').height(availableH);
-                        $('#facsimile').height(availableH);
-                        var facsimileWidth = $('#facsimile').innerWidth();
-                        var canvasSize = _.max([facsimileWidth,availableH]);
-                        $('#facsimile-canvas').height(canvasSize);
-                        $('#facsimile-canvas').width(canvasSize);
+                    $(window).resize(geometry.resizeHandler);
 
-                    });
                     $(window).resize();
-
                 });
             });
         });
