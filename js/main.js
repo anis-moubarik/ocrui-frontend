@@ -10,7 +10,7 @@ require.config({
         "jquery-ui": "../lib/jquery-ui.min",
         "backbone": "../lib/backbone-min",
         "jsdiff": "../lib/jsdiff",
-        "underscore.string": "../lib/aganov-underscore-strings-edba03c/vendor/underscore",
+        "spin": "../lib/spin",
     },
     'shim': {
         'backbone': {deps:['jquery','underscore']},
@@ -32,13 +32,14 @@ require(
         "vkeyboard",
         "router",
         "geometry",
-    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry) {
+        "spin",
+        "spinner"
+    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner) {
         $(function() {
             $.get('templates.html',function(html) {
                 $templates = $(html);
                 $(document).ready(function() {
 
-                    toolbar.view.render();
                     vkeyboard.view.render();
                     Backbone.history.start();
 

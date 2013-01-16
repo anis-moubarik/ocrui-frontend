@@ -6,10 +6,13 @@
             <a href="{{target}}"> {{name}} </a>
         </li>
     {{/buttons}}
+    {{#displayPageSelector}}
         <li>
             <button id="page-previous"> &lt; </button>
-            <input type="text" class="span1" id="page-number" />
+            <input type="text" class="span1" id="page-number"
+                value="{{pageNumber}}"/>
             <button id="page-next"> &gt;</button>
         </li>
+    {{/displayPageSelector}}
     </ul>
 </div>

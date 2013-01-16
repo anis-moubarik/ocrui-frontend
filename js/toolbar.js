@@ -1,6 +1,9 @@
 define(['mustache','backbone'],function (mustache) {
 
     var View = Backbone.View.extend({
+        initialize: function() {
+            this.options = {};
+        },
         el: '#toolbar',
         events: {
             'click #page-next': 'pageNext',
@@ -16,26 +19,37 @@ define(['mustache','backbone'],function (mustache) {
         pageNumber : function (ev) {
             this.boundedSetPage(this.getPageNumber());
         },
-        getPageNumber : function (number) {
+        getPageNumber : function () {
             var s = $('#page-number').attr('value');
             var i = parseInt(s);
-            if (isNaN(i)) return 0;
+            if (isNaN(i)) return 1;
             return i
         },
         setPageNumber : function (number) {
-            $('#page-number').attr('value',number);
+                require('router').gotoPage(number);
         },
         boundedSetPage : function(number) {
-            if (number < this.min) number = this.min;
-            if (number > this.max) number = this.max;
+            if (number < this.options.minPage) number = this.options.minPage;
+            if (number > this.options.maxPage) number = this.options.maxPage;
             this.setPageNumber(number);
         },
         setPageNumberBounds : function (min,max) {
-            this.min = min;
-            this.max = max;
+            this.options.minPage = min;
+            this.options.maxPage = max;
+            var pageNumber = this.getPageNumber();
+            if ((pageNumber < this.options.minPage) ||
+                (pageNumber > this.options.maxPage)) {
+                this.boundedSetPage(pageNumber);
+            }
+        },
+        setOptions : function(options) {
+            this.options = options;
         },
         render: function(options) {
-            context = {
+            var context = {
+
+                displayPageSelector: this.options.displayPageSelector,
+                pageNumber: this.options.pageNumber,
                 buttons: [
                         {name:'home',active:false,target:'#'},
                         {name:'item',active:true,target:'#item'},

@@ -112,6 +112,7 @@ define(['backbone'],function () {
         },
         getNthWord: function(index) {
             var dom =  $(this.data).find('String').get(index);
+            if (dom == undefined) return undefined;
             return {
                 content: dom.getAttribute('CONTENT'),
                 hpos: dom.getAttribute('HPOS'),
@@ -161,32 +162,33 @@ define(['backbone'],function () {
     var altos = {};
 
     function loadDocument(options,callback) {
-        if (options.id in documents) {
+        if (options.url in documents) {
             callback(documents[options.id]);
         } else {
             var doc = new DocumentModel(options);
-            doc.fetch(callback);
             documents[options.id] = doc;
+            doc.fetch(callback);
         }
     }
 
     function loadAlto(options,callback) {
-        if (options.id in altos) {
+        if (options.url in altos) {
             callback(altos[options.id]);
         } else {
             var alto = new AltoModel(options);
-            alto.fetch(callback);
             altos[options.id] = alto;
+            alto.fetch(callback);
         }
     }
 
     function loadImage(options,callback) {
-        if (options.id in images) {
+        console.log(JSON.stringify(options));
+        if (options.url in images) {
             callback(images[options.id]);
         } else {
             var image = new ImageModel(options);
-            image.fetch(callback);
             images[options.id] = image;
+            image.fetch(callback);
         }
     }
 

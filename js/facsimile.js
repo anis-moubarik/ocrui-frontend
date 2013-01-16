@@ -1,4 +1,4 @@
-define(['events','backbone'],function (events) {
+define(['spinner','events','backbone'],function (spinner,events) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -22,6 +22,7 @@ define(['events','backbone'],function (events) {
 
         initialize: function() {
             var that = this;
+            this.spinner = spinner.createSpinner();
             events.on('changeCoordinates',function(data) {
                 //BUG
                 that.setHighlight(data);
@@ -33,6 +34,7 @@ define(['events','backbone'],function (events) {
         events: {
             'click #facsimile-canvas': 'propagateClick'
         },
+
         propagateClick: function(ev) {
             var offset = $('#facsimile-canvas').offset();
             var coords = this.canvasCoordsToImageCoords({
@@ -59,7 +61,12 @@ define(['events','backbone'],function (events) {
         setHighlight: function(highlight) {
             this.highlight = highlight;
         },
+        showSpinner : function() {
+            // TODO: dim canvas
+            this.spinner.spin(this.$el.get(0));
+        },
         render: function() {
+            this.spinner.stop();
             var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>')
             $canvas.attr('width',500);
             $canvas.attr('height',500);
@@ -109,6 +116,7 @@ define(['events','backbone'],function (events) {
             $(window).resize();
         }
     });
+
 
     return {
         view: new View(),

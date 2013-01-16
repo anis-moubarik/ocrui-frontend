@@ -1,4 +1,4 @@
-define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
+define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,events,jsdiff) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -9,6 +9,13 @@ define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
     View = Backbone.View.extend({
 
         initialize: function () {
+            this.spinner = spinner.createSpinner();
+            var element = this.$el.get(0);
+            this.cMirror = CodeMirror(element, {
+                value: "",
+                lineWrapping: true,
+                mode: 'html'
+            });
             events.on('cursorToCoordinate',function(data) {
 
                 if (this.alto) {
@@ -79,16 +86,16 @@ define(['events','jsdiff','codemirror','backbone'],function (events,jsdiff) {
         setAlto: function(alto) {
             this.alto = alto;
         },
+        showSpinner : function() {
+            // TODO: dim canvas
+            this.spinner.spin(this.$el.get(0));
+        },
         render: function() {
+            this.spinner.stop();
             var s = this.alto.getString();
+            this.cMirror.setValue(s);
             var that = this;
             if (this.alto.get('status') == 'success') {
-                var element = this.$el.get(0);
-                this.cMirror = CodeMirror(element, {
-                    value: s,
-                    lineWrapping: true,
-                    mode: 'html'
-                });
                 this.cMirror.on('cursorActivity',function (instance) {
                     that.cursorActivity(instance);
                 });
