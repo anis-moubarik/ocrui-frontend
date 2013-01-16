@@ -26,7 +26,9 @@ define(['spinner','events','backbone'],function (spinner,events) {
             events.on('changeCoordinates',function(data) {
                 //BUG
                 that.setHighlight(data);
-                that.render();
+                if (that.image != undefined) {
+                    that.render();
+                }
 
             });
         },
@@ -39,13 +41,9 @@ define(['spinner','events','backbone'],function (spinner,events) {
         horizontalPixels : 500,
         verticalPixels : 500,
         propagateClick: function(ev) {
-            var canvasCoords = this.onWindowCoordsToCanvasCoords({
-                x:ev.pageX,
-                y:ev.pageY
-            });
+            var canvasCoords = this.onWindowCoordsToCanvasCoords(
+                { x:ev.pageX, y:ev.pageY });
             var imageCoords = this.canvasCoordsToImageCoords(canvasCoords);
-            console.log(JSON.stringify(canvasCoords));
-            console.log(JSON.stringify(imageCoords));
             events.trigger('cursorToCoordinate',imageCoords);
         },
         onWindowCoordsToCanvasCoords: function(coords) {
@@ -78,8 +76,8 @@ define(['spinner','events','backbone'],function (spinner,events) {
         },
         setImage: function(image) {
             this.image = image;
-            this.imageHRatio = this.horizontalPixels / this.image.width;
-            this.imageVRatio = this.verticalPixels / this.image.height;
+            this.imageHRatio = this.horizontalPixels;
+            this.imageVRatio = this.verticalPixels;
         },
         setHighlight: function(highlight) {
             // highlight is stored in image coordinates
@@ -90,10 +88,11 @@ define(['spinner','events','backbone'],function (spinner,events) {
             this.spinner.spin(this.$el.get(0));
         },
         setWindowScaling : function() {
-            onScreenWidth = this.$el.innerWidth();
-            onScreenHeight = this.$el.innerHeight();
-            this.windowHRatio = onScreenWidth / this.horizontalPixels;
-            this.windowVRatio = onScreenHeight / this.verticalPixels;
+            var onScreenWidth = this.$el.innerWidth();
+            var onScreenHeight = this.$el.innerHeight();
+            var onScreenCanvasSize = _.max([onScreenWidth,onScreenHeight]);
+            this.windowHRatio = onScreenCanvasSize / this.horizontalPixels;
+            this.windowVRatio = onScreenCanvasSize / this.verticalPixels;
         },
         renderHighlight : function(ctx,hl) {
             if (!hl) { return; }
@@ -103,9 +102,12 @@ define(['spinner','events','backbone'],function (spinner,events) {
             var rect = this.imageRectangleToCanvasRectangle(hl);
 
             // Start with what is already there.
-            var imgd = ctx.getImageData(rect.hpos,rect.vpos,rect.width,rect.height);
-            console.log(JSON.stringify(hl))
-            console.log(JSON.stringify(rect))
+            try {
+                var imgd = ctx.getImageData(rect.hpos,rect.vpos,rect.width,rect.height);
+            } catch (err) {
+                console.log(err);
+                return;
+            }
             var pix = imgd.data;
 
             // Loop over each pixel and set rgba
@@ -126,7 +128,7 @@ define(['spinner','events','backbone'],function (spinner,events) {
 
             ctx.putImageData(imgd,rect.hpos,rect.vpos);
         },
-        render: function(extradebug) {
+        render: function() {
             this.spinner.stop();
             var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>')
             $canvas.attr('width',this.horizontalPixels);
@@ -141,15 +143,12 @@ define(['spinner','events','backbone'],function (spinner,events) {
                         this.horizontalPixels,this.verticalPixels);
             } catch (err) {
                 console.log(err);
+                throw "";
             }
 
             $canvas.resize(); // trigger to get initial scaling
 
             this.renderHighlight(ctx,this.highlight);
-            for (var i in extradebug) {
-                this.renderHighlight(ctx,extradebug[i]);
-            }
-
 
             // Call the geometry handler:
             // TODO: get rid of this. handle geometry otherwise

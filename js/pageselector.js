@@ -63,8 +63,7 @@ define(['toolbar','mustache','backbone'],function (toolbar,mustache) {
     });
 
     return {
-        view: undefined,
-        View: View,
+        view: new View(),
     }
 
 });

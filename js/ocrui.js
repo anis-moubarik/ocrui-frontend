@@ -30,7 +30,6 @@ define(['pageselector','events','alto','mets','image','facsimile','editor','tool
         pageselector.view.render();
         editor.view.showSpinner();
         facsimile.view.showSpinner();
-        var extra;
         mets.load({id:id},function(_doc) {
 
             var progressCounter = 0;
@@ -51,11 +50,6 @@ define(['pageselector','events','alto','mets','image','facsimile','editor','tool
             alto.load({url:url},function(alto) {
                 editor.view.setAlto(alto);
                 editor.view.render();
-                extra = alto.getWords();
-                extra.push({hpos:1,vpos:1,width:200,height:200});
-                extra.push({hpos:2000,vpos:1,width:200,height:200});
-                extra.push({hpos:1,vpos:2000,width:200,height:200});
-                extra.push({hpos:2000,vpos:2000,width:200,height:200});
                 progressCounter ++ ;
                 if (progressCounter == 2) doneLoading();
             });
@@ -63,7 +57,7 @@ define(['pageselector','events','alto','mets','image','facsimile','editor','tool
         });
 
         function doneLoading() {
-            facsimile.view.render(extra);
+            facsimile.view.render();
             $(window).resize();
         }
 

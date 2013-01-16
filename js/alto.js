@@ -6,40 +6,41 @@ define(['backbone'],function () {
         initialize: function (options) {
             this.url = options.url;
         },
+        dom2Word: function(dom) {
+            return {
+                content: dom.getAttribute('CONTENT'),
+                hpos: parseInt(dom.getAttribute('HPOS'))/this.get('width'),
+                vpos: parseInt(dom.getAttribute('VPOS'))/this.get('height'),
+                width: parseInt(dom.getAttribute('WIDTH'))/this.get('width'),
+                height: parseInt(dom.getAttribute('HEIGHT'))/this.get('height'),
+            }
+        },
         getWords: function() {
 
+            var that = this;
             var words = $(this.data).find('String').map(function(i) {
-                return {
-                    hpos : parseInt(this.getAttribute('HPOS')),
-                    vpos : parseInt(this.getAttribute('VPOS')),
-                    width : parseInt(this.getAttribute('WIDTH')),
-                    height : parseInt(this.getAttribute('HEIGHT')),
-                    content : this.getAttribute('CONTENT'),
-                }
-                
+                return that.dom2Word(this);
             }).get();
             return words;
 
         },
-        getWordAt: function(x,y) {
+        getWordIndexAt: function(x,y) {
             var selection = undefined;
-            x = Math.round(x);
-            y = Math.round(y);
+            x = x;
+            y = y;
 
             var minDistance = undefined;
             var minDistanceIndex = undefined;
+            var that=this;
             // find bounding box under or closest to the cursor.
             $(this.data).find('String').each(function(i) {
 
-                var hpos = parseInt(this.getAttribute('HPOS'));
-                var vpos = parseInt(this.getAttribute('VPOS'));
-                var width = parseInt(this.getAttribute('WIDTH'));
-                var height = parseInt(this.getAttribute('HEIGHT'));
+                var word = that.dom2Word(this);
 
                 function tryToSetClosestCorner(cornerX,cornerY) {
                     var distance = Math.sqrt(
-                        (cornerX - x) ^ 2 +
-                        (cornerY - y) ^ 2 
+                        Math.pow((cornerX - x), 2) +
+                        Math.pow((cornerY - y), 2)
                     );
                     if ((minDistance == undefined) || (distance < minDistance))
                     {
@@ -47,16 +48,14 @@ define(['backbone'],function () {
                         minDistanceIndex = i;
                     }
                 };
-                tryToSetClosestCorner(hpos,vpos);
-                tryToSetClosestCorner(hpos+width,vpos);
-                tryToSetClosestCorner(hpos,vpos+height);
-                tryToSetClosestCorner(hpos+width,vpos+height);
+                tryToSetClosestCorner(word.hpos,word.vpos);
+                tryToSetClosestCorner(word.hpos+word.width,word.vpos);
+                tryToSetClosestCorner(word.hpos,word.vpos+word.height);
+                tryToSetClosestCorner(word.hpos+word.width,word.vpos+word.height);
 
-                if ((x >= hpos) && (x <= hpos + width) &&
-                    (y >= vpos) && (y <= vpos + height)) {
+                if ((x >= word.hpos) && (x <= word.hpos + word.width) &&
+                    (y >= word.vpos) && (y <= word.vpos + word.height)) {
 
-                    var content = this.getAttribute('CONTENT');
-                    console.log(hpos,vpos,width,height,content);
                     selection = i;
                     return false;
 
@@ -66,19 +65,12 @@ define(['backbone'],function () {
             if (selection == undefined) {
                 selection = minDistanceIndex;
             }
-            console.log(selection);
             return selection;
         },
         getNthWord: function(index) {
             var dom =  $(this.data).find('String').get(index);
             if (dom == undefined) return undefined;
-            return {
-                content: dom.getAttribute('CONTENT'),
-                hpos: dom.getAttribute('HPOS'),
-                vpos: dom.getAttribute('VPOS'),
-                width: dom.getAttribute('WIDTH'),
-                height: dom.getAttribute('HEIGHT'),
-            }
+            return this.dom2Word(dom);
         },
         getStringSequence: function() {
             xx = [];
@@ -90,10 +82,14 @@ define(['backbone'],function () {
         getString: function() {
             return this.getStringSequence().join(' ');
         },
+
         fetch: function (callback) {
             var that = this;
             var jqxhr = $.ajax(this.url).always(function(data,textStatus) {
-                    that.data = data,
+                    that.data = data;
+                    var page = $(data).find('Page').get(0);
+                    that.set('width',page.getAttribute("WIDTH"));
+                    that.set('height',page.getAttribute("HEIGHT"));
                     that.set('status',textStatus);
                     callback(that);
                 });

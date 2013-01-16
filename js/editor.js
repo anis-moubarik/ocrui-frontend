@@ -11,6 +11,7 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
         initialize: function () {
             this.spinner = spinner.createSpinner();
             var element = this.$el.get(0);
+            var that = this;
             this.cMirror = CodeMirror(element, {
                 value: "",
                 lineWrapping: true,
@@ -18,9 +19,9 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
             });
             events.on('cursorToCoordinate',function(data) {
 
-                if (this.alto) {
-                    var index = this.alto.getWordAt(data.x,data.y)
-                    editor.view.moveCursorToWord(index);    
+                if (that.alto) {
+                    var index = that.alto.getWordIndexAt(data.x,data.y)
+                    that.moveCursorToWord(index);    
                 }
 
             });
@@ -48,7 +49,7 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
                 ch ++;
             }
             this.cMirror.setCursor(line,ch);
-            this.$el.find('.CodeMirror').focus();
+            this.$el.find('.CodeMirror textarea').focus();
         },
         changed: function (instance) {
             var content = instance.getValue().split(/\s+/);
@@ -109,6 +110,7 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
                 $e.css('height','100%');
                 this.$el.html($e);
             }
+            events.trigger('changeCoordinates',this.alto.getNthWord(0));
         }
     });
 

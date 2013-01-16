@@ -42,8 +42,6 @@ require(
                 $(document).ready(function() {
 
                     vkeyboard.view.render();
-                    toolbar.view.render();
-                    pageselector.view = new pageselector.View();
                     Backbone.history.start();
 
                     // keep element sizes ok, when window size changes
