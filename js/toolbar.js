@@ -1,55 +1,28 @@
 define(['mustache','backbone'],function (mustache) {
 
-    var View = Backbone.View.extend({
-        initialize: function() {
-            this.options = {};
-        },
-        el: '#toolbar',
-        events: {
-            'click #page-next': 'pageNext',
-            'click #page-previous': 'pagePrevious',
-            'change #page-number': 'pageNumber',
-        },
-        pageNext : function (ev) {
-            this.boundedSetPage(this.getPageNumber() + 1);
-        },
-        pagePrevious : function (ev) {
-            this.boundedSetPage(this.getPageNumber() - 1);
-        },
-        pageNumber : function (ev) {
-            this.boundedSetPage(this.getPageNumber());
-        },
-        getPageNumber : function () {
-            var s = $('#page-number').attr('value');
-            var i = parseInt(s);
-            if (isNaN(i)) return 1;
-            return i
-        },
-        setPageNumber : function (number) {
-                require('router').gotoPage(number);
-        },
-        boundedSetPage : function(number) {
-            if (number < this.options.minPage) number = this.options.minPage;
-            if (number > this.options.maxPage) number = this.options.maxPage;
-            this.setPageNumber(number);
-        },
-        setPageNumberBounds : function (min,max) {
-            this.options.minPage = min;
-            this.options.maxPage = max;
-            var pageNumber = this.getPageNumber();
-            if ((pageNumber < this.options.minPage) ||
-                (pageNumber > this.options.maxPage)) {
-                this.boundedSetPage(pageNumber);
-            }
-        },
-        setOptions : function(options) {
-            this.options = options;
-        },
-        render: function(options) {
-            var context = {
+    // handle keyboard shortcuts also
 
-                displayPageSelector: this.options.displayPageSelector,
-                pageNumber: this.options.pageNumber,
+    var keyboardShortcuts = {};
+
+    function registerKeyboardShortcut(which,callback) {
+        if (which in keyboardShortcuts) {
+            throw "Trying to reregister shortcut for " + which;
+        }
+        keyboardShortcuts [which] = callback;
+    };
+
+    $('body').on('keydown',function(ev) {
+        var callback = keyboardShortcuts[ev.which];
+        if (callback) {
+            callback();
+        }
+    });
+
+    // toolbar view
+    var View = Backbone.View.extend({
+        el: '#toolbar',
+        render: function() {
+            var context = {
                 buttons: [
                         {name:'item',active:true,target:'#item'},
                         {name:'item/1',active:false,target:'#item/0001'},
@@ -60,8 +33,10 @@ define(['mustache','backbone'],function (mustache) {
         }
     });
 
+
     return {
         view: new View(),
+        registerKeyboardShortcut : registerKeyboardShortcut,
     }
 
 });

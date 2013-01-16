@@ -74,10 +74,10 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
                     inMiddleOfWord = true;
                 }
                 if (line == 0) {
-                    ch --;
                     if (ch == 0) {
                         break;
                     }
+                    ch --;
                 }
             }
             word = this.alto.getNthWord(wordIndex);

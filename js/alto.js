@@ -1,71 +1,30 @@
 define(['backbone'],function () {
 
 
-    DocumentModel = Backbone.Model.extend({
-        initialize: function (options) {
-            this.id = options.id;
-            this.urlBase = 'items/'+this.id;
-        },
-        pageInfo: [],
-        getNumberOfPages : function () {
-            return this.pageInfo.length;
-        },
-        getImageUrl : function (pageNumber) {
-            var page = this.pageInfo[pageNumber];
-            if (page == undefined) return undefined;
-            return this.urlBase + '/' + page[0];
-        },
-        getAltoUrl : function (pageNumber) {
-            var page = this.pageInfo[pageNumber];
-            if (page == undefined) return undefined;
-            return this.urlBase + '/' + page[1];
-        },
-        parsePageInfo : function (data) {
-
-            var that = this;
-
-            // loop through image files
-            $(data).find('fileGrp[ID="IMGGRP"] file').each(function() {
-                var seq = parseInt(this.getAttribute('SEQ'));
-                var element = $(this).find('FLocat').get(0)
-                var imageFilename = element.getAttribute('xlink:href');
-                imageFilename = imageFilename.replace(/^file:\/\//,'').replace(/.\//,'');
-                that.pageInfo[seq] = [imageFilename,undefined];
-            });
-
-            // loop through alto files
-            $(data).find('fileGrp[ID="ALTOGRP"] file').each(function() {
-                var seq = parseInt(this.getAttribute('SEQ'));
-                var element = $(this).find('FLocat').get(0)
-                var altoFilename = element.getAttribute('xlink:href');
-                altoFilename = altoFilename.replace(/^file:\/\//,'').replace(/.\//,'');
-                if (that.pageInfo[seq] == undefined) {
-                    that.pageInfo[seq] = [undefined,undefined];
-                }
-                that.pageInfo[seq][1] = altoFilename;
-            });
-        },
-        fetch: function (callback) {
-            var url = this.urlBase+'/mets.xml';
-            var that = this;
-            $.get(url, function(data) {
-                that.data = data;
-                that.parsePageInfo(data);
-                that.set('status','');
-                callback(that);
-            });
-        }
-    });
 
     AltoModel = Backbone.Model.extend({
         initialize: function (options) {
             this.url = options.url;
         },
+        getWords: function() {
+
+            var words = $(this.data).find('String').map(function(i) {
+                return {
+                    hpos : parseInt(this.getAttribute('HPOS')),
+                    vpos : parseInt(this.getAttribute('VPOS')),
+                    width : parseInt(this.getAttribute('WIDTH')),
+                    height : parseInt(this.getAttribute('HEIGHT')),
+                    content : this.getAttribute('CONTENT'),
+                }
+                
+            }).get();
+            return words;
+
+        },
         getWordAt: function(x,y) {
             var selection = undefined;
             x = Math.round(x);
             y = Math.round(y);
-            console.log(x,y);
 
             var minDistance = undefined;
             var minDistanceIndex = undefined;
@@ -157,21 +116,9 @@ define(['backbone'],function () {
         }
     });
 
-    var documents = {};
-    var images = {};
     var altos = {};
 
-    function loadDocument(options,callback) {
-        if (options.id in documents) {
-            callback(documents[options.id]);
-        } else {
-            var doc = new DocumentModel(options);
-            documents[options.id] = doc;
-            doc.fetch(callback);
-        }
-    }
-
-    function loadAlto(options,callback) {
+    function load(options,callback) {
         if (options.url in altos) {
             callback(altos[options.url]);
         } else {
@@ -181,19 +128,7 @@ define(['backbone'],function () {
         }
     }
 
-    function loadImage(options,callback) {
-        if (options.url in images) {
-            callback(images[options.url]);
-        } else {
-            var image = new ImageModel(options);
-            images[options.url] = image;
-            image.fetch(callback);
-        }
-    }
-
     return {
-        loadDocument: loadDocument,
-        loadAlto: loadAlto,
-        loadImage: loadImage,
+        load: load,
     }
 });

@@ -33,14 +33,17 @@ require(
         "router",
         "geometry",
         "spin",
-        "spinner"
-    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner) {
+        "spinner",
+        "pageselector",
+    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector) {
         $(function() {
             $.get('templates.html',function(html) {
                 $templates = $(html);
                 $(document).ready(function() {
 
                     vkeyboard.view.render();
+                    toolbar.view.render();
+                    pageselector.view = new pageselector.View();
                     Backbone.history.start();
 
                     // keep element sizes ok, when window size changes

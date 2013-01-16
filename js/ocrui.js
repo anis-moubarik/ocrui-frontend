@@ -1,15 +1,12 @@
-define(['events','model','facsimile','editor','toolbar'],
-        function (events,model,facsimile,editor,toolbar) {
+define(['pageselector','events','alto','mets','image','facsimile','editor','toolbar'],
+        function (pageselector,events,alto,mets,image,facsimile,editor,toolbar) {
 
     var doc = undefined; // this is used to store mets currently being edited
 
     function route_empty() {
 
 
-        toolbar.view.setOptions({
-            displayPageSelector: false,
-        });
-        toolbar.view.render();
+        pageselector.view.hide();
         facsimile.empty.render();
         editor.empty.render();
         $(window).resize();
@@ -17,11 +14,8 @@ define(['events','model','facsimile','editor','toolbar'],
 
     function route_doc(id) {
 
-        toolbar.view.setOptions({
-            displayPageSelector: false,
-        });
-        toolbar.view.render();
-        model.loadDocument({id:id},function(_doc) {
+        pageselector.view.hide();
+        mets.load({id:id},function(_doc) {
             doc = _doc;
             facsimile.thumbnails.render();
             editor.empty.render();
@@ -32,22 +26,21 @@ define(['events','model','facsimile','editor','toolbar'],
     function route_page(id,pageNumber) {
 
         var intPageNumber = Math.floor(parseInt(pageNumber));
-        toolbar.view.setOptions({
-            displayPageSelector: true,
-            pageNumber: intPageNumber,
-        });
-        toolbar.view.render();
+        pageselector.view.options.pageNumber = intPageNumber;
+        pageselector.view.render();
         editor.view.showSpinner();
         facsimile.view.showSpinner();
-        model.loadDocument({id:id},function(_doc) {
+        var extra;
+        mets.load({id:id},function(_doc) {
 
-            var progressCounter;
+            var progressCounter = 0;
             var pages = _doc.getNumberOfPages();
-            toolbar.view.setPageNumberBounds(1,pages);
+            pageselector.view.setPageNumberBounds(1,pages);
+            pageselector.view.render();
             doc = _doc;
 
             var url = _doc.getImageUrl(intPageNumber);
-            model.loadImage({url:url},function(image) {
+            image.load({url:url},function(image) {
                 facsimile.view.setImage(image);
                 facsimile.view.render();
                 progressCounter ++ ;
@@ -55,9 +48,14 @@ define(['events','model','facsimile','editor','toolbar'],
             });
 
             var url = _doc.getAltoUrl(intPageNumber);
-            model.loadAlto({url:url},function(alto) {
+            alto.load({url:url},function(alto) {
                 editor.view.setAlto(alto);
                 editor.view.render();
+                extra = alto.getWords();
+                extra.push({hpos:1,vpos:1,width:200,height:200});
+                extra.push({hpos:2000,vpos:1,width:200,height:200});
+                extra.push({hpos:1,vpos:2000,width:200,height:200});
+                extra.push({hpos:2000,vpos:2000,width:200,height:200});
                 progressCounter ++ ;
                 if (progressCounter == 2) doneLoading();
             });
@@ -65,6 +63,7 @@ define(['events','model','facsimile','editor','toolbar'],
         });
 
         function doneLoading() {
+            facsimile.view.render(extra);
             $(window).resize();
         }
 
