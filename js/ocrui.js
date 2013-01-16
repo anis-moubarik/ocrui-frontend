@@ -37,6 +37,8 @@ define(['events','model','facsimile','editor','toolbar'],
             pageNumber: intPageNumber,
         });
         toolbar.view.render();
+        editor.view.showSpinner();
+        facsimile.view.showSpinner();
         model.loadDocument({id:id},function(_doc) {
 
             var progressCounter;
@@ -65,8 +67,6 @@ define(['events','model','facsimile','editor','toolbar'],
         function doneLoading() {
             $(window).resize();
         }
-        editor.view.showSpinner();
-        facsimile.view.showSpinner();
 
     };
 

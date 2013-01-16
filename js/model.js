@@ -162,7 +162,7 @@ define(['backbone'],function () {
     var altos = {};
 
     function loadDocument(options,callback) {
-        if (options.url in documents) {
+        if (options.id in documents) {
             callback(documents[options.id]);
         } else {
             var doc = new DocumentModel(options);
@@ -173,21 +173,20 @@ define(['backbone'],function () {
 
     function loadAlto(options,callback) {
         if (options.url in altos) {
-            callback(altos[options.id]);
+            callback(altos[options.url]);
         } else {
             var alto = new AltoModel(options);
-            altos[options.id] = alto;
+            altos[options.url] = alto;
             alto.fetch(callback);
         }
     }
 
     function loadImage(options,callback) {
-        console.log(JSON.stringify(options));
         if (options.url in images) {
-            callback(images[options.id]);
+            callback(images[options.url]);
         } else {
             var image = new ImageModel(options);
-            images[options.id] = image;
+            images[options.url] = image;
             image.fetch(callback);
         }
     }

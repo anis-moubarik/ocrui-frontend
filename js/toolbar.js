@@ -51,7 +51,6 @@ define(['mustache','backbone'],function (mustache) {
                 displayPageSelector: this.options.displayPageSelector,
                 pageNumber: this.options.pageNumber,
                 buttons: [
-                        {name:'home',active:false,target:'#'},
                         {name:'item',active:true,target:'#item'},
                         {name:'item/1',active:false,target:'#item/0001'},
                     ],

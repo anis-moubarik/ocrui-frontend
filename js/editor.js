@@ -54,7 +54,7 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
             var content = instance.getValue().split(/\s+/);
             var original = this.alto.getStringSequence();
             var out = jsdiff.diff(original,content);
-            console.log(out);
+            //console.log(out);
 
         },
         cursorActivity: function (instance) {

@@ -8,10 +8,12 @@
     {{/buttons}}
     {{#displayPageSelector}}
         <li>
-            <button id="page-previous"> &lt; </button>
-            <input type="text" class="span1" id="page-number"
-                value="{{pageNumber}}"/>
-            <button id="page-next"> &gt;</button>
+            <div class="form-horizontal btn-group input-prepend input-append">
+                    <button class="btn" id="page-previous"> &lt; </button>
+                    <input type="text" class="span1" id="page-number"
+                        value="{{pageNumber}}"/>
+                    <button class="btn" id="page-next"> &gt;</button>
+            </div>
         </li>
     {{/displayPageSelector}}
     </ul>

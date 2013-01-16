@@ -6,6 +6,7 @@ define([], function() {
         var wHeight = $(window).innerHeight();
         var availableH = wHeight - topHeight - bottomHeight;
         $('#editor').height(availableH);
+        $('.CodeMirror').height(availableH-10); // TODO: what is -10
         $('#facsimile').height(availableH);
         var facsimileWidth = $('#facsimile').innerWidth();
         var canvasSize = _.max([facsimileWidth,availableH]);
