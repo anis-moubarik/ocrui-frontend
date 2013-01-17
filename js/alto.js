@@ -1,6 +1,4 @@
-define(['backbone'],function () {
-
-
+define(['diffmethod','backbone'],function (diffmethod) {
 
     AltoModel = Backbone.Model.extend({
         initialize: function (options) {
@@ -18,7 +16,7 @@ define(['backbone'],function () {
         getWords: function() {
 
             var that = this;
-            var words = $(this.data).find('String').map(function(i) {
+            var words = $(this.currentData).find('String').map(function(i) {
                 return that.dom2Word(this);
             }).get();
             return words;
@@ -33,7 +31,7 @@ define(['backbone'],function () {
             var minDistanceIndex = undefined;
             var that=this;
             // find bounding box under or closest to the cursor.
-            $(this.data).find('String').each(function(i) {
+            $(this.currentData).find('String').each(function(i) {
 
                 var word = that.dom2Word(this);
 
@@ -67,48 +65,44 @@ define(['backbone'],function () {
             }
             return selection;
         },
+        updateAlto: function (content) {
+
+            // create new Alto based on string in content and
+            // original alto structure
+            if (this.originalData == undefined) return;
+            if (words) return;
+            var words = content.split(/\s+/);
+            this.currentData = diffmethod.createAlto( this.originalData,words );
+
+        },
+
         getNthWord: function(index) {
-            var dom =  $(this.data).find('String').get(index);
+            var dom =  $(this.currentData).find('String').get(index);
             if (dom == undefined) return undefined;
             return this.dom2Word(dom);
         },
-        getStringSequence: function() {
-            xx = [];
-            return $(this.data).find('String').map(
-                function() {xx.push(this);return this.getAttribute('CONTENT');}
+        getStringSequence: function(dom) {
+            if (dom == undefined) dom = this.currentData;
+            return $(dom).find('String').map(
+                function() { return this.getAttribute('CONTENT'); }
             ).get();
         },
 
-        getString: function() {
-            return this.getStringSequence().join(' ');
+        getString: function(dom) {
+            return this.getStringSequence(dom).join(' ');
         },
 
         fetch: function (callback) {
             var that = this;
             var jqxhr = $.ajax(this.url).always(function(data,textStatus) {
-                    that.data = data;
-                    var page = $(data).find('Page').get(0);
-                    that.set('width',page.getAttribute("WIDTH"));
-                    that.set('height',page.getAttribute("HEIGHT"));
-                    that.set('status',textStatus);
-                    callback(that);
-                });
-        }
-    });
-
-    ImageModel = Backbone.Model.extend({
-        initialize: function (options) {
-            this.url = options.url;
-        },
-        fetch: function (callback) {
-            var that = this;
-            this.image = new Image();
-            this.image.src = this.url;
-            this.image.onload = function() { 
-                that.width = this.width;
-                that.height = this.height;
+                that.currentData = data;
+                that.originalData = data; // BUG! figure out how this goes
+                var page = $(data).find('Page').get(0);
+                that.set('width',page.getAttribute("WIDTH"));
+                that.set('height',page.getAttribute("HEIGHT"));
+                that.set('status',textStatus);
                 callback(that);
-            };
+            });
         }
     });
 

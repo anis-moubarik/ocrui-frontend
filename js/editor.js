@@ -1,4 +1,4 @@
-define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,events,jsdiff) {
+define(['spinner','events','codemirror','backbone'],function (spinner,events) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -10,9 +10,9 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
 
         initialize: function () {
             this.spinner = spinner.createSpinner();
-            var element = this.$el.get(0);
+            this.wordUnderCursor = {};
             var that = this;
-            this.cMirror = CodeMirror(element, {
+            this.cMirror = CodeMirror(this.$el.get(0), {
                 value: "",
                 lineWrapping: true,
                 mode: 'html'
@@ -55,11 +55,8 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
             this.$el.find('.CodeMirror textarea').focus();
         },
         changed: function (instance) {
-            var content = instance.getValue().split(/\s+/);
-            var original = this.alto.getStringSequence();
-            var out = jsdiff.diff(original,content);
-            //console.log(out);
-
+            var content = instance.getValue();
+            this.alto.updateAlto(content);
         },
         cursorActivity: function (instance) {
             var content = instance.getValue();
@@ -84,8 +81,16 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
                     ch --;
                 }
             }
-            word = this.alto.getNthWord(wordIndex);
-            events.trigger('changeCoordinates',word);
+            var word = this.alto.getNthWord(wordIndex) || {};
+            if (
+                (word.hpos != this.wordUnderCursor.hpos) ||
+                (word.vpos != this.wordUnderCursor.vpos) ||
+                (word.width != this.wordUnderCursor.width) ||
+                (word.height != this.wordUnderCursor.height)
+            ) {
+                this.wordUnderCursor = word;
+                events.trigger('changeCoordinates',word);
+            }
         },
         setAlto: function(alto) {
             this.alto = alto;
