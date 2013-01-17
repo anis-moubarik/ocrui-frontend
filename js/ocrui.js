@@ -59,6 +59,7 @@ define(['pageselector','events','alto','mets','image','facsimile','editor','tool
         function doneLoading() {
             facsimile.view.render();
             $(window).resize();
+            editor.view.setFocus();
         }
 
     };

@@ -49,6 +49,9 @@ define(['spinner','events','jsdiff','codemirror','backbone'],function (spinner,e
                 ch ++;
             }
             this.cMirror.setCursor(line,ch);
+            this.setFocus();
+        },
+        setFocus: function () {
             this.$el.find('.CodeMirror textarea').focus();
         },
         changed: function (instance) {

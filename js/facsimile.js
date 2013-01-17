@@ -122,11 +122,11 @@ define(['spinner','events','backbone'],function (spinner,events) {
                         (iy == 0) || (iy == rect.height-1)) {
                     pix[i  ] = (pix[i  ] + 144) / 2; // red
                     pix[i+1] = (pix[i+1] + 133) / 2; // green
-                    pix[i+2] = (pix[i+2] +  88) / 2; // blue
+                    pix[i+2] = (pix[i+2] +  22) / 2; // blue
                 } else {
                     pix[i  ] = (pix[i  ] + 244) / 2; // red
                     pix[i+1] = (pix[i+1] + 233) / 2; // green
-                    pix[i+2] = (pix[i+2] + 111) / 2; // blue
+                    pix[i+2] = (pix[i+2] +  55) / 2; // blue
                 }
             }
 
