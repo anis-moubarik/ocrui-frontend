@@ -97,9 +97,13 @@ define(['spinner','events','backbone'],function (spinner,events) {
         renderHighlight : function(ctx,hl) {
             if (!hl) { return; }
 
-            //Draw semi transparent highlight box. won't work. BUG?
+            //Draw semi transparent highlight box.
 
             var rect = this.imageRectangleToCanvasRectangle(hl);
+            rect.hpos = rect.hpos - 2;
+            rect.vpos = rect.vpos - 2;
+            rect.width = rect.width + 4;
+            rect.height = rect.height + 4;
 
             // Start with what is already there.
             try {
