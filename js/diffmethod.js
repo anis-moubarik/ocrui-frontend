@@ -75,17 +75,12 @@ define(['jsdiff'],function (jsdiff) {
     }
 
     function splitBoundingBoxes($$elements,bbs) {
-        console.log('split:');
-        for (var i in $$elements) {console.log($$elements[i]);}
-        console.log('-');
         var stringLengths = _.map($$elements,function(element) {
             return element.attr('CONTENT').length;
         });
         var totalLength = _.reduce(stringLengths,function(subTotal,length) {
             return subTotal + length;
         }, 0);
-        //console.log(stringLengths);
-        //console.log(totalLength);
         var combinedBB = getCombinedBoundingBox(bbs);
         var elements = $$elements.length;
         var precedingProportion = 0;
@@ -99,7 +94,6 @@ define(['jsdiff'],function (jsdiff) {
                 width : combinedBB.width * proportion,
                 height : combinedBB.height
             }
-            console.log(JSON.stringify(bb));
             precedingProportion += proportion;
             setBoundingBox($element,bb);
         }
@@ -111,7 +105,6 @@ define(['jsdiff'],function (jsdiff) {
     }
 
     ProcessingState.prototype.resetLine = function () {
-        console.log('init');
         this.wordStack = []; // stack of pending words to add
         this.$$elementStack = []; // stack of pending elements to replace
         this.$textline = undefined; // textline of pending changes
@@ -124,11 +117,8 @@ define(['jsdiff'],function (jsdiff) {
         var $nextTextline = this.$textline;
         var elementsAdded = 0;
 
-        console.log('push: ' + word);
-
         if ($string != undefined) $nextTextline = $string.parent();
 
-        console.log(word,$string);
         if ( ( this.$textline ) &&
              ($nextTextline) &&
              (this.$textline.get(0) != $nextTextline.get(0)) ) {
@@ -143,8 +133,6 @@ define(['jsdiff'],function (jsdiff) {
             this.$$elementStack.push($string);
         }
 
-        console.log('ws: ' + JSON.stringify(this.wordStack));
-        console.log('es: ' + this.$$elementStack);
         return elementsAdded;
 
     }
@@ -156,7 +144,6 @@ define(['jsdiff'],function (jsdiff) {
 
     ProcessingState.prototype.stringDone = function() {
         this.$position = this.$nextPosition;
-        console.log('position set to: ', this.$position);
         this.$textline = this.$position.parent();
 
 
@@ -168,39 +155,34 @@ define(['jsdiff'],function (jsdiff) {
         if ((this.wordStack.length == 0) && (this.$$elementStack.length == 0)) {
             return 0;
         }
-        console.log('pending');
-        //console.log(this.wordStack);
-        //console.log(this.$$elementStack);
 
         // calculate bounding boxes here as afterwards elements
         // with no bounding boxes may appear
         var boundingBoxes = _.map(this.$$elementStack,getBoundingBoxOf);
-        console.log('bb: ', boundingBoxes);
 
         // If there are no elements to replace try to add preceding and
         // subsequent elements and words.
         if (this.$$elementStack == 0) {
             // BUG: only add when these are at the same line
             if (this.$position) {
-                console.log('1');
                 this.wordStack.splice(0,0,this.$position.attr('CONTENT'));
                 this.$$elementStack.splice(0,0,this.$position);
             }
             if (this.$nextPosition) {
-                console.log('2');
                 this.wordStack.push(this.$nextPosition.attr('CONTENT'));
                 this.$$elementStack.push(this.$nextPosition);
             }
         }
 
+        var $insertPosition = this.$position;
         // add elements if they are too few
         while (this.$$elementStack.length < this.wordStack.length) {
-            console.log('position:');
-            console.log(this.$position);
             var $string = $($.parseXML('<String />')).find('String');
-            if (this.$position != undefined) {
-                this.$position.after($string);
-            } else if (this.$position != undefined) {
+            if ($insertPosition != undefined) {
+                $insertPosition.after($string);
+                $insertPosition = $insertPosition.next();
+                
+            } else if (this.$textline != undefined) {
                 // this happens, when edits occur in the beginning
                 // of a line.
                 this.$textline.prepend($string);
@@ -218,11 +200,8 @@ define(['jsdiff'],function (jsdiff) {
             elementsAdded--;
         }
 
-            console.log('--');
         for (var i = 0; i < this.$$elementStack.length; i++) {
             this.$$elementStack[i].attr('CONTENT',this.wordStack[i]);
-            console.log(this.$$elementStack[i]);
-            console.log(this.wordStack[i]);
         }
         splitBoundingBoxes (this.$$elementStack, boundingBoxes);
 
@@ -237,7 +216,6 @@ define(['jsdiff'],function (jsdiff) {
         ).get();
         var diff = jsdiff.diff(originalWords,words);
         var seq = getEditSequence(diff);
-        console.log(seq);
         var $target = $(source).find('alto').clone();
         var $strings = $target.find('String');
 
@@ -255,7 +233,6 @@ define(['jsdiff'],function (jsdiff) {
             var oldSi = si;
             processingState.prepareString($currentString);
 
-            console.log('loop: ',i,wi,si);
             if (seq[i] == 'match') {
 
                 wi ++;
@@ -280,8 +257,6 @@ define(['jsdiff'],function (jsdiff) {
 
             }
 
-            console.log('counters now: ',i,wi,si);
-
             if (si != oldSi) {
                 processingState.stringDone();
             }
@@ -290,7 +265,6 @@ define(['jsdiff'],function (jsdiff) {
 
         processingState.processPending();
 
-        console.log($target.find('TextLine'));
         return $target.get(0);
     }
 

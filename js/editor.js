@@ -57,10 +57,11 @@ define(['spinner','events','codemirror','backbone'],function (spinner,events) {
         changed: function (instance) {
             var content = instance.getValue();
             this.alto.updateAlto(content);
+            this.triggerHighlightChange();
         },
-        cursorActivity: function (instance) {
-            var content = instance.getValue();
-            var cursor = instance.getCursor();
+        triggerHighlightChange: function () {
+            var content = this.cMirror.getValue();
+            var cursor = this.cMirror.getCursor();
             var line = cursor.line;
             var ch = cursor.ch;
             var wordIndex = 0;
@@ -106,7 +107,7 @@ define(['spinner','events','codemirror','backbone'],function (spinner,events) {
             var that = this;
             if (this.alto.get('status') == 'success') {
                 this.cMirror.on('cursorActivity',function (instance) {
-                    that.cursorActivity(instance);
+                    that.triggerHighlightChange();
                 });
                 this.cMirror.on('change',function (instance) {
                     that.changed(instance);
