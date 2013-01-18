@@ -18,20 +18,19 @@ define(['jsdiff'],function (jsdiff) {
             if (_.isString(diff.n[i])) {
                 // This is either add replace
                 if (_.isString(diff.o[i])) {
-                    // replace
-                    seq.push('r');
+                    seq.push('replace');
                     oi ++;
                 } else {
-                    seq.push('a');
+                    seq.push('add');
                 }
             } else {
                 // this one corresponds to one original word
                 // but there bight be removes before this one
                 while (_.isString(diff.o[oi])) {
-                    seq.push('d');
+                    seq.push('delete');
                     oi ++;
                 }
-                seq.push('.');
+                seq.push('match');
                 oi ++;
 
             }
@@ -76,16 +75,29 @@ define(['jsdiff'],function (jsdiff) {
     }
 
     function splitBoundingBoxes($$elements,bbs) {
+        var stringLengths = _.map($$elements,function(element) {
+            return element.attr('CONTENT').length;
+        });
+        var totalLength = _.reduce(stringLengths,function(subTotal,length) {
+            return subTotal + length;
+        }, 0);
+        console.log(stringLengths);
+        console.log(totalLength);
         var combinedBB = getCombinedBoundingBox(bbs);
         var elements = $$elements.length;
+        var precedingProportion = 0;
         for (var i in $$elements) {
             var $element = $$elements[i];
+            var proportion = stringLengths[i] / totalLength;
             var bb = {
-                hpos : combinedBB.hpos + combinedBB.width / elements * i,
+                hpos : combinedBB.hpos + 
+                       Math.floor(combinedBB.width * precedingProportion),
                 vpos : combinedBB.vpos,
-                width : combinedBB.width / elements,
+                width : combinedBB.width * proportion,
                 height : combinedBB.height
             }
+            console.log(JSON.stringify(bb));
+            precedingProportion += proportion;
             setBoundingBox($element,bb);
         }
     };
@@ -102,19 +114,19 @@ define(['jsdiff'],function (jsdiff) {
 
         var wi = 0; // content word index
         for (var i = 0; i < seq.length; i++) {
-            if (seq[i] == '.') {
+            if (seq[i] == 'match') {
 
                 //match
                 wi ++;
 
-            } else if (seq[i] == 'r') {
+            } else if (seq[i] == 'replace') {
 
                 //replace
                 var $string = $strings.eq(wi);
                 $string.attr('CONTENT',words[wi]);
                 wi ++;
 
-            } else if (seq[i] == 'd') {
+            } else if (seq[i] == 'delete') {
 
                 //delete
                 var $string = $strings.eq(wi);
@@ -143,35 +155,34 @@ define(['jsdiff'],function (jsdiff) {
                 }
                 $string.remove();
 
-            } else if (seq[i] == 'a') {
+            } else if (seq[i] == 'add') {
 
                 //add
-                var $string = $('<String />');
+                var $string = $($.parseXML('<String />')).find('String');
                 $string.attr('CONTENT',words[wi]);
-                console.log('c: ' + words[wi]);
 
                 if (wi > 0) {
-                    console.log('1');
+
                     var $other = $strings.eq(wi-1);
                     var $textline = $other.parent();
-                    console.log($other);
                     $other.after($string);
                     splitBoundingBoxes([$other,$string],
                             [getBoundingBoxOf($other)]);
+
                 } else if (wi < $strings.length) {
-                    console.log('2');
+
                     var $other = $strings.eq(wi);
                     var $textline = $other.parent();
                     $other.eq(wi-1).before($string);
                     splitBoundingBoxes([$other,$string],
                             [getBoundingBoxOf($other)]);
+
                 } else {
+
                     throw "No text, cannot edit.";
+
                 }
-                    console.log($textline);
-                    console.log($target);
-                    //console.log($target.find('String'));
-                console.log($string);
+
                 wi ++;
 
             }
@@ -179,7 +190,6 @@ define(['jsdiff'],function (jsdiff) {
 
         }
 
-        //console.log($target.find('String'));
         return $target.get(0);
     }
 
@@ -267,7 +277,7 @@ define(['jsdiff'],function (jsdiff) {
             var $textline = figureOutTextLine();
             var $$lineToReplace = getLineToReplace($textline,$$deleted);
             while (len($$lineToReplace)<line) {
-                var $string = $('<String />');
+                var $string = $.parseXML('<String />');
                 addToCorrectPosition($textline,$string);
                 $$lineToReplace.push($string);
             }
