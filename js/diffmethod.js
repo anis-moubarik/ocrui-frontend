@@ -12,18 +12,22 @@ define(['jsdiff'],function (jsdiff) {
                 to the corresponding word in other sequence
         */
         var seq = [];
-        var oi = 0;
-        for ( var i = 0; i < diff.n.length; i++ ) {
+        for ( var ni = 0, oi = 0; ni < diff.n.length; ni++ ) {
 
-            if (_.isString(diff.n[i])) {
+            // looping over two sequences, ni indexes diff.n
+            // oi indexes diff.o
+            if (_.isString(diff.n[ni])) {
+
                 // This is either add replace
-                if (_.isString(diff.o[i])) {
+                if (_.isString(diff.o[oi])) {
                     seq.push('replace');
                     oi ++;
                 } else {
                     seq.push('add');
                 }
+
             } else {
+
                 // this one corresponds to one original word
                 // but there bight be removes before this one
                 while (_.isString(diff.o[oi])) {
@@ -182,7 +186,6 @@ define(['jsdiff'],function (jsdiff) {
             if ($insertPosition != undefined) {
                 $insertPosition.after($string);
                 $insertPosition = $insertPosition.next();
-                
             } else if (this.$textline != undefined) {
                 // this happens, when edits occur in the beginning
                 // of a line.
@@ -232,7 +235,7 @@ define(['jsdiff'],function (jsdiff) {
         processingState.$textline = $target.find('TextLine').first();
         for (var i = 0, wi=0, si=0; i < seq.length; i++) {
             // Iterating simultaneously three sequences
-            //  i indexes edit sequence
+            //  i indexes edit edit sequence
             // wi indexes editor words sequence
             // si indexes alto string elements
 
@@ -245,23 +248,23 @@ define(['jsdiff'],function (jsdiff) {
 
                 wi ++;
                 si ++;
-                si += processingState.processPending();
+                processingState.processPending();
 
             } else if (seq[i] == 'replace') {
 
                 si ++;
                 wi ++;
-                si += processingState.pushEdit( currentWord, $currentString);
+                processingState.pushEdit( currentWord, $currentString);
 
             } else if (seq[i] == 'delete') {
 
-                si ++; // skip the deleted elements for now.
-                si += processingState.pushEdit( undefined, $currentString);
+                si ++;
+                processingState.pushEdit( undefined, $currentString);
 
             } else if (seq[i] == 'add') {
 
                 wi ++;
-                si += processingState.pushEdit( currentWord, undefined);
+                processingState.pushEdit( currentWord, undefined);
 
             }
 
