@@ -75,14 +75,17 @@ define(['jsdiff'],function (jsdiff) {
     }
 
     function splitBoundingBoxes($$elements,bbs) {
+        console.log('split:');
+        for (var i in $$elements) {console.log($$elements[i]);}
+        console.log('-');
         var stringLengths = _.map($$elements,function(element) {
             return element.attr('CONTENT').length;
         });
         var totalLength = _.reduce(stringLengths,function(subTotal,length) {
             return subTotal + length;
         }, 0);
-        console.log(stringLengths);
-        console.log(totalLength);
+        //console.log(stringLengths);
+        //console.log(totalLength);
         var combinedBB = getCombinedBoundingBox(bbs);
         var elements = $$elements.length;
         var precedingProportion = 0;
@@ -102,6 +105,132 @@ define(['jsdiff'],function (jsdiff) {
         }
     };
 
+    function ProcessingState() {
+        this.$nextPosition = undefined; // next $position to come
+        this.resetLine();
+    }
+
+    ProcessingState.prototype.resetLine = function () {
+        console.log('init');
+        this.wordStack = []; // stack of pending words to add
+        this.$$elementStack = []; // stack of pending elements to replace
+        this.$textline = undefined; // textline of pending changes
+        this.$position = undefined; // element just before pending changes
+    };
+
+    ProcessingState.prototype.pushEdit = function(word, $string) {
+        // push edit and process earlier stack if this is a new line
+
+        var $nextTextline = this.$textline;
+        var elementsAdded = 0;
+
+        console.log('push: ' + word);
+
+        if ($string != undefined) $nextTextline = $string.parent();
+
+        console.log(word,$string);
+        if ( ( this.$textline ) &&
+             ($nextTextline) &&
+             (this.$textline.get(0) != $nextTextline.get(0)) ) {
+            elementsAdded = this.processPending();
+        }
+
+        if (word != undefined) {
+            this.wordStack.push(word);
+        }
+
+        if ($string != undefined) {
+            this.$$elementStack.push($string);
+        }
+
+        console.log('ws: ' + JSON.stringify(this.wordStack));
+        console.log('es: ' + this.$$elementStack);
+        return elementsAdded;
+
+    }
+
+    ProcessingState.prototype.prepareString = function($string) {
+        this.$nextPosition = $string;
+
+    }
+
+    ProcessingState.prototype.stringDone = function() {
+        this.$position = this.$nextPosition;
+        console.log('position set to: ', this.$position);
+        this.$textline = this.$position.parent();
+
+
+    }
+
+    ProcessingState.prototype.processPending = function() {
+
+        var elementsAdded = 0;
+        if ((this.wordStack.length == 0) && (this.$$elementStack.length == 0)) {
+            return 0;
+        }
+        console.log('pending');
+        //console.log(this.wordStack);
+        //console.log(this.$$elementStack);
+
+        // calculate bounding boxes here as afterwards elements
+        // with no bounding boxes may appear
+        var boundingBoxes = _.map(this.$$elementStack,getBoundingBoxOf);
+        console.log('bb: ', boundingBoxes);
+
+        // If there are no elements to replace try to add preceding and
+        // subsequent elements and words.
+        if (this.$$elementStack == 0) {
+            // BUG: only add when these are at the same line
+            if (this.$position) {
+                console.log('1');
+                this.wordStack.splice(0,0,this.$position.attr('CONTENT'));
+                this.$$elementStack.splice(0,0,this.$position);
+            }
+            if (this.$nextPosition) {
+                console.log('2');
+                this.wordStack.push(this.$nextPosition.attr('CONTENT'));
+                this.$$elementStack.push(this.$nextPosition);
+            }
+        }
+
+        // add elements if they are too few
+        while (this.$$elementStack.length < this.wordStack.length) {
+            console.log('position:');
+            console.log(this.$position);
+            var $string = $($.parseXML('<String />')).find('String');
+            if (this.$position != undefined) {
+                this.$position.after($string);
+            } else if (this.$position != undefined) {
+                // this happens, when edits occur in the beginning
+                // of a line.
+                this.$textline.prepend($string);
+            } else {
+                throw "no textline! cannot edit.";
+            }
+            this.$$elementStack.push($string);
+            elementsAdded++;
+        }
+
+        // remove elements if they are too many
+        while (this.$$elementStack.length > this.wordStack.length) {
+            var $element = this.$$elementStack.pop();
+            $element.remove();
+            elementsAdded--;
+        }
+
+            console.log('--');
+        for (var i = 0; i < this.$$elementStack.length; i++) {
+            this.$$elementStack[i].attr('CONTENT',this.wordStack[i]);
+            console.log(this.$$elementStack[i]);
+            console.log(this.wordStack[i]);
+        }
+        splitBoundingBoxes (this.$$elementStack, boundingBoxes);
+
+        this.resetLine();
+        return elementsAdded;
+
+    }
+
     function createAlto (source,words) {
         var originalWords = $(source).find('String').map(
             function() { return this.getAttribute('CONTENT'); }
@@ -112,84 +241,56 @@ define(['jsdiff'],function (jsdiff) {
         var $target = $(source).find('alto').clone();
         var $strings = $target.find('String');
 
-        var wi = 0; // content word index
-        for (var i = 0; i < seq.length; i++) {
+        var processingState = new ProcessingState();
+
+
+        for (var i = 0, wi=0, si=0; i < seq.length; i++) {
+            // Iterating simultaneously three sequences
+            //  i indexes edit sequence
+            // wi indexes editor words sequence
+            // si indexes alto string elements
+
+            var $currentString = $strings.eq(si);
+            var currentWord = words[wi];
+            var oldSi = si;
+            processingState.prepareString($currentString);
+
+            console.log('loop: ',i,wi,si);
             if (seq[i] == 'match') {
 
-                //match
                 wi ++;
+                si ++;
+                si += processingState.processPending();
 
             } else if (seq[i] == 'replace') {
 
-                //replace
-                var $string = $strings.eq(wi);
-                $string.attr('CONTENT',words[wi]);
+                si ++;
                 wi ++;
+                si += processingState.pushEdit( currentWord, $currentString);
 
             } else if (seq[i] == 'delete') {
 
-                //delete
-                var $string = $strings.eq(wi);
-                var myTL = $string.parent().get(0);
-                var $textline = $string.parent();
-                var bb = getBoundingBoxOf($string);
-
-                // give deleted bounding box to the word before it
-                // if it exists and is on the same line
-                // Otherwise to the word after it if it exists and on the
-                // same line, otherwise throw bounding box away.
-                if ((wi > 0) && ($strings.eq(wi-1).parent().get(0) == myTL)) {
-
-                    var $other = $strings.eq(wi-1);
-                    var otherBB = getBoundingBoxOf($other);
-                    splitBoundingBoxes([$other],[bb,otherBB]);
-
-                } else if ((wi < $strings.length) &&
-                           ($strings.eq(wi) == myTL)) {
-                    var $other = $strings.eq(wi);
-                    var otherBB = getBoundingBoxOf($other);
-                    splitBoundingBoxes([$other],[bb,otherBB]);
-
-                } else {
-                    // throw bb away
-                }
-                $string.remove();
+                si ++; // skip the deleted elements for now.
+                si += processingState.pushEdit( undefined, $currentString);
 
             } else if (seq[i] == 'add') {
 
-                //add
-                var $string = $($.parseXML('<String />')).find('String');
-                $string.attr('CONTENT',words[wi]);
-
-                if (wi > 0) {
-
-                    var $other = $strings.eq(wi-1);
-                    var $textline = $other.parent();
-                    $other.after($string);
-                    splitBoundingBoxes([$other,$string],
-                            [getBoundingBoxOf($other)]);
-
-                } else if (wi < $strings.length) {
-
-                    var $other = $strings.eq(wi);
-                    var $textline = $other.parent();
-                    $other.eq(wi-1).before($string);
-                    splitBoundingBoxes([$other,$string],
-                            [getBoundingBoxOf($other)]);
-
-                } else {
-
-                    throw "No text, cannot edit.";
-
-                }
-
                 wi ++;
+                si += processingState.pushEdit( currentWord, undefined);
 
             }
 
+            console.log('counters now: ',i,wi,si);
+
+            if (si != oldSi) {
+                processingState.stringDone();
+            }
 
         }
 
+        processingState.processPending();
+
+        console.log($target.find('TextLine'));
         return $target.get(0);
     }
 
@@ -198,146 +299,5 @@ define(['jsdiff'],function (jsdiff) {
     };
 });
 
-    /*
-    function _createAlto (source,words) {
-
-        /*
-            words: array of words in version to be created
-            source: original alto structure
-
-            loop through diff and create alto structure
-            for new content in words
-            Handle each textline at a time so no merges or
-            splits will ever cross line boundaries
-            diff = { o : [...], n : [...] }
-            o contains entry for each word in original,
-            n contains entry for each word in new string,
-            words are confusingly called rows here.
-            entry is a string if we don't know what word it corresponds
-                to in the other sequence.
-            otherwise it is {row: n, text: '...'} where row is index
-                to the corresponding word in other sequence
-        * /
-
-        var originalWords = this.getStringSequence(source);
-        var diff = jsdiff.diff(originalWords,words);
-        var $target = $(source).clone();
-        var $strings = $target.find('String');
-
-        var oi = 0;
-
-        // We'll stick all non-matching words to stack until we hit
-        // the next matching word or end of input and then distribute
-        // equal amount of space to the elements in stack
-        var stack = []
-        // another stack for deleted or replaced words. Contains jquery
-        // objects
-        var $$deleted = [];
-        // we also need to know what was the word just before and after
-        // modifications
-        var $stringBefore = undefined;
-        var $stringAfter = undefined;
-
-        function figureOutTextLine() {
-            if ($$deleted.length > 0) {
-                return $$deleted[0].parent();
-            } else if ($stringBefore != undefined) {
-                return $stringBefore.parent();
-            } else if ($stringAfter != undefined) {
-                return $stringAfter.parent();
-            } else {
-                throw "No strings! Cannot edit."
-            }
-        }
-
-        function getLineToReplace($textline,$$candidates) {
-            var $$line = []
-            for (var i in $$candidates) {
-                var $string = $$candidates[i];
-                if ($string.parent().get(0) == $textline.get(0)) {
-                }
-            }
-            return $$line;
-        }
-
-        function xxx() {
-        }
-
-        function handleDeletedWordsAndDistribute() {
-
-
-            // find any pending deleted words and increment counter
-            while (_.isString(diff.o[oi])) {
-                // delete
-                $$deleted.push($strings.get(oi));
-                oi ++;
-            }
-
-            // distribute words
-            var $textline = figureOutTextLine();
-            var $$lineToReplace = getLineToReplace($textline,$$deleted);
-            while (len($$lineToReplace)<line) {
-                var $string = $.parseXML('<String />');
-                addToCorrectPosition($textline,$string);
-                $$lineToReplace.push($string);
-            }
-
-            var combinedBB = getCombinedBoundingBox($$lineToReplace);
-            for (var i in $$lineToReplace) {
-
-                var boundingBox = getPieceOfBoundingBox(combinedBB);
-                var $s = $$lineToReplace[i];
-                $s.attr('CONTENT',line[i]);
-                $s.attr('HPOS',boundingBox.hpos);
-                $s.attr('VPOS',boundingBox.vpos);
-                $s.attr('WIDTH',boundingBox.width);
-                $s.attr('HEIGHT',boundingBox.height);
-
-            }
-            $$deleted = [];
-            $stringBefore = undefined;
-            $stringAfter = undefined;
-
-        }
-        for ( var i = 0; i < diff.n.length; i++ ) {
-            var $string = $strings.eq(i);
-            var $textline = $string.parent();
-
-            if (_.isString(diff.n[i])) {
-
-                if (_.isString(diff.o[i])) {
-                    $$deleted.push($strings.get(oi));
-                    oi ++; // replace
-                } else {
-                    // add
-                }
-
-                stack.push(diff.n[i]);
-
-                if ($stringBefore == undefined) {
-
-                    $stringBefore = $strings.eq(i-1);
-
-                }
-
-            } else {
-
-                // match, distribute any pending modified words and
-                // go on.
-                $stringAfter = $strings.eq(i);
-                handleDeletedWordsAndDistribute();
-                oi ++;
-
-            }
-        }
-
-        // distribute any pending modified words.
-        handleDeletedWordsAndDistribute();
-        var s = seq.slice(0,20).join(' ')
-
-            console.log(s);
-        return $target;
-    }
-        */
 
 
