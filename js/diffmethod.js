@@ -38,6 +38,13 @@ define(['jsdiff'],function (jsdiff) {
         return seq;
     }
 
+    function isNonNullBB(bb) {
+        if (isNaN(bb.hpos)) return false;
+        if (isNaN(bb.vpos)) return false;
+        if (isNaN(bb.width)) return false;
+        if (isNaN(bb.height)) return false;
+        return true;
+    }
     function getBoundingBoxOf($object) {
         return {
             hpos : parseInt($object.attr('HPOS')),
@@ -152,26 +159,20 @@ define(['jsdiff'],function (jsdiff) {
     ProcessingState.prototype.processPending = function() {
 
         var elementsAdded = 0;
+        var needToAddNextElement = false;
         if ((this.wordStack.length == 0) && (this.$$elementStack.length == 0)) {
             return 0;
         }
 
-        // calculate bounding boxes here as afterwards elements
-        // with no bounding boxes may appear
-        var boundingBoxes = _.map(this.$$elementStack,getBoundingBoxOf);
-
         // If there are no elements to replace try to add preceding and
         // subsequent elements and words.
-        if (this.$$elementStack == 0) {
+        if (this.$$elementStack.length == 0) {
             // BUG: only add when these are at the same line
-            if (this.$position) {
+            if ((this.$position) && (this.$position.parent().get(0) == this.$textline.get(0))) {
                 this.wordStack.splice(0,0,this.$position.attr('CONTENT'));
                 this.$$elementStack.splice(0,0,this.$position);
             }
-            if (this.$nextPosition) {
-                this.wordStack.push(this.$nextPosition.attr('CONTENT'));
-                this.$$elementStack.push(this.$nextPosition);
-            }
+            needToAddNextElement = true;
         }
 
         var $insertPosition = this.$position;
@@ -192,6 +193,13 @@ define(['jsdiff'],function (jsdiff) {
             this.$$elementStack.push($string);
             elementsAdded++;
         }
+        if ((needToAddNextElement) && (this.$nextPosition) && (this.$nextPosition.parent().get(0) == this.$textline.get(0))) {
+            this.wordStack.push(this.$nextPosition.attr('CONTENT'));
+            this.$$elementStack.push(this.$nextPosition);
+        }
+
+        var unfilteredBBs = _.map(this.$$elementStack,getBoundingBoxOf);
+        var boundingBoxes = _.filter(unfilteredBBs,isNonNullBB);
 
         // remove elements if they are too many
         while (this.$$elementStack.length > this.wordStack.length) {
@@ -221,7 +229,7 @@ define(['jsdiff'],function (jsdiff) {
 
         var processingState = new ProcessingState();
 
-
+        processingState.$textline = $target.find('TextLine').first();
         for (var i = 0, wi=0, si=0; i < seq.length; i++) {
             // Iterating simultaneously three sequences
             //  i indexes edit sequence
