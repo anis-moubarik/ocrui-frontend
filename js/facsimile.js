@@ -29,8 +29,12 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             this.pageHRatio = 500; // initial something
             this.pageVRatio = 500; // initial something
 
-            toolbar.registerButton('zoom-in','click','icon-zoom-in',['page']);
-            toolbar.registerButton('zoom-out','click','icon-zoom-out',['page']);
+            toolbar.registerButton('zoom-in',false,'icon-zoom-in',['page']);
+            toolbar.registerButton('zoom-out',false,'icon-zoom-out',['page']);
+            toolbar.registerButton('pan-zoom',true,'icon-move',['page']);
+            toolbar.registerKeyboardShortcut(113, function(ev) {
+                $('#pan-zoom').click();
+            });
 
             events.on('button-zoom-in-clicked',function(data) {
                 var x = that.horizontalPixels / 2;
@@ -44,8 +48,13 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
                 that.adjustZoom(0.5,x,y);
             });
 
+            events.on('button-pan-zoom-clicked',function(data) {
+                var toggled = !($('#pan-zoom').hasClass("active"));
+                that.wheelPan = toggled;
+            });
+
             events.on('changeCoordinates',function(data) {
-                // gets called whenever cursor moves in editor
+            // gets called whenever cursor moves in editor
                 that.setHighlight(data);
                 that.render();
             
@@ -77,16 +86,26 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             if (scale < 0.01) scale = 0.01;
             if (scale > 1) scale = 1;
 
-            var oldOriginDistanceX = (fixedX - this.originX) * this.pageScale;
-            var oldOriginDistanceY = (fixedY - this.originX) * this.pageScale;
-            var originDistanceX = (fixedX - this.originX) * scale;
-            var originDistanceY = (fixedY - this.originX) * scale;
-            var originDeltaX = oldOriginDistanceX - originDistanceX;
-            var originDeltaY = oldOriginDistanceY - originDistanceY;
+            var oldPageFixedX = (fixedX - this.originX) / (this.pageHRatio * this.pageScale);
+            var oldPageFixedY = (fixedY - this.originY) / (this.pageVRatio * this.pageScale);
+            var newPageFixedX = (fixedX - this.originX) / (this.pageHRatio * scale);
+            var newPageFixedY = (fixedY - this.originY) / (this.pageVRatio * scale);
             var scaleChange = (scale / this.pageScale);
+            var delta = this.pageCoordsToScreenCoords({
+                x: oldPageFixedX - newPageFixedX,
+                y: oldPageFixedY - newPageFixedY,
+            });
+            console.log(
+                oldPageFixedX,
+                oldPageFixedY,
+                newPageFixedX,
+                newPageFixedY,
+                delta.x,
+                delta.y,
+                scaleChange);
             this.setOrigin(
-                    this.originX + originDeltaX,
-                    this.originY + originDeltaY);
+                    this.originX - delta.x/2,
+                    this.originY - delta.y/2);
             var fixedPageX = this.origin
             this.pageScale = scale
             this.render();
@@ -95,10 +114,18 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             var offset = this.$el.offset();
             var x = ev.pageX - offset.left;
             var y = ev.pageY - offset.top;
-            if (delta > 0) {
-                this.adjustZoom(1.5,x,y);
+            if (this.wheelPan) {
+                this.setOrigin(
+                        this.originX + 32*deltaX,
+                        this.originY + 32*deltaY
+                    );
+                this.render();
             } else {
-                this.adjustZoom(0.75,x,y);
+                if (delta > 0) {
+                    this.adjustZoom(1.5,x,y);
+                } else {
+                    this.adjustZoom(0.75,x,y);
+                }
             }
         },
 
@@ -159,10 +186,12 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
                 y: (coords.y - this.originY) / (this.pageVRatio * this.pageScale), 
             }
         },
-        pageCoordsToCanvasCoords: function(coords) {
+        pageCoordsToScreenCoords: function(coords) {
+            var hScale = this.pageHRatio * this.pageScale;
+            var vScale = this.pageVRatio * this.pageScale;
             return {
-                x: coords.x * this.pageHRatio, 
-                y: coords.y * this.pageVRatio, 
+                x : Math.round(coords.x * hScale + this.originX) - 2,
+                y : Math.round(coords.y * vScale + this.originY) - 2,
             }
         },
         setImage: function(image) {
@@ -187,7 +216,6 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
                 width : Math.round(hl.width * hScale) + 2,
                 height : Math.round(hl.height * vScale) + 2,
             };
-            console.log(hl);
 
             // Start with what is already there.
             var imgd;

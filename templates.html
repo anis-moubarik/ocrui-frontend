@@ -8,7 +8,14 @@
         <li id="buttons">
             <div class="btn-group">
                 {{#buttons}}
-                    <button class="btn" id="{{id}}"> <i class="{{icon}}"> </i> </button>
+                    {{#toggle}}
+                    <button type="button" class="btn" id="{{id}}" data-toggle="button">
+                    {{/toggle}}
+                    {{^toggle}}
+                    <button type="button" class="btn" id="{{id}}" >
+                    {{/toggle}}
+                        <i class="{{icon}}"> </i>
+                    </button>
                 {{/buttons}}
             </div>
         </li>

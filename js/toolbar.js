@@ -28,17 +28,17 @@ define(['events','mustache','backbone'],function (events,mustache) {
         }
     };
 
-    function registerButton(id,type,icon,modes) {
-        // type is 'toggle','click'
+    function registerButton(id,toggle,icon,modes) {
+        // toggle makes button togleable, otherwise clickable
         // toolbar takes care of firing button-{{id}}-click,
-        // button-{{id}}-set, button-{{id}}-unset events on clicks.
+        // events on clicks.
 
         if (id in buttons) {
             throw "Trying to reregister button " + id;
         }
         buttons [id] = {
             id: id,
-            type: type,
+            toggle: toggle,
             icon: icon,
             modes: modes,
         }
@@ -80,9 +80,10 @@ define(['events','mustache','backbone'],function (events,mustache) {
                 //if (widgets[i].modes)
                 var view = widgets[i].view;
                 view.setElement('#' + i);
-                console.log('s');
                 view.render();
             };
+
+            //this.$el.button(); // enable bootstrap button code
         }
     });
 

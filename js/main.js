@@ -15,12 +15,14 @@ require.config({
     },
     'shim': {
         'backbone': {deps:['jquery','underscore']},
+        'bootstrap': {deps:['jquery','jquery-ui']},
     },
     });
 
 require(
     [
         "jquery",
+        "bootstrap",
         "mustache",
         "underscore",
         "jquery-ui",
@@ -37,7 +39,7 @@ require(
         "spinner",
         "pageselector",
         "mousewheel",
-    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel) {
+    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel) {
         $(function() {
             $.get('templates.html',function(html) {
                 $templates = $(html);
