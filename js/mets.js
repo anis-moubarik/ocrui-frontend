@@ -10,12 +10,12 @@ define(['backbone'],function () {
             return this.pageInfo.length;
         },
         getImageUrl : function (pageNumber) {
-            var page = this.pageInfo[pageNumber];
+            var page = this.pageInfo[pageNumber - 1]; //pageNumber is 1-based
             if (page == undefined) return undefined;
             return this.urlBase + '/' + page[0];
         },
         getAltoUrl : function (pageNumber) {
-            var page = this.pageInfo[pageNumber];
+            var page = this.pageInfo[pageNumber - 1]; //pageNumber is 1-based
             if (page == undefined) return undefined;
             return this.urlBase + '/' + page[1];
         },
@@ -62,6 +62,15 @@ define(['backbone'],function () {
                 });
 
             }
+
+            // Remove empty slots in pageInfo
+            for (var i=0; i < this.pageInfo.length; i++) {
+                while ((i < this.pageInfo.length) &&
+                        (this.pageInfo[i] == undefined)) {
+                    this.pageInfo.splice(i,1);
+                }
+            }
+            
         },
         fetch: function (callback) {
             var url = this.urlBase+'/mets.xml';

@@ -1,5 +1,5 @@
-define(['pageselector','events','alto','mets','image','facsimile','editor','toolbar'],
-        function (pageselector,events,alto,mets,image,facsimile,editor,toolbar) {
+define(['spinner','pageselector','events','alto','mets','image','facsimile','editor','toolbar'],
+        function (spinner,pageselector,events,alto,mets,image,facsimile,editor,toolbar) {
 
     var doc = undefined; // this is used to store mets currently being edited
 
@@ -28,20 +28,21 @@ define(['pageselector','events','alto','mets','image','facsimile','editor','tool
         var intPageNumber = Math.floor(parseInt(pageNumber));
         pageselector.view.options.pageNumber = intPageNumber;
         pageselector.view.render();
-        editor.view.showSpinner();
-        facsimile.view.showSpinner();
+        spinner.showSpinner(2);
         mets.load({id:id},function(_doc) {
 
             var progressCounter = 0;
             var pages = _doc.getNumberOfPages();
             pageselector.view.setPageNumberBounds(1,pages);
             pageselector.view.render();
+            spinner.hideSpinner();
             doc = _doc;
 
             var url = _doc.getImageUrl(intPageNumber);
             image.load({url:url},function(image) {
                 facsimile.view.setImage(image);
                 facsimile.view.render();
+                spinner.hideSpinner();
                 progressCounter ++ ;
                 if (progressCounter == 2) doneLoading();
             });

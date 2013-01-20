@@ -1,4 +1,4 @@
-define(['spinner','events','codemirror','backbone'],function (spinner,events) {
+define(['events','codemirror','backbone'],function (events) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -9,7 +9,6 @@ define(['spinner','events','codemirror','backbone'],function (spinner,events) {
     View = Backbone.View.extend({
 
         initialize: function () {
-            this.spinner = spinner.createSpinner();
             this.wordUnderCursor = {};
             var that = this;
             this.cMirror = CodeMirror(this.$el.get(0), {
@@ -96,12 +95,7 @@ define(['spinner','events','codemirror','backbone'],function (spinner,events) {
         setAlto: function(alto) {
             this.alto = alto;
         },
-        showSpinner : function() {
-            // TODO: dim canvas
-            this.spinner.spin(this.$el.get(0));
-        },
         render: function() {
-            this.spinner.stop();
             var s = this.alto.getString();
             this.cMirror.setValue(s);
             var that = this;

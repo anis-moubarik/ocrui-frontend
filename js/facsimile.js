@@ -1,4 +1,4 @@
-define(['spinner','events','backbone'],function (spinner,events) {
+define(['events','backbone'],function (events) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -11,8 +11,8 @@ define(['spinner','events','backbone'],function (spinner,events) {
         el: '#facsimile',
         render: function() {
             var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>')
-            $canvas.attr('width',this.horizontalPixels);
-            $canvas.attr('height',this.verticalPixels);
+            $canvas.attr(this.horizontalPixels,'width');
+            $canvas.attr(this.verticalPixels,'height');
             this.$el.html('');
             this.$el.append($canvas);
         }
@@ -22,7 +22,6 @@ define(['spinner','events','backbone'],function (spinner,events) {
 
         initialize: function() {
             var that = this;
-            this.spinner = spinner.createSpinner();
             events.on('changeCoordinates',function(data) {
                 //BUG
                 that.setHighlight(data);
@@ -32,26 +31,20 @@ define(['spinner','events','backbone'],function (spinner,events) {
 
             });
         },
-        el: '#facsimile',
+        el: '#facsimile-canvas',
         events: {
-            'click #facsimile-canvas': 'propagateClick',
-            'resize #facsimile-canvas': 'setWindowScaling',
+            'click': 'propagateClick',
+            'set-scaling': 'render',
         },
 
-        horizontalPixels : 500,
-        verticalPixels : 500,
         propagateClick: function(ev) {
-            var canvasCoords = this.onWindowCoordsToCanvasCoords(
-                { x:ev.pageX, y:ev.pageY });
+            var offset = this.$el.offset()
+            var canvasCoords = {
+                x:ev.pageX - offset.left,
+                y:ev.pageY - offset.top
+            };
             var imageCoords = this.canvasCoordsToImageCoords(canvasCoords);
             events.trigger('cursorToCoordinate',imageCoords);
-        },
-        onWindowCoordsToCanvasCoords: function(coords) {
-            var offset = $('#facsimile-canvas').offset();
-            return {
-                x: (coords.x - offset.left) / this.windowHRatio,
-                y: (coords.y - offset.top) / this.windowVRatio,
-            }
         },
         canvasCoordsToImageCoords: function(coords) {
             return {
@@ -76,23 +69,10 @@ define(['spinner','events','backbone'],function (spinner,events) {
         },
         setImage: function(image) {
             this.image = image;
-            this.imageHRatio = this.horizontalPixels;
-            this.imageVRatio = this.verticalPixels;
         },
         setHighlight: function(highlight) {
             // highlight is stored in image coordinates
             this.highlight = highlight;
-        },
-        showSpinner : function() {
-            // TODO: dim canvas
-            this.spinner.spin(this.$el.get(0));
-        },
-        setWindowScaling : function() {
-            var onScreenWidth = this.$el.innerWidth();
-            var onScreenHeight = this.$el.innerHeight();
-            var onScreenCanvasSize = _.max([onScreenWidth,onScreenHeight]);
-            this.windowHRatio = onScreenCanvasSize / this.horizontalPixels;
-            this.windowVRatio = onScreenCanvasSize / this.verticalPixels;
         },
         renderHighlight : function(ctx,hl) {
             if (!hl) { return; }
@@ -109,6 +89,7 @@ define(['spinner','events','backbone'],function (spinner,events) {
             try {
                 var imgd = ctx.getImageData(rect.hpos,rect.vpos,rect.width,rect.height);
             } catch (err) {
+                console.log(rect);
                 console.log(err);
                 return;
             }
@@ -133,30 +114,30 @@ define(['spinner','events','backbone'],function (spinner,events) {
             ctx.putImageData(imgd,rect.hpos,rect.vpos);
         },
         render: function() {
-            this.spinner.stop();
-            var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>')
-            $canvas.attr('width',this.horizontalPixels);
-            $canvas.attr('height',this.verticalPixels);
-            this.$el.html('');
-            this.$el.append($canvas);
 
-            var canvas = $canvas.get(0);
-            var ctx = canvas.getContext("2d");
-            try {
-                ctx.drawImage(this.image.image,0,0,
-                        this.horizontalPixels,this.verticalPixels);
-            } catch (err) {
-                console.log(err);
-                throw "";
+            // default to 500x500 in case of trouble
+            this.horizontalPixels = this.$el.attr('width') || 500;
+            this.verticalPixels = this.$el.attr('width') || 500;
+            this.imageHRatio = this.horizontalPixels;
+            this.imageVRatio = this.verticalPixels;
+
+
+            var ctx = this.$el.get(0).getContext("2d");
+    
+            if (this.image) {
+                try {
+                    ctx.drawImage(this.image.image,0,0,
+                            this.horizontalPixels,this.verticalPixels);
+                } catch (err) {
+                    console.log(err);
+                }
             }
 
-            $canvas.resize(); // trigger to get initial scaling
 
             this.renderHighlight(ctx,this.highlight);
 
             // Call the geometry handler:
             // TODO: get rid of this. handle geometry otherwise
-            $(window).resize();
         }
     });
 

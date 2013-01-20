@@ -98,8 +98,10 @@ define(['diffmethod','backbone'],function (diffmethod) {
                 that.currentData = data;
                 that.originalData = data; // BUG! figure out how this goes
                 var page = $(data).find('Page').get(0);
-                that.set('width',page.getAttribute("WIDTH"));
-                that.set('height',page.getAttribute("HEIGHT"));
+                if (page) {
+                    that.set('width',page.getAttribute("WIDTH"));
+                    that.set('height',page.getAttribute("HEIGHT"));
+                }
                 that.set('status',textStatus);
                 callback(that);
             });
