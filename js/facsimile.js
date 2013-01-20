@@ -1,4 +1,4 @@
-define(['events','backbone'],function (events) {
+define(['toolbar','events','backbone'],function (toolbar,events) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -21,15 +21,50 @@ define(['events','backbone'],function (events) {
     View = Backbone.View.extend({
 
         initialize: function() {
-            var that = this;
-            events.on('changeCoordinates',function(data) {
-                //BUG
-                that.setHighlight(data);
-                if (that.image != undefined) {
-                    that.render();
-                }
 
+            var that = this;
+            this.pageScale = 1; // 
+            this.originX = 0; //
+            this.originY = 0; //
+            this.pageHRatio = 500; // initial something
+            this.pageVRatio = 500; // initial something
+
+            toolbar.registerButton('zoom-in','click','icon-zoom-in',['page']);
+            toolbar.registerButton('zoom-out','click','icon-zoom-out',['page']);
+
+            events.on('button-zoom-in-clicked',function(data) {
+                var scale = that.pageScale * 2;
+                if (scale > 1) scale = 1;
+                that.pageScale = scale;
+                console.log(that.pageScale);
+                that.render();
             });
+
+            events.on('button-zoom-out-clicked',function(data) {
+                var scale = that.pageScale / 2;
+                if (scale < 0.01) scale = 0.01;
+                that.pageScale = scale;
+                console.log(that.pageScale);
+                that.render();
+            });
+
+            events.on('changeCoordinates',function(data) {
+                // gets called whenever cursor moves in editor
+                that.setHighlight(data);
+                that.render();
+            
+            });
+
+            events.on('setZoom',function(data) {
+                that.setZoom(data);
+                that.render();
+            });
+
+            events.on('setOrigin',function(data) {
+                that.setOrigin(data.x,data.y);
+                that.render();
+            });
+
         },
         el: '#facsimile-canvas',
         events: {
@@ -43,28 +78,28 @@ define(['events','backbone'],function (events) {
                 x:ev.pageX - offset.left,
                 y:ev.pageY - offset.top
             };
-            var imageCoords = this.canvasCoordsToImageCoords(canvasCoords);
+            var imageCoords = this.canvasCoordsToPageCoords(canvasCoords);
             events.trigger('cursorToCoordinate',imageCoords);
         },
-        canvasCoordsToImageCoords: function(coords) {
+        canvasCoordsToPageCoords: function(coords) {
             return {
-                x: coords.x / this.imageHRatio, 
-                y: coords.y / this.imageVRatio, 
+                x: coords.x / this.pageHRatio, 
+                y: coords.y / this.pageVRatio, 
             }
         },
-        imageCoordsToCanvasCoords: function(coords) {
+        pageCoordsToCanvasCoords: function(coords) {
             return {
-                x: coords.x * this.imageHRatio, 
-                y: coords.y * this.imageVRatio, 
+                x: coords.x * this.pageHRatio, 
+                y: coords.y * this.pageVRatio, 
             }
         },
-        imageRectangleToCanvasRectangle: function(rect) {
+        pageRectangleToCanvasRectangle: function(rect) {
 
             return {
-                hpos : Math.round(rect.hpos * this.imageHRatio),
-                vpos : Math.round(rect.vpos * this.imageVRatio),
-                width : Math.round(rect.width * this.imageHRatio),
-                height : Math.round(rect.height * this.imageVRatio),
+                hpos : Math.round(rect.hpos * this.pageHRatio),
+                vpos : Math.round(rect.vpos * this.pageVRatio),
+                width : Math.round(rect.width * this.pageHRatio),
+                height : Math.round(rect.height * this.pageVRatio),
             }
         },
         setImage: function(image) {
@@ -79,7 +114,7 @@ define(['events','backbone'],function (events) {
 
             //Draw semi transparent highlight box.
 
-            var rect = this.imageRectangleToCanvasRectangle(hl);
+            var rect = this.pageRectangleToCanvasRectangle(hl);
             rect.hpos = rect.hpos - 2;
             rect.vpos = rect.vpos - 2;
             rect.width = rect.width + 4;
@@ -113,26 +148,41 @@ define(['events','backbone'],function (events) {
 
             ctx.putImageData(imgd,rect.hpos,rect.vpos);
         },
+        setZoom: function (scale) {
+            this.pageScale = scale;
+        },
+        setOrigin: function (originX,originY) {
+            this.originX = originX; // logical coordinate origin for panning
+            this.originY = originY; // logical coordinate origin for panning
+        },
         render: function() {
 
             // default to 500x500 in case of trouble
-            this.horizontalPixels = this.$el.attr('width') || 500;
-            this.verticalPixels = this.$el.attr('width') || 500;
-            this.imageHRatio = this.horizontalPixels;
-            this.imageVRatio = this.verticalPixels;
-
+            this.horizontalPixels = this.$el.attr('width') || this.pageHRatio;
+            this.verticalPixels = this.$el.attr('height') || this.pageVRatio;
 
             var ctx = this.$el.get(0).getContext("2d");
+
+            ctx.clearRect(
+                    0,
+                    0,
+                    this.horizontalPixels / this.pageScale,
+                    this.verticalPixels / this.pageScale);
     
             if (this.image) {
+                this.pageHRatio = this.image.height;
+                this.pageVRatio = this.image.width;
+                //ctx.scale(this.pageScale,this.pageScale);
+                ctx.setTransform(this.pageScale,0,0,this.pageScale,0,0);
+                cc=ctx;
                 try {
-                    ctx.drawImage(this.image.image,0,0,
-                            this.horizontalPixels,this.verticalPixels);
+                    var iWidth = this.image.width;
+                    var iHeight = this.image.height;
+                    ctx.drawImage(this.image.image,0,0);
                 } catch (err) {
                     console.log(err);
                 }
             }
-
 
             this.renderHighlight(ctx,this.highlight);
 
@@ -140,7 +190,6 @@ define(['events','backbone'],function (events) {
             // TODO: get rid of this. handle geometry otherwise
         }
     });
-
 
     return {
         view: new View(),

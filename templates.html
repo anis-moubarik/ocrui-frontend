@@ -1,4 +1,19 @@
 <div id="templates">
+    <ul id="toolbar-template" class="nav">
+        {{#widgets}}
+            <li>
+                <div id="{{.}}"> </div>
+            </li>
+        {{/widgets}}
+        <li id="buttons">
+            <div class="btn-group">
+                {{#buttons}}
+                    <button class="btn" id="{{id}}"> <i class="{{icon}}"> </i> </button>
+                {{/buttons}}
+            </div>
+        </li>
+    </ul>
+
     <li id="page-selector-template">
         <div class="form-horizontal btn-group input-prepend input-append">
                 <button class="btn" id="page-previous"> &lt; </button>

@@ -1,8 +1,17 @@
-define(['toolbar','mustache','backbone'],function (toolbar,mustache) {
+define(['events','toolbar','mustache','backbone'],function (events,toolbar,mustache) {
 
     var View = Backbone.View.extend({
         initialize: function() {
             this.options = {};
+            var that = this;
+            events.on('changePage',function(data) {
+                that.options.pageNumber = data;
+                that.render();
+            });
+            events.on('changePageBounds',function(data) {
+                that.setPageNumberBounds(data.min,data.max);
+                that.render();
+            });
         },
         el : '#page-selector',
         events: {
@@ -42,9 +51,6 @@ define(['toolbar','mustache','backbone'],function (toolbar,mustache) {
                 this.boundedSetPage(pageNumber);
             }
         },
-        hide: function() {
-            this.$el.html("");
-        },
         render: function() {
             var context = {
                 pageNumber: this.options.pageNumber,
@@ -62,9 +68,10 @@ define(['toolbar','mustache','backbone'],function (toolbar,mustache) {
         view.pageNext();
     });
 
-    return {
-        view: new View(),
-    }
+    var view = new View();
+    toolbar.registerWidget( 'page-selector', view, ['page'] );
+
+    return { } // no external interface, this just registers a widget
 
 });
 

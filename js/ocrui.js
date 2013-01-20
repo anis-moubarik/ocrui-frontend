@@ -1,12 +1,13 @@
-define(['spinner','pageselector','events','alto','mets','image','facsimile','editor','toolbar'],
-        function (spinner,pageselector,events,alto,mets,image,facsimile,editor,toolbar) {
+define(['spinner','events','alto','mets','image','facsimile','editor','toolbar'],
+        function (spinner,events,alto,mets,image,facsimile,editor,toolbar) {
 
     var doc = undefined; // this is used to store mets currently being edited
 
     function route_empty() {
 
 
-        pageselector.view.hide();
+        toolbar.setMode('empty');
+        toolbar.render();
         facsimile.empty.render();
         editor.empty.render();
         $(window).resize();
@@ -14,7 +15,8 @@ define(['spinner','pageselector','events','alto','mets','image','facsimile','edi
 
     function route_doc(id) {
 
-        pageselector.view.hide();
+        toolbar.setMode('doc');
+        toolbar.render();
         mets.load({id:id},function(_doc) {
             doc = _doc;
             facsimile.thumbnails.render();
@@ -26,15 +28,15 @@ define(['spinner','pageselector','events','alto','mets','image','facsimile','edi
     function route_page(id,pageNumber) {
 
         var intPageNumber = Math.floor(parseInt(pageNumber));
-        pageselector.view.options.pageNumber = intPageNumber;
-        pageselector.view.render();
+        events.trigger('changePage',intPageNumber);
+        toolbar.view.setMode('page');
+        toolbar.view.render();
         spinner.showSpinner(2);
         mets.load({id:id},function(_doc) {
 
             var progressCounter = 0;
             var pages = _doc.getNumberOfPages();
-            pageselector.view.setPageNumberBounds(1,pages);
-            pageselector.view.render();
+            events.trigger('changePageBounds',{min:1,max:pages});
             spinner.hideSpinner();
             doc = _doc;
 
