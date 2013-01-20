@@ -33,14 +33,14 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             toolbar.registerButton('zoom-out','click','icon-zoom-out',['page']);
 
             events.on('button-zoom-in-clicked',function(data) {
-                var x = this.horizontalPixels / 2;
-                var y = this.verticalPixels / 2;
+                var x = that.horizontalPixels / 2;
+                var y = that.verticalPixels / 2;
                 that.adjustZoom(2,x,y);
             });
 
             events.on('button-zoom-out-clicked',function(data) {
-                var x = this.horizontalPixels / 2;
-                var y = this.verticalPixels / 2;
+                var x = that.horizontalPixels / 2;
+                var y = that.verticalPixels / 2;
                 that.adjustZoom(0.5,x,y);
             });
 
@@ -69,7 +69,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             'mousemove': 'pan',
             'mousedown': 'beginPan',
             'mouseup': 'endPan',
-            'mouseout': 'cancelPan',
+            'mouseout': 'endPan',
             'set-scaling': 'render',
         },
         adjustZoom: function(amount,fixedX,fixedY) {
