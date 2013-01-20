@@ -23,7 +23,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         initialize: function() {
 
             var that = this;
-            this.pageScale = 1; // 
+            this.pageScale = 0.4; // some default...
             this.originX = 0; //
             this.originY = 0; //
             this.pageHRatio = 500; // initial something
@@ -84,7 +84,6 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             var originDeltaX = oldOriginDistanceX - originDistanceX;
             var originDeltaY = oldOriginDistanceY - originDistanceY;
             var scaleChange = (scale / this.pageScale);
-            console.log('z',oldOriginDistanceX, oldOriginDistanceY,originDistanceX, originDistanceY, originDeltaX,originDeltaY);
             this.setOrigin(
                     this.originX + originDeltaX,
                     this.originY + originDeltaY);
@@ -144,33 +143,26 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         propagateClick: function(ev) {
             if (!this.propageteNextClick) return;
             var offset = this.$el.offset()
-            var canvasCoords = {
+            var screenCoords = {
                 x:ev.pageX - offset.left,
                 y:ev.pageY - offset.top
             };
             // BUG: scaling?
-            var imageCoords = this.canvasCoordsToPageCoords(canvasCoords);
+            var imageCoords = this.screenCoordsToPageCoords(screenCoords);
+            console.log(screenCoords);
+            console.log(imageCoords);
             events.trigger('cursorToCoordinate',imageCoords);
         },
-        canvasCoordsToPageCoords: function(coords) {
+        screenCoordsToPageCoords: function(coords) {
             return {
-                x: coords.x / this.pageHRatio, 
-                y: coords.y / this.pageVRatio, 
+                x: (coords.x - this.originX) / (this.pageHRatio * this.pageScale), 
+                y: (coords.y - this.originY) / (this.pageVRatio * this.pageScale), 
             }
         },
         pageCoordsToCanvasCoords: function(coords) {
             return {
                 x: coords.x * this.pageHRatio, 
                 y: coords.y * this.pageVRatio, 
-            }
-        },
-        pageRectangleToCanvasRectangle: function(rect) {
-
-            return {
-                hpos : Math.round(rect.hpos * this.pageHRatio),
-                vpos : Math.round(rect.vpos * this.pageVRatio),
-                width : Math.round(rect.width * this.pageHRatio),
-                height : Math.round(rect.height * this.pageVRatio),
             }
         },
         setImage: function(image) {
@@ -185,15 +177,22 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
 
             //Draw semi transparent highlight box.
 
-            var rect = this.pageRectangleToCanvasRectangle(hl);
-            rect.hpos = rect.hpos - 2;
-            rect.vpos = rect.vpos - 2;
-            rect.width = rect.width + 4;
-            rect.height = rect.height + 4;
+            // getImageData & putImageData work in screen coordinates and not
+            // in canvas coordinates so transform
+            var hScale = this.pageHRatio * this.pageScale;
+            var vScale = this.pageVRatio * this.pageScale;
+            var rect = {
+                hpos : Math.round(hl.hpos * hScale + this.originX) - 2,
+                vpos : Math.round(hl.vpos * vScale + this.originY) - 2,
+                width : Math.round(hl.width * hScale) + 2,
+                height : Math.round(hl.height * vScale) + 2,
+            };
+            console.log(hl);
 
             // Start with what is already there.
+            var imgd;
             try {
-                var imgd = ctx.getImageData(rect.hpos,rect.vpos,rect.width,rect.height);
+                imgd = ctx.getImageData(rect.hpos,rect.vpos,rect.width,rect.height);
             } catch (err) {
                 console.log(rect);
                 console.log(err);
@@ -236,40 +235,28 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             ctx.setTransform(1,0,0,1,0,0);
             ctx.clearRect( 0, 0, this.horizontalPixels, this.verticalPixels);
     
-            if (this.image) {
-                this.pageHRatio = this.image.height;
-                this.pageVRatio = this.image.width;
-                //ctx.scale(this.pageScale,this.pageScale);
-                console.log(
-                        this.pageScale,
-                        0,
-                        0,
-                        this.pageScale,
-                        this.originX,
-                        this.originY );
-                ctx.setTransform(
-                        this.pageScale,
-                        0,
-                        0,
-                        this.pageScale,
-                        this.originX,
-                        this.originY );
-                var iWidth = this.image.width;
-                var iHeight = this.image.height;
-                ctx.shadowColor = 'black';
-                ctx.shadowBlur = 20;
-                try {
-                    ctx.drawImage(this.image.image,0,0);
-                } catch (err) {
-                    console.log(err);
-                }
-                ctx.shadowBlur = 0;
+            if (!this.image) { return; }
+
+            this.pageHRatio = this.image.width;
+            this.pageVRatio = this.image.height;
+            ctx.setTransform(
+                    this.pageScale,
+                    0,
+                    0,
+                    this.pageScale,
+                    this.originX,
+                    this.originY );
+            ctx.shadowColor = 'black';
+            ctx.shadowBlur = 20;
+            try {
+                ctx.drawImage(this.image.image,0,0);
+            } catch (err) {
+                console.log(err);
             }
+            ctx.shadowBlur = 0;
 
             this.renderHighlight(ctx,this.highlight);
 
-            // Call the geometry handler:
-            // TODO: get rid of this. handle geometry otherwise
         }
     });
 

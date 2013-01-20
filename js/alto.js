@@ -24,8 +24,6 @@ define(['diffmethod','backbone'],function (diffmethod) {
         },
         getWordIndexAt: function(x,y) {
             var selection = undefined;
-            x = x;
-            y = y;
 
             var minDistance = undefined;
             var minDistanceIndex = undefined;
@@ -35,6 +33,16 @@ define(['diffmethod','backbone'],function (diffmethod) {
 
                 var word = that.dom2Word(this);
 
+                // look for an exact match
+                if ((x >= word.hpos) && (x <= word.hpos + word.width) &&
+                    (y >= word.vpos) && (y <= word.vpos + word.height)) {
+
+                    selection = i;
+                    return false;
+
+                }
+
+                // look for a bounding box nearby
                 function tryToSetClosestCorner(cornerX,cornerY) {
                     var distance = Math.sqrt(
                         Math.pow((cornerX - x), 2) +
@@ -50,14 +58,6 @@ define(['diffmethod','backbone'],function (diffmethod) {
                 tryToSetClosestCorner(word.hpos+word.width,word.vpos);
                 tryToSetClosestCorner(word.hpos,word.vpos+word.height);
                 tryToSetClosestCorner(word.hpos+word.width,word.vpos+word.height);
-
-                if ((x >= word.hpos) && (x <= word.hpos + word.width) &&
-                    (y >= word.vpos) && (y <= word.vpos + word.height)) {
-
-                    selection = i;
-                    return false;
-
-                }
 
             });
             if (selection == undefined) {
