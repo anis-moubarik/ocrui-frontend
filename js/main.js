@@ -11,6 +11,7 @@ require.config({
         "backbone": "../lib/backbone-min",
         "jsdiff": "../lib/jsdiff",
         "spin": "../lib/spin",
+        "mousewheel": "../lib/jquery-mousewheel",
     },
     'shim': {
         'backbone': {deps:['jquery','underscore']},
@@ -35,7 +36,8 @@ require(
         "spin",
         "spinner",
         "pageselector",
-    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector) {
+        "mousewheel",
+    ], function($, mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel) {
         $(function() {
             $.get('templates.html',function(html) {
                 $templates = $(html);

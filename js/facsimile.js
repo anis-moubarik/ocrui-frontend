@@ -33,19 +33,15 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             toolbar.registerButton('zoom-out','click','icon-zoom-out',['page']);
 
             events.on('button-zoom-in-clicked',function(data) {
-                var scale = that.pageScale * 2;
-                if (scale > 1) scale = 1;
-                that.pageScale = scale;
-                console.log(that.pageScale);
-                that.render();
+                var x = this.horizontalPixels / 2;
+                var y = this.verticalPixels / 2;
+                that.adjustZoom(2,x,y);
             });
 
             events.on('button-zoom-out-clicked',function(data) {
-                var scale = that.pageScale / 2;
-                if (scale < 0.01) scale = 0.01;
-                that.pageScale = scale;
-                console.log(that.pageScale);
-                that.render();
+                var x = this.horizontalPixels / 2;
+                var y = this.verticalPixels / 2;
+                that.adjustZoom(0.5,x,y);
             });
 
             events.on('changeCoordinates',function(data) {
@@ -69,15 +65,90 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         el: '#facsimile-canvas',
         events: {
             'click': 'propagateClick',
+            'mousewheel': 'wheel',
+            'mousemove': 'pan',
+            'mousedown': 'beginPan',
+            'mouseup': 'endPan',
+            'mouseout': 'cancelPan',
             'set-scaling': 'render',
         },
+        adjustZoom: function(amount,fixedX,fixedY) {
+            var scale = this.pageScale * amount;
+            if (scale < 0.01) scale = 0.01;
+            if (scale > 1) scale = 1;
 
+            var oldOriginDistanceX = (fixedX - this.originX) * this.pageScale;
+            var oldOriginDistanceY = (fixedY - this.originX) * this.pageScale;
+            var originDistanceX = (fixedX - this.originX) * scale;
+            var originDistanceY = (fixedY - this.originX) * scale;
+            var originDeltaX = oldOriginDistanceX - originDistanceX;
+            var originDeltaY = oldOriginDistanceY - originDistanceY;
+            var scaleChange = (scale / this.pageScale);
+            console.log('z',oldOriginDistanceX, oldOriginDistanceY,originDistanceX, originDistanceY, originDeltaX,originDeltaY);
+            this.setOrigin(
+                    this.originX + originDeltaX,
+                    this.originY + originDeltaY);
+            var fixedPageX = this.origin
+            this.pageScale = scale
+            this.render();
+        },
+        wheel: function(ev,delta,deltaX,deltaY) {
+            var offset = this.$el.offset();
+            var x = ev.pageX - offset.left;
+            var y = ev.pageY - offset.top;
+            if (delta > 0) {
+                this.adjustZoom(1.5,x,y);
+            } else {
+                this.adjustZoom(0.75,x,y);
+            }
+        },
+
+        beginPan: function(ev) {
+            this.propageteNextClick = true;
+            this.panning = true;
+            this.savedOriginX = this.originX;
+            this.savedOriginY = this.originY;
+
+            var offset = this.$el.offset();
+            this.panBeginX = ev.pageX - offset.left;
+            this.panBeginY = ev.pageY - offset.top;
+            ev.preventDefault();
+            ev.stopPropagation();
+        },
+        endPan: function(ev) {
+            this.panning = false;
+        },
+        cancelPan: function(ev) {
+
+            if (!this.panning) return;
+            this.setOrigin(this.savedOriginX, this.savedOriginY);
+            this.render();
+            this.panning = false;
+
+        },
+        pan: function(ev) {
+            this.propageteNextClick = false;
+            if (!this.panning) {
+                return
+            }
+            var offset = this.$el.offset();
+            var currentX = ev.pageX - offset.left;
+            var currentY = ev.pageY - offset.top;
+
+            this.setOrigin(
+                this.savedOriginX - (this.panBeginX - currentX),
+                this.savedOriginY - (this.panBeginY - currentY));
+            this.render();
+
+        },
         propagateClick: function(ev) {
+            if (!this.propageteNextClick) return;
             var offset = this.$el.offset()
             var canvasCoords = {
                 x:ev.pageX - offset.left,
                 y:ev.pageY - offset.top
             };
+            // BUG: scaling?
             var imageCoords = this.canvasCoordsToPageCoords(canvasCoords);
             events.trigger('cursorToCoordinate',imageCoords);
         },
@@ -157,31 +228,42 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         },
         render: function() {
 
-            // default to 500x500 in case of trouble
             this.horizontalPixels = this.$el.attr('width') || this.pageHRatio;
             this.verticalPixels = this.$el.attr('height') || this.pageVRatio;
 
             var ctx = this.$el.get(0).getContext("2d");
 
-            ctx.clearRect(
-                    0,
-                    0,
-                    this.horizontalPixels / this.pageScale,
-                    this.verticalPixels / this.pageScale);
+            ctx.setTransform(1,0,0,1,0,0);
+            ctx.clearRect( 0, 0, this.horizontalPixels, this.verticalPixels);
     
             if (this.image) {
                 this.pageHRatio = this.image.height;
                 this.pageVRatio = this.image.width;
                 //ctx.scale(this.pageScale,this.pageScale);
-                ctx.setTransform(this.pageScale,0,0,this.pageScale,0,0);
-                cc=ctx;
+                console.log(
+                        this.pageScale,
+                        0,
+                        0,
+                        this.pageScale,
+                        this.originX,
+                        this.originY );
+                ctx.setTransform(
+                        this.pageScale,
+                        0,
+                        0,
+                        this.pageScale,
+                        this.originX,
+                        this.originY );
+                var iWidth = this.image.width;
+                var iHeight = this.image.height;
+                ctx.shadowColor = 'black';
+                ctx.shadowBlur = 20;
                 try {
-                    var iWidth = this.image.width;
-                    var iHeight = this.image.height;
                     ctx.drawImage(this.image.image,0,0);
                 } catch (err) {
                     console.log(err);
                 }
+                ctx.shadowBlur = 0;
             }
 
             this.renderHighlight(ctx,this.highlight);
