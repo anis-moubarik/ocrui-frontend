@@ -6,8 +6,8 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
     function route_empty() {
 
 
-        toolbar.setMode('empty');
-        toolbar.render();
+        toolbar.view.setMode('empty');
+        toolbar.view.render();
         facsimile.empty.render();
         editor.empty.render();
         $(window).resize();
@@ -15,8 +15,8 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
 
     function route_doc(id) {
 
-        toolbar.setMode('doc');
-        toolbar.render();
+        toolbar.view.setMode('doc');
+        toolbar.view.render();
         mets.load({id:id},function(_doc) {
             doc = _doc;
             facsimile.thumbnails.render();
