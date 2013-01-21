@@ -26,8 +26,8 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             this.pageScale = 0.4; // some default...
             this.originX = 0; //
             this.originY = 0; //
-            this.pageHRatio = 500; // initial something
-            this.pageVRatio = 500; // initial something
+            this.imageWidth = 500; // initial something
+            this.imageHeight = 500; // initial something
 
             toolbar.registerButton({
                 id:'zoom-in',
@@ -101,27 +101,34 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             if (scale < 0.01) scale = 0.01;
             if (scale > 1) scale = 1;
 
-            var oldPageFixedX = (fixedX - this.originX) / (this.pageHRatio * this.pageScale);
-            var oldPageFixedY = (fixedY - this.originY) / (this.pageVRatio * this.pageScale);
-            var newPageFixedX = (fixedX - this.originX) / (this.pageHRatio * scale);
-            var newPageFixedY = (fixedY - this.originY) / (this.pageVRatio * scale);
+            // (fixedX, fixedY) on screen point that should remain fixed to a
+            // point in page soon to be calculated
             var scaleChange = (scale / this.pageScale);
+            var ofX = fixedX - this.originX;
+            var ofY = fixedY - this.originY;
+            var newOfX = ofX * scaleChange;
+            var newOfY = ofY * scaleChange;
+            var newOriginX = fixedX - newOfX;
+            var newOriginY = fixedY - newOfY;
+            // var newFixedX = (fixedX - this.originX) / (this.imageWidth * scale);
+            // var newFixedY = (fixedY - this.originY) / (this.imageHeight * scale);
+            // var oldPageFixedX = (fixedX - this.originX) / (this.imageWidth * this.pageScale);
+            // var oldPageFixedY = (fixedY - this.originY) / (this.imageHeight * this.pageScale);
+            /*
             var delta = this.pageCoordsToScreenCoords({
                 x: oldPageFixedX - newPageFixedX,
                 y: oldPageFixedY - newPageFixedY,
             });
-            console.log(
-                oldPageFixedX,
-                oldPageFixedY,
-                newPageFixedX,
-                newPageFixedY,
-                delta.x,
-                delta.y,
-                scaleChange);
-            this.setOrigin(
-                    this.originX - delta.x/2,
-                    this.originY - delta.y/2);
-            var fixedPageX = this.origin
+            console.log('fixed: ', fixedX,fixedY);
+            console.log('page: ', pageFixedX,pageFixedY);
+            console.log('new origin: ',
+                newPageOriginX,
+                newPageOriginY,
+                newOriginX,
+                newOriginY);
+            */
+            this.setOrigin( newOriginX, newOriginY);
+            console.log('x',this.originX,this.originY);
             this.pageScale = scale
             this.render();
         },
@@ -197,13 +204,13 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         },
         screenCoordsToPageCoords: function(coords) {
             return {
-                x: (coords.x - this.originX) / (this.pageHRatio * this.pageScale), 
-                y: (coords.y - this.originY) / (this.pageVRatio * this.pageScale), 
+                x: (coords.x - this.originX) / (this.imageWidth * this.pageScale), 
+                y: (coords.y - this.originY) / (this.imageHeight * this.pageScale), 
             }
         },
         pageCoordsToScreenCoords: function(coords) {
-            var hScale = this.pageHRatio * this.pageScale;
-            var vScale = this.pageVRatio * this.pageScale;
+            var hScale = this.imageWidth * this.pageScale;
+            var vScale = this.imageHeight * this.pageScale;
             return {
                 x : Math.round(coords.x * hScale + this.originX) - 2,
                 y : Math.round(coords.y * vScale + this.originY) - 2,
@@ -218,13 +225,15 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         },
         renderHighlight : function(ctx,hl) {
             if (!hl) { return; }
+            console.log(hl);
 
             //Draw semi transparent highlight box.
 
             // getImageData & putImageData work in screen coordinates and not
             // in canvas coordinates so transform
-            var hScale = this.pageHRatio * this.pageScale;
-            var vScale = this.pageVRatio * this.pageScale;
+            var hScale = this.imageWidth * this.pageScale;
+            var vScale = this.imageHeight * this.pageScale;
+            console.log(hScale,vScale);
             var rect = {
                 hpos : Math.round(hl.hpos * hScale + this.originX) - 2,
                 vpos : Math.round(hl.vpos * vScale + this.originY) - 2,
@@ -270,8 +279,8 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         },
         render: function() {
 
-            this.horizontalPixels = this.$el.attr('width') || this.pageHRatio;
-            this.verticalPixels = this.$el.attr('height') || this.pageVRatio;
+            this.horizontalPixels = this.$el.attr('width') || this.imageWidth;
+            this.verticalPixels = this.$el.attr('height') || this.imageHeight;
 
             var ctx = this.$el.get(0).getContext("2d");
 
@@ -280,8 +289,8 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
     
             if (!this.image) { return; }
 
-            this.pageHRatio = this.image.width;
-            this.pageVRatio = this.image.height;
+            this.imageWidth = this.image.width;
+            this.imageHeight = this.image.height;
             ctx.setTransform(
                     this.pageScale,
                     0,
