@@ -81,13 +81,16 @@ define(['events','codemirror','backbone'],function (events) {
                     ch --;
                 }
             }
-            var word = this.alto.getNthWord(wordIndex) || {};
+            var word = this.alto.getNthWord(wordIndex);
             if (
-                (word.hpos != this.wordUnderCursor.hpos) ||
-                (word.vpos != this.wordUnderCursor.vpos) ||
-                (word.width != this.wordUnderCursor.width) ||
-                (word.height != this.wordUnderCursor.height)
-            ) {
+                (this.wordUnderCursor && !word) ||
+                (!this.wordUndeCursor && word) ||
+                (word && (
+                    (word.hpos != this.wordUnderCursor.hpos) ||
+                    (word.vpos != this.wordUnderCursor.vpos) ||
+                    (word.width != this.wordUnderCursor.width) ||
+                    (word.height != this.wordUnderCursor.height)
+                ))) {
                 this.wordUnderCursor = word;
                 events.trigger('changeCoordinates',word);
             }
@@ -113,7 +116,8 @@ define(['events','codemirror','backbone'],function (events) {
                 $e.css('height','100%');
                 this.$el.html($e);
             }
-            events.trigger('changeCoordinates',this.alto.getNthWord(0));
+            var word = this.alto.getNthWord(0);
+            events.trigger('changeCoordinates',word);
         }
     });
 

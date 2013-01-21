@@ -212,9 +212,11 @@ define(['jsdiff'],function (jsdiff) {
         }
 
         for (var i = 0; i < this.$$elementStack.length; i++) {
-            this.$$elementStack[i].attr('CONTENT',this.wordStack[i]);
+            this.$$elementStack[i].attr('CONTENT',this.wordStack[i] || '');
         }
-        splitBoundingBoxes (this.$$elementStack, boundingBoxes);
+        if (boundingBoxes.length > 0) {
+            splitBoundingBoxes (this.$$elementStack, boundingBoxes);
+        }
 
         this.resetLine();
         return elementsAdded;

@@ -53,6 +53,8 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
             alto.load({url:url},function(alto) {
                 editor.view.setAlto(alto);
                 editor.view.render();
+            /*
+            */
                 progressCounter ++ ;
                 if (progressCounter == 2) doneLoading();
             });
