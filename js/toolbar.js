@@ -13,35 +13,29 @@ define(['events','mustache','backbone'],function (events,mustache) {
         keyboardShortcuts [which] = callback;
     };
 
-    function registerWidget(id,widget,modes) {
+    function registerWidget(data) {
         // widget is a backbone view that renders widget
         // modes is an array of modes in which this widget is active
         // toolbar takes care that widget.el exists when widget.render
         // is called
 
+        var id = data.id;
         if (id in widgets) {
             throw "Trying to reregister widget " + id;
         }
-        widgets [id] = {
-            view: widget,
-            modes: modes,
-        }
+        widgets [id] = data
     };
 
-    function registerButton(id,toggle,icon,modes) {
+    function registerButton(data) {
         // toggle makes button togleable, otherwise clickable
         // toolbar takes care of firing button-{{id}}-click,
         // events on clicks.
 
+        var id = data.id;
         if (id in buttons) {
             throw "Trying to reregister button " + id;
         }
-        buttons [id] = {
-            id: id,
-            toggle: toggle,
-            icon: icon,
-            modes: modes,
-        }
+        buttons [id] = data;
     };
 
     $('body').on('keydown',function(ev) {
@@ -70,7 +64,7 @@ define(['events','mustache','backbone'],function (events,mustache) {
         render: function() {
             
             var context = {
-                widgets: _.map(widgets,function(w,i) { return i; }),
+                widgets: _.map(widgets,function(w) { return w; }),
                 buttons: _.map(buttons,function(b) { return b; }),
             };
             var tpl = $templates.find('#toolbar-template').html();

@@ -1,33 +1,31 @@
 <div id="templates">
-    <ul id="toolbar-template" class="nav">
+    <div id="toolbar-template" class="btn-toolbar">
         {{#widgets}}
-            <li>
-                <div id="{{.}}"> </div>
-            </li>
+            <div class="{{classes}}" id="{{id}}"> </div>
         {{/widgets}}
-        <li id="buttons">
-            <div class="btn-group">
+            <div id="buttons" class="btn-group">
                 {{#buttons}}
                     {{#toggle}}
-                    <button type="button" class="btn" id="{{id}}" data-toggle="button">
+                    <button type="button" class="btn" id="{{id}}" data-toggle="button" title="{{title}}">
                     {{/toggle}}
                     {{^toggle}}
-                    <button type="button" class="btn" id="{{id}}" >
+                    <button type="button" class="btn" id="{{id}}" title="{{title}}">
                     {{/toggle}}
                         <i class="{{icon}}"> </i>
                     </button>
                 {{/buttons}}
             </div>
-        </li>
-    </ul>
+    </div>
 
-    <li id="page-selector-template">
-        <div class="form-horizontal btn-group input-prepend input-append">
-                <button class="btn" id="page-previous"> &lt; </button>
-                <input type="text" class="span1" id="page-number"
-                    value="{{pageNumber}}"/>
-                <button class="btn disabled" >/ {{pages}}</button>
-                <button class="btn" id="page-next"> &gt;</button>
-        </div>
-    </li>
+    <div id="page-selector-template">
+        <button class="btn" id="page-previous" title="Previous page">
+            <i class="icon-arrow-left"> </i>
+        </button>
+        <input type="text" class="span1" id="page-number" title="Page number"
+            value="{{pageNumber}}"/>
+        <button class="btn disabled" title="Number of pages">/ {{pages}}</button>
+        <button class="btn" id="page-next" title="Next page">
+            <i class="icon-arrow-right"> </i>
+        </button>
+    </div>
 </div>

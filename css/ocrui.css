@@ -23,12 +23,16 @@
     height: 100%;
     z-index: 0;
 }
+
 #greyout {
     background-color: white;
     opacity: 0.5;
 }
 
+#page-selector {
+    margin-bottom: 0;
+}
+
 body {
-    padding-top: 40px;
     overflow:hidden;
 }

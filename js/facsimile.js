@@ -29,9 +29,24 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             this.pageHRatio = 500; // initial something
             this.pageVRatio = 500; // initial something
 
-            toolbar.registerButton('zoom-in',false,'icon-zoom-in',['page']);
-            toolbar.registerButton('zoom-out',false,'icon-zoom-out',['page']);
-            toolbar.registerButton('pan-zoom',true,'icon-move',['page']);
+            toolbar.registerButton({
+                id:'zoom-in',
+                toggle:false,
+                icon:'icon-zoom-in',
+                title:'Zoom in',
+                modes:['page']});
+            toolbar.registerButton({
+                id:'zoom-out',
+                toggle:false,
+                icon:'icon-zoom-out',
+                title:'Zoom out',
+                modes:['page']});
+            toolbar.registerButton({
+                id:'pan-zoom',
+                toggle:true,
+                icon:'icon-move',
+                title:'Mouse wheel pan/zoom',
+                modes:['page']});
             toolbar.registerKeyboardShortcut(113, function(ev) {
                 $('#pan-zoom').click();
             });

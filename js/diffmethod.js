@@ -64,23 +64,22 @@ define(['jsdiff'],function (jsdiff) {
         $object.attr('HEIGHT', bb.height);
     }
     function getCombinedBoundingBox(bbs) {
-        var bb = _.clone(bbs[0]);
         
+        var xs = [];
+        var ys = [];
         for (var i in bbs) {
-            var bb2 = bbs[i];
-            if (bb2.hpos < bb.hpos) {
-                bb.hpos = bb2.hpos;
-            }
-            if (bb2.vpos < bb.vpos) {
-                bb.vpos = bb2.vpos;
-            }
-            if (bb2.hpos+bb2.width > bb.hpos+bb.width) {
-                bb.width = bb2.hpos + bb2.width - bb.hpos;
-            }
-            if (bb2.vpos+bb2.height > bb.vpos+bb.height) {
-                bb.height = bb2.height + bb2.height - bb.vpos;
-            }
+            xs.push(bbs[i].hpos);
+            xs.push(bbs[i].hpos + bbs[i].width);
+            ys.push(bbs[i].vpos);
+            ys.push(bbs[i].vpos + bbs[i].height);
         }
+        var bb = {
+            hpos: _.min(xs),
+            vpos: _.min(ys),
+        }
+        bb.width = _.max(xs) - bb.hpos;
+        bb.height = _.max(ys) - bb.vpos;
+
         return bb;
 
     }

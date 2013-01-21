@@ -69,7 +69,11 @@ define(['events','toolbar','mustache','backbone'],function (events,toolbar,musta
     });
 
     var view = new View();
-    toolbar.registerWidget( 'page-selector', view, ['page'] );
+    toolbar.registerWidget({
+        id:'page-selector',
+        view:view,
+        classes: "btn-group form-horizontal input-prepend input-append",
+        modes:['page'] });
 
     return { } // no external interface, this just registers a widget
 

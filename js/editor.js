@@ -1,4 +1,4 @@
-define(['events','codemirror','backbone'],function (events) {
+define(['events','toolbar','codemirror','backbone'],function (events,toolbar) {
 
     EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -55,10 +55,27 @@ define(['events','codemirror','backbone'],function (events) {
         },
         changed: function (instance) {
             var content = instance.getValue();
-            this.alto.updateAlto(content);
-            this.triggerHighlightChange();
+            this.setupAltoUpdate(content);
+        },
+        setupAltoUpdate: function (content) {
+            this.altoUpdatePending = true;
+            var that = this;
+            setTimeout(function() {
+                    that.alto.updateAlto(content);
+                    that.setupHighlightChange();
+                }, 100);
+        },
+        setupHighlightChange: function () {
+            this.highlightChangePending = true;
+            var that = this;
+            setTimeout(function() {
+                    that.triggerHighlightChange();
+                }, 100);
         },
         triggerHighlightChange: function () {
+
+            if (!this.highlightChangePending) return;
+            this.highlightChangePending = false;
             var content = this.cMirror.getValue();
             var cursor = this.cMirror.getCursor();
             var line = cursor.line;
@@ -104,7 +121,7 @@ define(['events','codemirror','backbone'],function (events) {
             var that = this;
             if (this.alto.get('status') == 'success') {
                 this.cMirror.on('cursorActivity',function (instance) {
-                    that.triggerHighlightChange();
+                    that.setupHighlightChange();
                 });
                 this.cMirror.on('change',function (instance) {
                     that.changed(instance);

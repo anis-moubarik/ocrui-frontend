@@ -3,6 +3,17 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
 
     var doc = undefined; // this is used to store mets currently being edited
 
+    toolbar.registerButton({
+        id:"save",
+        toggle:false,
+        icon:"icon-hdd",
+        title:"Save",
+        modes:["page"]});
+    events.on('button-save-clicked',function () {
+        console.log('should now PUT');
+    });
+
+
     function route_empty() {
 
 
