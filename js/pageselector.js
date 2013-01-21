@@ -4,6 +4,20 @@ define(['events','toolbar','mustache','backbone'],function (events,toolbar,musta
         initialize: function() {
             this.options = {};
             var that = this;
+
+            toolbar.registerKeyboardShortcut(33, function() {
+                this.pagePrevious();
+            });
+            toolbar.registerKeyboardShortcut(34, function() {
+                this.pageNext();
+            });
+
+            toolbar.registerWidget({
+                id:'page-selector',
+                view:this,
+                classes: "btn-group form-horizontal input-prepend input-append",
+                modes:['page'] });
+
             events.on('changePage',function(data) {
                 that.options.pageNumber = data;
                 that.render();
@@ -61,19 +75,7 @@ define(['events','toolbar','mustache','backbone'],function (events,toolbar,musta
         }
     });
 
-    toolbar.registerKeyboardShortcut(33, function() {
-        view.pagePrevious();
-    });
-    toolbar.registerKeyboardShortcut(34, function() {
-        view.pageNext();
-    });
-
     var view = new View();
-    toolbar.registerWidget({
-        id:'page-selector',
-        view:view,
-        classes: "btn-group form-horizontal input-prepend input-append",
-        modes:['page'] });
 
     return { } // no external interface, this just registers a widget
 

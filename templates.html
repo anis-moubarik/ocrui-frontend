@@ -28,4 +28,18 @@
             <i class="icon-arrow-right"> </i>
         </button>
     </div>
+
+    <div id="language-selector-template">
+        <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
+            {{selected}}
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            {{#languages}}
+            <li>
+                <a href="#">{{.}}</a>
+            </li>
+            {{/languages}}
+        </ul>
+    </div>
 </div>
