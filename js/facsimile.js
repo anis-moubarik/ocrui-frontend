@@ -110,25 +110,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             var newOfY = ofY * scaleChange;
             var newOriginX = fixedX - newOfX;
             var newOriginY = fixedY - newOfY;
-            // var newFixedX = (fixedX - this.originX) / (this.imageWidth * scale);
-            // var newFixedY = (fixedY - this.originY) / (this.imageHeight * scale);
-            // var oldPageFixedX = (fixedX - this.originX) / (this.imageWidth * this.pageScale);
-            // var oldPageFixedY = (fixedY - this.originY) / (this.imageHeight * this.pageScale);
-            /*
-            var delta = this.pageCoordsToScreenCoords({
-                x: oldPageFixedX - newPageFixedX,
-                y: oldPageFixedY - newPageFixedY,
-            });
-            console.log('fixed: ', fixedX,fixedY);
-            console.log('page: ', pageFixedX,pageFixedY);
-            console.log('new origin: ',
-                newPageOriginX,
-                newPageOriginY,
-                newOriginX,
-                newOriginY);
-            */
             this.setOrigin( newOriginX, newOriginY);
-            console.log('x',this.originX,this.originY);
             this.pageScale = scale
             this.render();
         },
@@ -198,8 +180,6 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             };
             // BUG: scaling?
             var imageCoords = this.screenCoordsToPageCoords(screenCoords);
-            console.log(screenCoords);
-            console.log(imageCoords);
             events.trigger('cursorToCoordinate',imageCoords);
         },
         screenCoordsToPageCoords: function(coords) {
@@ -225,7 +205,6 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         },
         renderHighlight : function(ctx,hl) {
             if (!hl) { return; }
-            console.log(hl);
 
             //Draw semi transparent highlight box.
 
@@ -233,7 +212,6 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             // in canvas coordinates so transform
             var hScale = this.imageWidth * this.pageScale;
             var vScale = this.imageHeight * this.pageScale;
-            console.log(hScale,vScale);
             var rect = {
                 hpos : Math.round(hl.hpos * hScale + this.originX) - 2,
                 vpos : Math.round(hl.vpos * vScale + this.originY) - 2,
