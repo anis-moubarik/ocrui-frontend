@@ -75,7 +75,9 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
         function doneLoading() {
             facsimile.view.render();
             $(window).resize();
-            editor.view.setFocus();
+            if (editor.view.cMirror) {
+                editor.view.cMirror.focus();
+            }
         }
 
     }

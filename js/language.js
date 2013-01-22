@@ -34,22 +34,36 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
         },
         el : '#language-selector',
         events: {
-            //'click #page-next': 'pageNext',
-            //'click #page-previous': 'pagePrevious',
-            //'change #page-number': 'pageNumber',
+            'click ul a': 'changeLanguage',
+        },
+        changeLanguage: function (ev) {
+            var l = ev.currentTarget.getAttribute("data-value");
+            model.set('selected',l);
+            events.trigger('languagesChanged',model);
+            this.render();
+            ev.preventDefault();
+            ev.stopPropagation();
         },
         render: function() {
             var that = this;
             load(function(languages) {
                 events.trigger('languagesChanged',languages);
                 var context = {
-                    selected: 'Mordva',
-                    languages: _.map(
-                            languages.get('languages'),
-                            function(e) {return e.name;})
+                    selected: languages.get('selected'),
+                    selectedName: languages.get('selected'),
                 };
+                context.languages = languages.get('languages').map(function(e) {
+                    if(e.code==languages.get('selected')) {
+                        context.selectedName = e.name;
+                        console.log(e.name);
+                        return undefined;
+                    } else {
+                        return e;
+                    }
+                }).filter(function(e) { return !(e===undefined); })
                 var tpl = $templates.find('#language-selector-template').html();
                 that.$el.html(mustache.render(tpl,context));
+                that.$el.removeClass('open');
             });
         }
     });

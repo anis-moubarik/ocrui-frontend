@@ -7,13 +7,13 @@ define(['jquery','underscore','backbone','events'],function ($,_,Backbone,events
             events.on('languagesChanged',function(languages) {
                 that.languages = languages;
                 that.render();
-            });
+                });
 
-        },
+            },
         el: '#vkeyboard',
         render: function() {
 
-            this.$el.html();
+            this.$el.html('');
             var $div = $('<div class="btn-group"/>');
             this.$el.append($div);
 
@@ -31,8 +31,15 @@ define(['jquery','underscore','backbone','events'],function ($,_,Backbone,events
                 var $a = $('<a />');
                 $a.attr("href","#");
                 $a.attr("class","btn");
+                $a.attr("data-character",v);
                 $a.text(v);
-                $div.append($a);
+                $a.click(function(ev) {
+                    var ch = ev.currentTarget.getAttribute('data-character');
+                    events.trigger('virtualKeyboard',ch);
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                });
+            $div.append($a);
             });
         }
     });

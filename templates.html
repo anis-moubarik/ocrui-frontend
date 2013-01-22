@@ -31,13 +31,13 @@
 
     <div id="language-selector-template">
         <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
-            {{selected}}
+            {{selectedName}}
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
             {{#languages}}
             <li>
-                <a href="#">{{.}}</a>
+                <a href="#" data-value="{{code}}">{{name}}</a>
             </li>
             {{/languages}}
         </ul>

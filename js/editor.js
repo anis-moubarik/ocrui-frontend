@@ -18,6 +18,12 @@ define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,
                 lineWrapping: true,
                 mode: 'html'
             });
+            events.on('virtualKeyboard',function(data) {
+                that.cMirror.replaceSelection(data);
+                that.cMirror.focus();
+                var cursor = that.cMirror.getCursor();
+                that.cMirror.setCursor(cursor);
+            });
             events.on('cursorToCoordinate',function(data) {
 
                 if (that.alto) {
@@ -50,10 +56,7 @@ define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,
                 ch ++;
             }
             this.cMirror.setCursor(line,ch);
-            this.setFocus();
-        },
-        setFocus: function () {
-            this.$el.find('.CodeMirror textarea').focus();
+            this.cMirror.focus();
         },
         changed: function (instance) {
             var content = instance.getValue();
