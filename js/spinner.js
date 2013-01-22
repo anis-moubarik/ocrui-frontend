@@ -1,7 +1,8 @@
-define(['spin','backbone'],function (spin) {
+define(['jquery','spin'],function ($,spin) {
+    "use strict";
 
 
-    options = {
+    var options = {
         lines: 12, // The number of lines to draw
         length: 7, // The length of each line
         width: 5, // The line thickness
@@ -16,8 +17,8 @@ define(['spin','backbone'],function (spin) {
     var spinnerCount = 0;
 
     function showSpinner(i) {
-        if (i==undefined) i = 1
-        if (spinnerCount == 0) {
+        if (i===undefined) i = 1;
+        if (spinnerCount === 0) {
             spinner.spin($('#spinner').get(0));
             $('#greyout').css('z-index','1000000');
             $('#spinner').css('z-index','1000001');
@@ -26,7 +27,7 @@ define(['spin','backbone'],function (spin) {
     }
     
     function hideSpinner(i) {
-        if (i==undefined) i = 1
+        if (i===undefined) i = 1;
         spinnerCount -= i;
         if (spinnerCount <= 0) {
             spinnerCount = 0;
@@ -37,7 +38,7 @@ define(['spin','backbone'],function (spin) {
     
     return {
         showSpinner : showSpinner,
-        hideSpinner : hideSpinner,
+        hideSpinner : hideSpinner
     };
 
 });

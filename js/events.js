@@ -1,6 +1,7 @@
 define(function () {
+    "use strict";
 
-    var listeners = {}
+    var listeners = {};
 
     function on (ev,cb) {
 

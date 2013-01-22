@@ -1,16 +1,18 @@
-define(['toolbar','events','backbone'],function (toolbar,events) {
+/*globals console:true */
+define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backbone) {
+    "use strict";
 
-    EmptyView = Backbone.View.extend({
+    var EmptyView = Backbone.View.extend({
         el: '#editor',
         render: function() {
             this.$el.html("<div>empty</div>");
         }
     });
 
-    Thumbnails = Backbone.View.extend({
+    var Thumbnails = Backbone.View.extend({
         el: '#facsimile',
         render: function() {
-            var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>')
+            var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>');
             $canvas.attr(this.horizontalPixels,'width');
             $canvas.attr(this.verticalPixels,'height');
             this.$el.html('');
@@ -18,7 +20,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         }
     });
 
-    View = Backbone.View.extend({
+    var View = Backbone.View.extend({
 
         initialize: function() {
 
@@ -94,7 +96,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             'mousedown': 'beginPan',
             'mouseup': 'endPan',
             'mouseout': 'endPan',
-            'set-scaling': 'render',
+            'set-scaling': 'render'
         },
         adjustZoom: function(amount,fixedX,fixedY) {
             var scale = this.pageScale * amount;
@@ -111,7 +113,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             var newOriginX = fixedX - newOfX;
             var newOriginY = fixedY - newOfY;
             this.setOrigin( newOriginX, newOriginY);
-            this.pageScale = scale
+            this.pageScale = scale;
             this.render();
         },
         wheel: function(ev,delta,deltaX,deltaY) {
@@ -158,9 +160,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         },
         pan: function(ev) {
             this.propageteNextClick = false;
-            if (!this.panning) {
-                return
-            }
+            if (!this.panning) { return; }
             var offset = this.$el.offset();
             var currentX = ev.pageX - offset.left;
             var currentY = ev.pageY - offset.top;
@@ -173,7 +173,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         },
         propagateClick: function(ev) {
             if (!this.propageteNextClick) return;
-            var offset = this.$el.offset()
+            var offset = this.$el.offset();
             var screenCoords = {
                 x:ev.pageX - offset.left,
                 y:ev.pageY - offset.top
@@ -184,17 +184,17 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
         },
         screenCoordsToPageCoords: function(coords) {
             return {
-                x: (coords.x - this.originX) / (this.imageWidth * this.pageScale), 
-                y: (coords.y - this.originY) / (this.imageHeight * this.pageScale), 
-            }
+                x: (coords.x - this.originX) / (this.imageWidth * this.pageScale),
+                y: (coords.y - this.originY) / (this.imageHeight * this.pageScale)
+            };
         },
         pageCoordsToScreenCoords: function(coords) {
             var hScale = this.imageWidth * this.pageScale;
             var vScale = this.imageHeight * this.pageScale;
             return {
                 x : Math.round(coords.x * hScale + this.originX) - 2,
-                y : Math.round(coords.y * vScale + this.originY) - 2,
-            }
+                y : Math.round(coords.y * vScale + this.originY) - 2
+            };
         },
         setImage: function(image) {
             this.image = image;
@@ -216,7 +216,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
                 hpos : Math.round(hl.hpos * hScale + this.originX) - 2,
                 vpos : Math.round(hl.vpos * vScale + this.originY) - 2,
                 width : Math.round(hl.width * hScale) + 2,
-                height : Math.round(hl.height * vScale) + 2,
+                height : Math.round(hl.height * vScale) + 2
             };
 
             // Start with what is already there.
@@ -231,11 +231,11 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
             var pix = imgd.data;
 
             // Loop over each pixel and set rgba
-            for (var i = 0; n = pix.length, i < n; i += 4) {
+            for (var i = 0, n = pix.length; i < n; i += 4) {
                 var ix = Math.floor(i / 4) % rect.width;
                 var iy = Math.floor(i / 4 / rect.width);
-                if ( (ix == 0) || (ix == rect.width-1) ||
-                        (iy == 0) || (iy == rect.height-1)) {
+                if ( (ix === 0) || (ix === rect.width-1) ||
+                        (iy === 0) || (iy === rect.height-1)) {
                     pix[i  ] = (pix[i  ] + 144) / 2; // red
                     pix[i+1] = (pix[i+1] + 133) / 2; // green
                     pix[i+2] = (pix[i+2] +  22) / 2; // blue
@@ -293,7 +293,7 @@ define(['toolbar','events','backbone'],function (toolbar,events) {
     return {
         view: new View(),
         thumbnails: new Thumbnails(),
-        empty: new EmptyView(),
-    }
+        empty: new EmptyView()
+    };
 
 });

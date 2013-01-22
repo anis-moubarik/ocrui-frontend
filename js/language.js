@@ -1,4 +1,6 @@
-define(['toolbar','events','mustache','backbone'],function (toolbar,events,mustache) {
+/*globals console:true, $templates:false*/
+define(['toolbar','events','mustache','backbone'],function (toolbar,events,mustache,Backbone) {
+    "use strict";
 
     var View = Backbone.View.extend({
         initialize: function() {
@@ -28,7 +30,7 @@ define(['toolbar','events','mustache','backbone'],function (toolbar,events,musta
                     'Suomi',
                     'Mordva',
                     'Vepsä',
-                    'Venäjä',
+                    'Venäjä'
                 ]
             };
             var tpl = $templates.find('#language-selector-template').html();
@@ -38,5 +40,5 @@ define(['toolbar','events','mustache','backbone'],function (toolbar,events,musta
 
     var view = new View();
 
-    return {}
+    return {};
 });

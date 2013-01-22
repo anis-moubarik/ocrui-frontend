@@ -1,4 +1,7 @@
-define(['events','toolbar','mustache','backbone'],function (events,toolbar,mustache) {
+/*globals require:false $templates:false */
+define(['jquery','events','toolbar','mustache','backbone'],
+        function ($,events,toolbar,mustache,Backbone) {
+    "use strict";
 
     var View = Backbone.View.extend({
         initialize: function() {
@@ -31,7 +34,7 @@ define(['events','toolbar','mustache','backbone'],function (events,toolbar,musta
         events: {
             'click #page-next': 'pageNext',
             'click #page-previous': 'pagePrevious',
-            'change #page-number': 'pageNumber',
+            'change #page-number': 'pageNumber'
         },
         pageNext : function (ev) {
             this.boundedSetPage(this.getPageNumber() + 1);
@@ -44,9 +47,9 @@ define(['events','toolbar','mustache','backbone'],function (events,toolbar,musta
         },
         getPageNumber : function () {
             var s = $('#page-number').attr('value');
-            var i = parseInt(s);
+            var i = parseInt(s,10);
             if (isNaN(i)) return 1;
-            return i
+            return i;
         },
         setPageNumber : function (number) {
                 require('router').gotoPage(number);
@@ -77,7 +80,7 @@ define(['events','toolbar','mustache','backbone'],function (events,toolbar,musta
 
     var view = new View();
 
-    return { } // no external interface, this just registers a widget
+    return { }; // no external interface, this just registers a widget
 
 });
 

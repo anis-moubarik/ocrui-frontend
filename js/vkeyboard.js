@@ -1,4 +1,5 @@
-define(['backbone'],function () {
+define(['jquery','underscore','backbone'],function ($,_,Backbone) {
+    "use strict";
 
     var View = Backbone.View.extend({
         el: '#vkeyboard',
@@ -21,6 +22,6 @@ define(['backbone'],function () {
     });
 
     return {
-        view: new(View)
-    }
+        view: new View()
+    };
 });

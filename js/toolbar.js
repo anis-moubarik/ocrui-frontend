@@ -1,4 +1,6 @@
-define(['events','mustache','backbone'],function (events,mustache) {
+/*globals $templates:false */
+define(['jquery','underscore','events','mustache','backbone'],function ($,_,events,mustache,Backbone) {
+    "use strict";
 
     // handle keyboard shortcuts also
 
@@ -11,7 +13,7 @@ define(['events','mustache','backbone'],function (events,mustache) {
             throw "Trying to reregister shortcut for " + which;
         }
         keyboardShortcuts [which] = callback;
-    };
+    }
 
     function registerWidget(data) {
         // widget is a backbone view that renders widget
@@ -23,8 +25,8 @@ define(['events','mustache','backbone'],function (events,mustache) {
         if (id in widgets) {
             throw "Trying to reregister widget " + id;
         }
-        widgets [id] = data
-    };
+        widgets [id] = data;
+    }
 
     function registerButton(data) {
         // toggle makes button togleable, otherwise clickable
@@ -36,7 +38,7 @@ define(['events','mustache','backbone'],function (events,mustache) {
             throw "Trying to reregister button " + id;
         }
         buttons [id] = data;
-    };
+    }
 
     $('body').on('keydown',function(ev) {
         var callback = keyboardShortcuts[ev.which];
@@ -54,7 +56,7 @@ define(['events','mustache','backbone'],function (events,mustache) {
             'click button': 'handleClick'
         },
         handleClick: function (ev) {
-            var id = ev.currentTarget.id
+            var id = ev.currentTarget.id;
             var myEvent = 'button-'+id+'-clicked';
             events.trigger(myEvent);
         },
@@ -65,7 +67,7 @@ define(['events','mustache','backbone'],function (events,mustache) {
             
             var context = {
                 widgets: _.map(widgets,function(w) { return w; }),
-                buttons: _.map(buttons,function(b) { return b; }),
+                buttons: _.map(buttons,function(b) { return b; })
             };
             var tpl = $templates.find('#toolbar-template').html();
             this.$el.html(mustache.render(tpl,context));
@@ -75,7 +77,7 @@ define(['events','mustache','backbone'],function (events,mustache) {
                 var view = widgets[i].view;
                 view.setElement('#' + i);
                 view.render();
-            };
+            }
 
             //this.$el.button(); // enable bootstrap button code
         }
@@ -87,6 +89,6 @@ define(['events','mustache','backbone'],function (events,mustache) {
         registerKeyboardShortcut : registerKeyboardShortcut,
         registerWidget : registerWidget,
         registerButton : registerButton
-    }
+    };
 
 });

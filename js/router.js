@@ -1,10 +1,11 @@
-define(['backbone','ocrui'],function (backbone,ocrui) {
+define(['backbone','ocrui'],function (Backbone,ocrui) {
+    "use strict";
 
     var Router = Backbone.Router.extend({
         routes:{
             "": "default",
             ":id": "document",
-            ":id/:page": "page",
+            ":id/:page": "page"
         }
     });
 
@@ -18,10 +19,10 @@ define(['backbone','ocrui'],function (backbone,ocrui) {
         var parts = Backbone.history.fragment.split('/');
         var route = parts[0]+'/'+pageNumber;
         router.navigate(route,{replace:true,trigger:true});
-    };
+    }
 
     return {
-        gotoPage:gotoPage,
+        gotoPage:gotoPage
     };
 
 });

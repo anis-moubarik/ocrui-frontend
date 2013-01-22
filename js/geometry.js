@@ -1,4 +1,6 @@
-define([], function() {
+/*globals window:false */
+define(['jquery'], function($) {
+    "use strict";
 
     function resizeHandler (ev) {
         var topHeight = $('#toolbar').outerHeight();
@@ -14,7 +16,7 @@ define([], function() {
         $('#facsimile-canvas').attr('height',facsimileHeight);
         $('#facsimile-canvas').attr('width',facsimileWidth);
         $('#facsimile-canvas').trigger('set-scaling');
-    };
+    }
 
     return {
         resizeHandler: resizeHandler

@@ -1,6 +1,8 @@
-define(['backbone'],function () {
+/*globals Image:false */
+define(['backbone'],function (Backbone) {
+    "use strict";
 
-    ImageModel = Backbone.Model.extend({
+    var ImageModel = Backbone.Model.extend({
         initialize: function (options) {
             this.url = options.url;
         },
@@ -29,6 +31,6 @@ define(['backbone'],function () {
     }
 
     return {
-        load: load,
-    }
+        load: load
+    };
 });

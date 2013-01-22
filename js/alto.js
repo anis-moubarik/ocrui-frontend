@@ -1,32 +1,33 @@
-define(['diffmethod','backbone'],function (diffmethod) {
+define(['jquery','diffmethod','backbone'],function ($,diffmethod,Backbone) {
+    "use strict";
 
-    AltoModel = Backbone.Model.extend({
+    var AltoModel = Backbone.Model.extend({
         initialize: function (options) {
             this.url = options.url;
         },
         dom2Word: function(dom) {
             return {
                 content: dom.getAttribute('CONTENT'),
-                hpos: parseInt(dom.getAttribute('HPOS'))/this.get('width'),
-                vpos: parseInt(dom.getAttribute('VPOS'))/this.get('height'),
-                width: parseInt(dom.getAttribute('WIDTH'))/this.get('width'),
-                height: parseInt(dom.getAttribute('HEIGHT'))/this.get('height'),
-            }
+                hpos: parseInt(dom.getAttribute('HPOS'),10)/this.get('width'),
+                vpos: parseInt(dom.getAttribute('VPOS'),10)/this.get('height'),
+                width: parseInt(dom.getAttribute('WIDTH'),10)/this.get('width'),
+                height: parseInt(dom.getAttribute('HEIGHT'),10)/this.get('height')
+            };
         },
         getWords: function() {
 
             var that = this;
-            var words = $(this.currentData).find('String').map(function(i) {
+            var words = $(this.currentData).find('String').map(function() {
                 return that.dom2Word(this);
             }).get();
             return words;
 
         },
         getWordIndexAt: function(x,y) {
-            var selection = undefined;
+            var selection;
 
-            var minDistance = undefined;
-            var minDistanceIndex = undefined;
+            var minDistance;
+            var minDistanceIndex;
             var that=this;
             // find bounding box under or closest to the cursor.
             $(this.currentData).find('String').each(function(i) {
@@ -48,19 +49,19 @@ define(['diffmethod','backbone'],function (diffmethod) {
                         Math.pow((cornerX - x), 2) +
                         Math.pow((cornerY - y), 2)
                     );
-                    if ((minDistance == undefined) || (distance < minDistance))
+                    if ((minDistance === undefined) || (distance < minDistance))
                     {
                         minDistance = distance;
                         minDistanceIndex = i;
                     }
-                };
+                }
                 tryToSetClosestCorner(word.hpos,word.vpos);
                 tryToSetClosestCorner(word.hpos+word.width,word.vpos);
                 tryToSetClosestCorner(word.hpos,word.vpos+word.height);
                 tryToSetClosestCorner(word.hpos+word.width,word.vpos+word.height);
 
             });
-            if (selection == undefined) {
+            if (selection === undefined) {
                 selection = minDistanceIndex;
             }
             return selection;
@@ -69,8 +70,8 @@ define(['diffmethod','backbone'],function (diffmethod) {
 
             // create new Alto based on string in content and
             // original alto structure
-            if (this.originalData == undefined) return;
-            if (words) return;
+            if (this.originalData === undefined) {return;}
+            if (words) {return;}
             var words = content.split(/\s+/);
             this.currentData = diffmethod.createAlto( this.originalData,words );
 
@@ -78,11 +79,11 @@ define(['diffmethod','backbone'],function (diffmethod) {
 
         getNthWord: function(index) {
             var dom =  $(this.currentData).find('String').get(index);
-            if (dom == undefined) return undefined;
+            if (dom === undefined) {return undefined;}
             return this.dom2Word(dom);
         },
         getStringSequence: function(dom) {
-            if (dom == undefined) dom = this.currentData;
+            if (dom === undefined) {dom = this.currentData;}
             return $(dom).find('String').map(
                 function() { return this.getAttribute('CONTENT'); }
             ).get();
@@ -94,7 +95,7 @@ define(['diffmethod','backbone'],function (diffmethod) {
 
         fetch: function (callback) {
             var that = this;
-            var jqxhr = $.ajax(this.url).always(function(data,textStatus) {
+            $.ajax(this.url).always(function(data,textStatus) {
                 that.currentData = data;
                 that.originalData = data; // BUG! figure out how this goes
                 var page = $(data).find('Page').get(0);
@@ -121,6 +122,6 @@ define(['diffmethod','backbone'],function (diffmethod) {
     }
 
     return {
-        load: load,
-    }
+        load: load
+    };
 });

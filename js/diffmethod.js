@@ -1,4 +1,5 @@
-define(['jsdiff'],function (jsdiff) {
+define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
+    "use strict";
 
     function getEditSequence (diff) {
         /*
@@ -51,11 +52,11 @@ define(['jsdiff'],function (jsdiff) {
     }
     function getBoundingBoxOf($object) {
         return {
-            hpos : parseInt($object.attr('HPOS')),
-            vpos : parseInt($object.attr('VPOS')),
-            width : parseInt($object.attr('WIDTH')),
-            height : parseInt($object.attr('HEIGHT')),
-        }
+            hpos : parseInt($object.attr('HPOS'),10),
+            vpos : parseInt($object.attr('VPOS'),10),
+            width : parseInt($object.attr('WIDTH'),10),
+            height : parseInt($object.attr('HEIGHT'),10)
+        };
     }
     function setBoundingBox($object,bb) {
         $object.attr('HPOS', bb.hpos);
@@ -75,8 +76,8 @@ define(['jsdiff'],function (jsdiff) {
         }
         var bb = {
             hpos: _.min(xs),
-            vpos: _.min(ys),
-        }
+            vpos: _.min(ys)
+        };
         bb.width = _.max(xs) - bb.hpos;
         bb.height = _.max(ys) - bb.vpos;
 
@@ -103,11 +104,11 @@ define(['jsdiff'],function (jsdiff) {
                 vpos : combinedBB.vpos,
                 width : combinedBB.width * proportion,
                 height : combinedBB.height
-            }
+            };
             precedingProportion += proportion;
             setBoundingBox($element,bb);
         }
-    };
+    }
 
     function ProcessingState() {
         this.$nextPosition = undefined; // next $position to come
@@ -127,7 +128,7 @@ define(['jsdiff'],function (jsdiff) {
         var $nextTextline = this.$textline;
         var elementsAdded = 0;
 
-        if ($string != undefined) $nextTextline = $string.parent();
+        if ($string !== undefined) $nextTextline = $string.parent();
 
         if ( ( this.$textline ) &&
              ($nextTextline) &&
@@ -135,41 +136,42 @@ define(['jsdiff'],function (jsdiff) {
             elementsAdded = this.processPending();
         }
 
-        if (word != undefined) {
+        if (word !== undefined) {
             this.wordStack.push(word);
         }
 
-        if ($string != undefined) {
+        if ($string !== undefined) {
             this.$$elementStack.push($string);
         }
 
         return elementsAdded;
 
-    }
+    };
 
     ProcessingState.prototype.prepareString = function($string) {
         this.$nextPosition = $string;
 
-    }
+    };
 
     ProcessingState.prototype.stringDone = function() {
         this.$position = this.$nextPosition;
         this.$textline = this.$position.parent();
 
 
-    }
+    };
 
     ProcessingState.prototype.processPending = function() {
 
         var elementsAdded = 0;
         var needToAddNextElement = false;
-        if ((this.wordStack.length == 0) && (this.$$elementStack.length == 0)) {
+        if (    (this.wordStack.length === 0) &&
+                (this.$$elementStack.length === 0) ) {
             return 0;
         }
 
         // If there are no elements to replace try to add preceding and
         // subsequent elements and words.
-        if (this.$$elementStack.length == 0) {
+        if (this.$$elementStack.length === 0) {
             // BUG: only add when these are at the same line
             if ((this.$position) && (this.$position.parent().get(0) == this.$textline.get(0))) {
                 this.wordStack.splice(0,0,this.$position.attr('CONTENT'));
@@ -182,10 +184,10 @@ define(['jsdiff'],function (jsdiff) {
         // add elements if they are too few
         while (this.$$elementStack.length < this.wordStack.length) {
             var $string = $($.parseXML('<String />')).find('String');
-            if ($insertPosition != undefined) {
+            if ($insertPosition !== undefined) {
                 $insertPosition.after($string);
                 $insertPosition = $insertPosition.next();
-            } else if (this.$textline != undefined) {
+            } else if (this.$textline !== undefined) {
                 // this happens, when edits occur in the beginning
                 // of a line.
                 this.$textline.prepend($string);
@@ -220,7 +222,7 @@ define(['jsdiff'],function (jsdiff) {
         this.resetLine();
         return elementsAdded;
 
-    }
+    };
 
     function createAlto (source,words) {
         var originalWords = $(source).find('String').map(
@@ -281,7 +283,7 @@ define(['jsdiff'],function (jsdiff) {
     }
 
     return {
-        createAlto : createAlto,
+        createAlto : createAlto
     };
 });
 

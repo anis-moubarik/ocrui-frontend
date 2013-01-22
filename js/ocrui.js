@@ -1,7 +1,7 @@
 define(['spinner','events','alto','mets','image','facsimile','editor','toolbar'],
         function (spinner,events,alto,mets,image,facsimile,editor,toolbar) {
 
-    var doc = undefined; // this is used to store mets currently being edited
+    var doc; // this is used to store mets currently being edited
 
     toolbar.registerButton({
         id:"save",
@@ -22,7 +22,7 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
         facsimile.empty.render();
         editor.empty.render();
         $(window).resize();
-    };
+    }
 
     function route_doc(id) {
 
@@ -34,11 +34,11 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
             editor.empty.render();
             $(window).resize();
         });
-    };
+    }
 
     function route_page(id,pageNumber) {
 
-        var intPageNumber = Math.floor(parseInt(pageNumber));
+        var intPageNumber = Math.floor(parseInt(pageNumber,10));
         events.trigger('changePage',intPageNumber);
         toolbar.view.setMode('page');
         toolbar.view.render();
@@ -60,7 +60,7 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
                 if (progressCounter == 2) doneLoading();
             });
 
-            var url = _doc.getAltoUrl(intPageNumber);
+            url = _doc.getAltoUrl(intPageNumber);
             alto.load({url:url},function(alto) {
                 editor.view.setAlto(alto);
                 editor.view.render();
@@ -78,12 +78,12 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
             editor.view.setFocus();
         }
 
-    };
+    }
 
     return {
         route_empty:route_empty,
         route_doc:route_doc,
-        route_page:route_page,
+        route_page:route_page
     };
 
 });

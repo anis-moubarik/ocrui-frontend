@@ -1,17 +1,19 @@
-define(['events','toolbar','codemirror','backbone'],function (events,toolbar) {
+/*global setTimeout:false */
+define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,toolbar,CodeMirror,Backbone) {
+    "use strict";
 
-    EmptyView = Backbone.View.extend({
+    var EmptyView = Backbone.View.extend({
         el: '#editor',
         render: function() {
             this.$el.html("<div>empty</div>");
         }
     });
-    View = Backbone.View.extend({
+    var View = Backbone.View.extend({
 
         initialize: function () {
             this.wordUnderCursor = {};
             var that = this;
-            this.cMirror = CodeMirror(this.$el.get(0), {
+            this.cMirror = new CodeMirror(this.$el.get(0), {
                 value: "",
                 lineWrapping: true,
                 mode: 'html'
@@ -19,7 +21,7 @@ define(['events','toolbar','codemirror','backbone'],function (events,toolbar) {
             events.on('cursorToCoordinate',function(data) {
 
                 if (that.alto) {
-                    var index = that.alto.getWordIndexAt(data.x,data.y)
+                    var index = that.alto.getWordIndexAt(data.x,data.y);
                     that.moveCursorToWord(index);    
                 }
 
@@ -30,17 +32,17 @@ define(['events','toolbar','codemirror','backbone'],function (events,toolbar) {
             var content = this.cMirror.getValue();
             var line = 0;
             var ch = 0;
-            inMiddleOfWord = false;
-            if (wordIndex == undefined) return;
+            var inMiddleOfWord = false;
+            if (wordIndex === undefined) {return;}
             for (var i in content) {
                 var c = content[i];
                 if (c == '\n') {
                     line ++;
-                    ch = 0
+                    ch = 0;
                 }
                 if (c.match(/\S/)) {
                     if (inMiddleOfWord) wordIndex --;
-                    if (wordIndex == 0) break;
+                    if (wordIndex === 0) {break;}
                     inMiddleOfWord = false;
                 } else {
                     inMiddleOfWord = true;
@@ -91,8 +93,8 @@ define(['events','toolbar','codemirror','backbone'],function (events,toolbar) {
                 } else {
                     inMiddleOfWord = true;
                 }
-                if (line == 0) {
-                    if (ch == 0) {
+                if (line === 0) {
+                    if (ch === 0) {
                         break;
                     }
                     ch --;
@@ -140,7 +142,7 @@ define(['events','toolbar','codemirror','backbone'],function (events,toolbar) {
 
     return {
         view: new View(),
-        empty: new EmptyView(),
-    }
+        empty: new EmptyView()
+    };
 
 });
