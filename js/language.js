@@ -1,6 +1,21 @@
 /*globals console:true, $templates:false*/
-define(['toolbar','events','mustache','backbone'],function (toolbar,events,mustache,Backbone) {
+define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,events,mustache,Backbone,vkeyboard) {
     "use strict";
+
+    var model;
+
+    function load(callback) {
+        if (model === undefined) {
+            model = new Model();
+            model.fetch({success:callback});
+        } else {
+            callback(model);
+        }
+    }
+
+    var Model = Backbone.Model.extend({
+        url: function () { return '/ocrui/languages.json';},
+    });
 
     var View = Backbone.View.extend({
         initialize: function() {
@@ -24,17 +39,18 @@ define(['toolbar','events','mustache','backbone'],function (toolbar,events,musta
             //'change #page-number': 'pageNumber',
         },
         render: function() {
-            var context = {
-                selected: 'Mordva',
-                languages: [
-                    'Suomi',
-                    'Mordva',
-                    'Vepsä',
-                    'Venäjä'
-                ]
-            };
-            var tpl = $templates.find('#language-selector-template').html();
-            this.$el.html(mustache.render(tpl,context));
+            var that = this;
+            load(function(languages) {
+                events.trigger('languagesChanged',languages);
+                var context = {
+                    selected: 'Mordva',
+                    languages: _.map(
+                            languages.get('languages'),
+                            function(e) {return e.name;})
+                };
+                var tpl = $templates.find('#language-selector-template').html();
+                that.$el.html(mustache.render(tpl,context));
+            });
         }
     });
 
@@ -42,3 +58,4 @@ define(['toolbar','events','mustache','backbone'],function (toolbar,events,musta
 
     return {};
 });
+

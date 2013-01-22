@@ -1,16 +1,32 @@
-define(['jquery','underscore','backbone'],function ($,_,Backbone) {
+define(['jquery','underscore','backbone','events'],function ($,_,Backbone,events) {
     "use strict";
 
     var View = Backbone.View.extend({
+        initialize:function() {
+            var that = this;
+            events.on('languagesChanged',function(languages) {
+                that.languages = languages;
+                that.render();
+            });
+
+        },
         el: '#vkeyboard',
         render: function() {
 
-            var chars = ['a','b','c','d','e','f','g','h','i',
-                'j','k','l','m','n','o','p','q','r','s','t',
-                'u','v','w','x','y','z'];
-            var $div = $('<div class="btn-group"/>');
             this.$el.html();
+            var $div = $('<div class="btn-group"/>');
             this.$el.append($div);
+
+            if (this.languages === undefined) {return;}
+            var chars = undefined;
+            for (var i in this.languages.get('languages')) {
+                var l = this.languages.get('languages')[i];
+                if (l.code==this.languages.get('selected')) {
+                    chars = l.keyboard;
+                }
+            }
+            if (chars === undefined) {return;}
+
             _.each(chars,function(v) {
                 var $a = $('<a />');
                 $a.attr("href","#");
