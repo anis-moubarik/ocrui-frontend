@@ -2,6 +2,36 @@
 define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,toolbar,CodeMirror,Backbone) {
     "use strict";
 
+    function cmMode (config, parserConfig) {
+        return {
+            startState: function() {
+                return {
+                    language:'fi',
+                    i:0
+                };
+            },
+            token: function(stream,state) {
+                stream.eatSpace();
+                var word = '';
+                while (!stream.eol()) {
+                    var next = stream.next();
+                    if (/\s/.test(next)) { break; }
+                    word += next;
+                }
+                stream.eatSpace();
+                //console.log(state.language, word);
+                state.i++;
+                if (state.i > 13) {
+                    state.i = 0;
+                    return 'language';
+                } else {
+                    return null;
+                }
+            }
+        };
+    }
+    CodeMirror.defineMode('ocrui',cmMode);
+
     var EmptyView = Backbone.View.extend({
         el: '#editor',
         render: function() {
@@ -16,7 +46,7 @@ define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,
             this.cMirror = new CodeMirror(this.$el.get(0), {
                 value: "",
                 lineWrapping: true,
-                mode: 'html'
+                mode: 'ocrui'
             });
             events.on('virtualKeyboard',function(data) {
                 that.cMirror.replaceSelection(data);
