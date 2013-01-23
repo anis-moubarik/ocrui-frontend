@@ -19,6 +19,10 @@
 #vkeyboard {
 }
 
+#editor {
+    outline: 1px solid #aaaaaa;
+}
+
 #facsimile-canvas {
     background-image: url(../img/canvas-bg.png);
 }

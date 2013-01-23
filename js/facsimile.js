@@ -40,7 +40,7 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                 click:function(data) {
                     var x = that.horizontalPixels / 2;
                     var y = that.verticalPixels / 2;
-                    that.adjustZoom(2,x,y);
+                    that.zoomTo(2,x,y);
                 }});
 
             toolbar.registerButton({
@@ -52,7 +52,7 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                 click:function(data) {
                     var x = that.horizontalPixels / 2;
                     var y = that.verticalPixels / 2;
-                    that.adjustZoom(0.5,x,y);
+                    that.zoomTo(0.5,x,y);
                 }});
 
             toolbar.registerButton({
@@ -88,24 +88,6 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
             'mouseout': 'endPan',
             'set-scaling': 'render'
         },
-        adjustZoom: function(amount,fixedX,fixedY) {
-            var scale = this.pageScale * amount;
-            if (scale < 0.01) scale = 0.01;
-            if (scale > 1) scale = 1;
-
-            // (fixedX, fixedY) on screen point that should remain fixed to a
-            // point in page soon to be calculated
-            var scaleChange = (scale / this.pageScale);
-            var ofX = fixedX - this.originX;
-            var ofY = fixedY - this.originY;
-            var newOfX = ofX * scaleChange;
-            var newOfY = ofY * scaleChange;
-            var newOriginX = fixedX - newOfX;
-            var newOriginY = fixedY - newOfY;
-            this.setOrigin( newOriginX, newOriginY);
-            this.pageScale = scale;
-            this.render();
-        },
         wheel: function(ev,delta,deltaX,deltaY) {
             var offset = this.$el.offset();
             var x = ev.pageX - offset.left;
@@ -118,9 +100,9 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                 this.render();
             } else {
                 if (delta > 0) {
-                    this.adjustZoom(1.5,x,y);
+                    this.zoomTo(1.5,x,y);
                 } else {
-                    this.adjustZoom(0.75,x,y);
+                    this.zoomTo(0.75,x,y);
                 }
             }
         },
@@ -233,20 +215,15 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                 else if (yy > 0) { scrollToY = vpos + height; }
             }
 
-            this.setupScrollTo(scrollToX,scrollToY,speed,margin);
-
-        },
-        setupScrollTo: function (x,y,speed,margin,timeout) {
+            // setup scroll
 
             var that = this;
 
             if (this.scrollingTo === undefined) {
-                console.log('set');
                 setTimeout(function() {that.scrollOneStep(speed,margin,timeout);},timeout);
             }
-            else console.log('no set');
 
-            this.scrollingTo = {x:x,y:y};
+            this.scrollingTo = {x:scrollToX,y:scrollToY};
 
         },
         scrollOneStep: function (speed,margin,timeout) {
@@ -337,12 +314,95 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
 
             ctx.putImageData(imgd,rect.hpos,rect.vpos);
         },
-        setZoom: function (scale) {
-            this.pageScale = scale;
+        zoomTo: function(amount,fixedX,fixedY) {
+            var scale = this.pageScale * amount;
+            if (scale < 0.01) scale = 0.01;
+            if (scale > 2) scale = 2;
+
+            var oldScale = this.pageScale;
+
+            this.setZoom(scale);
+
+            var newScale = this.pageScale
+
+            // (fixedX, fixedY) on screen point that should remain fixed to a
+            // point in page soon to be calculated
+
+            var scaleChange = (newScale / oldScale);
+            var ofX = fixedX - this.originX;
+            var ofY = fixedY - this.originY;
+            var newOfX = ofX * scaleChange;
+            var newOfY = ofY * scaleChange;
+            var newOriginX = fixedX - newOfX;
+            var newOriginY = fixedY - newOfY;
+
+            this.setOrigin( newOriginX, newOriginY);
+
+            this.render();
+        },
+        setZoom: function (newScale) {
+            // TODO: don't let zoom too far
+
+            var margin = 100;
+            var canvasLeft = -this.originX;
+            var canvasTop = -this.originY;
+            var canvasRight = canvasLeft + this.horizontalPixels;
+            var canvasBottom = canvasTop + this.verticalPixels;
+            var pageLeft = 0 * newScale;
+            var pageTop = 0 * newScale;
+            var pageRight = this.imageWidth * newScale;
+            var pageBottom = this.imageHeight * newScale;
+            var pageMarginLeft = pageLeft - margin;
+            var pageMarginTop = pageTop - margin;
+            var pageMarginRight = pageRight + margin;
+            var pageMarginBottom = pageBottom + margin;
+
+            
+            var canvasWidth = canvasRight - canvasLeft;
+            var canvasHeight = canvasBottom - canvasTop;
+            var pageMarginWidth = pageMarginRight - pageMarginLeft;
+            var pageMarginHeight = pageMarginBottom - pageMarginTop;
+
+            // this computes minimum scales based on horizontal and vertical widths.
+            var newHScale = (canvasWidth - margin * 2) / this.imageWidth;
+            var newVScale = (canvasHeight - margin * 2) / this.imageHeight;
+
+            // select maximum of requested scale and two minimums
+            this.pageScale = _.max([newScale,newHScale,newVScale]);
         },
         setOrigin: function (originX,originY) {
-            this.originX = parseInt(originX); // logical coordinate origin for panning
-            this.originY = parseInt(originY); // logical coordinate origin for panning
+            this.originX = parseInt(originX,10); // logical coordinate origin for panning
+            this.originY = parseInt(originY,10); // logical coordinate origin for panning
+
+            // Don't let user scroll too far
+            // Count bounding boxes of canvas and page in pixels from originX,originY.
+
+            var margin = 100; // acceptable margin
+            var canvasLeft = -this.originX;
+            var canvasTop = -this.originY;
+            var canvasRight = canvasLeft + this.horizontalPixels;
+            var canvasBottom = canvasTop + this.verticalPixels;
+            var pageLeft = 0 * this.pageScale;
+            var pageTop = 0 * this.pageScale;
+            var pageRight = this.imageWidth * this.pageScale;
+            var pageBottom = this.imageHeight * this.pageScale;
+            var pageMarginLeft = pageLeft - margin;
+            var pageMarginTop = pageTop - margin;
+            var pageMarginRight = pageRight + margin;
+            var pageMarginBottom = pageBottom + margin;
+
+            if (canvasLeft < pageMarginLeft) {
+                this.originX = - (pageLeft - margin);
+            } else if (canvasRight > pageMarginRight) {
+                this.originX = - (pageRight - this.horizontalPixels + margin);
+            }
+
+            if (canvasTop < pageMarginTop) {
+                this.originY = - (pageTop - margin);
+            } else if (canvasBottom > pageMarginBottom) {
+                this.originY = - ( pageBottom - this.verticalPixels + margin);
+            }
+
         },
         setPixels: function (horizontal, vertical) {
             this.horizontalPixels = parseInt(horizontal,10);
