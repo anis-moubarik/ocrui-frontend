@@ -1,36 +1,6 @@
 /*global setTimeout:false */
-define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,toolbar,CodeMirror,Backbone) {
+define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function ($,events,toolbar,CodeMirror,Backbone) {
     "use strict";
-
-    function cmMode (config, parserConfig) {
-        return {
-            startState: function() {
-                return {
-                    language:'fi',
-                    i:0
-                };
-            },
-            token: function(stream,state) {
-                stream.eatSpace();
-                var word = '';
-                while (!stream.eol()) {
-                    var next = stream.next();
-                    if (/\s/.test(next)) { break; }
-                    word += next;
-                }
-                stream.eatSpace();
-                //console.log(state.language, word);
-                state.i++;
-                if (state.i > 13) {
-                    state.i = 0;
-                    return 'language';
-                } else {
-                    return null;
-                }
-            }
-        };
-    }
-    CodeMirror.defineMode('ocrui',cmMode);
 
     var EmptyView = Backbone.View.extend({
         el: '#editor',
@@ -46,7 +16,8 @@ define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,
             this.cMirror = new CodeMirror(this.$el.get(0), {
                 value: "",
                 lineWrapping: true,
-                mode: 'ocrui'
+                mode: 'ocrui',
+                getAlto: function() {return that.getAlto();}
             });
             events.on('virtualKeyboard',function(data) {
                 that.cMirror.replaceSelection(data);
@@ -93,12 +64,12 @@ define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,
             this.setupAltoUpdate(content);
         },
         setupAltoUpdate: function (content) {
+            // instead of seting up timeout, call it strait away
+            // to stay in sync with codemirror highlighter
             this.altoUpdatePending = true;
             var that = this;
-            setTimeout(function() {
-                    that.alto.updateAlto(content);
-                    that.setupHighlightChange();
-                }, 100);
+            that.alto.updateAlto(content);
+            that.setupHighlightChange();
         },
         setupHighlightChange: function () {
             this.highlightChangePending = true;
@@ -146,6 +117,9 @@ define(['jquery','events','toolbar','codemirror','backbone'],function ($,events,
                 this.wordUnderCursor = word;
                 events.trigger('changeCoordinates',word);
             }
+        },
+        getAlto: function(alto) {
+            return this.alto;
         },
         setAlto: function(alto) {
             this.alto = alto;

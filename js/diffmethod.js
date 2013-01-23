@@ -58,12 +58,6 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
             height : parseInt($object.attr('HEIGHT'),10)
         };
     }
-    function setBoundingBox($object,bb) {
-        $object.attr('HPOS', bb.hpos);
-        $object.attr('VPOS', bb.vpos);
-        $object.attr('WIDTH', bb.width);
-        $object.attr('HEIGHT', bb.height);
-    }
     function getCombinedBoundingBox(bbs) {
         
         var xs = [];
@@ -106,7 +100,12 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
                 height : combinedBB.height
             };
             precedingProportion += proportion;
-            setBoundingBox($element,bb);
+
+            $element.attr('HPOS', bb.hpos);
+            $element.attr('VPOS', bb.vpos);
+            $element.attr('WIDTH', bb.width);
+            $element.attr('HEIGHT', bb.height);
+            $element.attr('CHANGED', 'true');
         }
     }
 
@@ -166,7 +165,7 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
         var needToAddNextElement = false;
         if (    (this.wordStack.length === 0) &&
                 (this.$$elementStack.length === 0) ) {
-            return 0;
+            return 0; // no pending elements
         }
 
         // If there are no elements to replace try to add preceding and
@@ -217,6 +216,8 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
         }
         if (boundingBoxes.length > 0) {
             splitBoundingBoxes (this.$$elementStack, boundingBoxes);
+        } else {
+            // BUG: should write something to mark changes made
         }
 
         this.resetLine();
@@ -252,6 +253,7 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
                 wi ++;
                 si ++;
                 processingState.processPending();
+                $currentString.removeAttr('CHANGED');
 
             } else if (seq[i] == 'replace') {
 
@@ -283,7 +285,7 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
     }
 
     return {
-        createAlto : createAlto
+        createAlto : createAlto,
     };
 });
 

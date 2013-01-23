@@ -88,6 +88,12 @@ define(['jquery','diffmethod','backbone'],function ($,diffmethod,Backbone) {
                 function() { return this.getAttribute('CONTENT'); }
             ).get();
         },
+        getChangedSequence: function(dom) {
+            if (dom === undefined) {dom = this.currentData;}
+            return $(dom).find('String').map(
+                function() { return this.getAttribute('CHANGED') ? true : false; }
+            ).get();
+        },
 
         getString: function(dom) {
             return this.getStringSequence(dom).join(' ');

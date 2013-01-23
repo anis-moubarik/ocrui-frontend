@@ -1,5 +1,9 @@
-.cm-language {
+.cm-changed {
     color: #ffaa00;
+}
+
+.cm-language {
+    color: #aaff00;
 }
 
 #facsimile {
