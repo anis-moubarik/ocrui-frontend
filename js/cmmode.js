@@ -12,7 +12,6 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
                 if (alto) {
                     changedSequence = alto.getChangedSequence();
                 }
-                console.log(changedSequence);
                 return {
                     language:'fi',
                     wordIndex:0,
@@ -30,8 +29,8 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
                 stream.eatSpace();
                 var changed = state.changedSequence[state.wordIndex]
                 state.wordIndex++;
-                if (changed) {
-                    return 'changed';
+                if (config.showOriginalChanges && changed) {
+                    return "changed"
                 } else {
                     return null;
                 }

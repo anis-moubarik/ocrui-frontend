@@ -36,38 +36,37 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                 toggle:false,
                 icon:'icon-zoom-in',
                 title:'Zoom in',
-                modes:['page']});
+                modes:['page'],
+                click:function(data) {
+                    var x = that.horizontalPixels / 2;
+                    var y = that.verticalPixels / 2;
+                    that.adjustZoom(2,x,y);
+                }});
+
             toolbar.registerButton({
                 id:'zoom-out',
                 toggle:false,
                 icon:'icon-zoom-out',
                 title:'Zoom out',
-                modes:['page']});
+                modes:['page'],
+                click:function(data) {
+                    var x = that.horizontalPixels / 2;
+                    var y = that.verticalPixels / 2;
+                    that.adjustZoom(0.5,x,y);
+                }});
+
             toolbar.registerButton({
                 id:'pan-zoom',
                 toggle:true,
                 icon:'icon-move',
                 title:'Mouse wheel pan/zoom',
-                modes:['page']});
+                modes:['page'],
+                click:function(data) {
+                    var toggled = !($('#pan-zoom').hasClass("active"));
+                    that.wheelPan = toggled;
+                }});
             toolbar.registerKeyboardShortcut(113, function(ev) {
                 $('#pan-zoom').click();
-            });
-
-            events.on('button-zoom-in-clicked',function(data) {
-                var x = that.horizontalPixels / 2;
-                var y = that.verticalPixels / 2;
-                that.adjustZoom(2,x,y);
-            });
-
-            events.on('button-zoom-out-clicked',function(data) {
-                var x = that.horizontalPixels / 2;
-                var y = that.verticalPixels / 2;
-                that.adjustZoom(0.5,x,y);
-            });
-
-            events.on('button-pan-zoom-clicked',function(data) {
-                var toggled = !($('#pan-zoom').hasClass("active"));
-                that.wheelPan = toggled;
             });
 
             events.on('changeCoordinates',function(data) {

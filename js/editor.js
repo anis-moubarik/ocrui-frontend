@@ -19,6 +19,32 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 mode: 'ocrui',
                 getAlto: function() {return that.getAlto();}
             });
+            toolbar.registerButton({
+                id:'show-saved-changes',
+                toggle:true,
+                icon:'icon-check',
+                title:'Show changes made to last saved version',
+                modes:['page'],
+                click:function() {
+                    var toggled = !($(this).hasClass("active"));
+                    that.cMirror.setOption('showSavedChanges',toggled);
+
+                    // trigger change to rehighlight
+                    that.cMirror.replaceSelection(that.cMirror.getSelection());
+                }});
+            toolbar.registerButton({
+                id:'show-original-changes',
+                toggle:true,
+                icon:'icon-edit',
+                title:'Show changes made to original',
+                modes:['page'],
+                click:function() {
+                    var toggled = !($(this).hasClass("active"));
+                    that.cMirror.setOption('showOriginalChanges',toggled);
+
+                    // trigger change to rehighlight
+                    that.cMirror.replaceSelection(that.cMirror.getSelection());
+                }});
             events.on('virtualKeyboard',function(data) {
                 that.cMirror.replaceSelection(data);
                 that.cMirror.focus();
