@@ -1,4 +1,4 @@
-/*globals console:true */
+/*globals console:true setTimeout:false */
 define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backbone) {
     "use strict";
 
@@ -25,7 +25,7 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
         initialize: function() {
 
             var that = this;
-            this.pageScale = 0.4; // some default...
+            this.pageScale = 1; // 0.4; // some default...
             this.originX = 0; //
             this.originY = 0; //
             this.imageWidth = 500; // initial something
@@ -201,6 +201,101 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
         setHighlight: function(highlight) {
             // highlight is stored in image coordinates
             this.highlight = highlight;
+
+            this.possiblyScrollToHighlight(highlight);
+        },
+        possiblyScrollToHighlight: function(hl) {
+            var hScale = this.imageWidth * this.pageScale;
+            var vScale = this.imageHeight * this.pageScale;
+
+            var hpos = Math.round(hl.hpos * hScale);
+            var vpos = Math.round(hl.vpos * vScale);
+            var width = Math.round(hl.width * hScale);
+            var height = Math.round(hl.height * vScale);
+            var cX = hpos + width / 2;
+            var cY = vpos + height / 2;
+            var vLeft = -this.originX;
+            var vTop = -this.originY;
+            var vRight = vLeft + this.horizontalPixels;
+            var vBottom = vTop + this.verticalPixels;
+            var scrollToX = cX;
+            var scrollToY = cY;
+
+            var xx = this.inVisibleX(cX,margin);
+            var yy = this.inVisibleY(cY,margin);
+
+            var speed = 0.3 // speed of scroll 0 < speed <= 1
+            var margin = 50;
+
+            if ((xx == 0) && (yy == 0)) {
+                return; // no need to scroll
+            }
+
+            // fit whole box to screen if possible otherwise just scroll thereabouts */
+            if (width + 2*margin < this.horizontalPixels) {
+                if (xx < 0) { scrollToX = hpos; }
+                else if (xx > 0) { scrollToX = hpos + width; }
+            }
+            if (height + 2*margin < this.vertivalPixels) {
+                if (yy < 0) { scrollToY = vpos; }
+                else if (yy > 0) { scrollToY = vpos + height; }
+            }
+
+            this.setupScrollTo(scrollToX,scrollToY,speed,margin);
+
+        },
+        setupScrollTo: function (x,y,speed,margin) {
+
+            var that = this;
+
+            if (this.scrollingTo === undefined) {
+                console.log('set');
+                setTimeout(function() {that.scrollOneStep(speed,margin);},50);
+            }
+            else console.log('no set');
+
+            this.scrollingTo = {x:x,y:y};
+
+        },
+        inVisibleX: function (x,margin) {
+            if (margin === undefined) margin = 0;
+            if (margin > this.horizontalPixels / 4) margin = this.horizontalPixels / 4;
+            var left = -this.originX + margin;
+            var right = left + this.horizontalPixels - (margin * 2);
+            // return amount of pixels x is off the visible canvas
+            if (x < left) {
+                return x-left;
+            } else if (x > right) {
+                return x-right;
+            } else {
+                return 0;
+            }
+        },
+        inVisibleY: function (y,margin) {
+            // return amount of pixels y is off the visible canvas
+            if (margin === undefined) margin = 0;
+            if (margin > this.verticalPixels / 4) margin = this.verticalPixels / 4;
+            var top = -this.originY + margin;
+            var bottom = top + this.verticalPixels - (margin * 2);
+            if (y < top) {
+                return y - top;
+            } else if (y > bottom) {
+                return y - bottom;
+            } else {
+                return 0;
+            }
+        },
+        scrollOneStep: function (speed,margin) {
+            var that = this;
+            var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,margin) * speed);
+            var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,margin) * speed);
+            this.setOrigin(this.originX - xDelta, this.originY - yDelta);
+            this.render();
+            if ((xDelta != 0) || (yDelta != 0)) {
+                setTimeout(function() {that.scrollOneStep(speed,margin);},50);
+            } else {
+                this.scrollingTo = undefined;
+            }
         },
         renderHighlight : function(ctx,hl) {
             if (!hl) { return; }
@@ -217,6 +312,9 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                 width : Math.round(hl.width * hScale) + 2,
                 height : Math.round(hl.height * vScale) + 2
             };
+
+            var cX = rect.hpos + rect.width / 2;
+            var cY = rect.vpos + rect.height / 2;
 
             // Start with what is already there.
             var imgd;
@@ -251,13 +349,18 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
             this.pageScale = scale;
         },
         setOrigin: function (originX,originY) {
-            this.originX = originX; // logical coordinate origin for panning
-            this.originY = originY; // logical coordinate origin for panning
+            this.originX = parseInt(originX); // logical coordinate origin for panning
+            this.originY = parseInt(originY); // logical coordinate origin for panning
+        },
+        setPixels: function (horizontal, vertical) {
+            this.horizontalPixels = parseInt(horizontal,10);
+            this.verticalPixels = parseInt(vertical,10);
         },
         render: function() {
 
-            this.horizontalPixels = this.$el.attr('width') || this.imageWidth;
-            this.verticalPixels = this.$el.attr('height') || this.imageHeight;
+            this.setPixels(
+                this.$el.attr('width') || this.imageWidth,
+                this.$el.attr('height') || this.imageHeight);
 
             var ctx = this.$el.get(0).getContext("2d");
 

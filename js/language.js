@@ -29,7 +29,7 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
 
             events.on('changeCoordinates',function(data) {
                 var string = data.CONTENT;
-                console.log('setting language selector for word ' + string);
+                //console.log('setting language selector for word ' + string);
             });
         },
         el : '#language-selector',
