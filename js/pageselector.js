@@ -9,10 +9,10 @@ define(['jquery','events','toolbar','mustache','backbone'],
             var that = this;
 
             toolbar.registerKeyboardShortcut(33, function() {
-                this.pagePrevious();
+                that.pagePrevious();
             });
             toolbar.registerKeyboardShortcut(34, function() {
-                this.pageNext();
+                that.pageNext();
             });
 
             toolbar.registerWidget({
