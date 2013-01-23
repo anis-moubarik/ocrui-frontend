@@ -6,7 +6,7 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
     toolbar.registerButton({
         id:"save",
         toggle:false,
-        icon:"icon-hdd",
+        text:"Save",
         title:"Save",
         modes:["page"]});
     events.on('button-save-clicked',function () {

@@ -65,25 +65,16 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                     var toggled = !($('#pan-zoom').hasClass("active"));
                     that.wheelPan = toggled;
                 }});
+
             toolbar.registerKeyboardShortcut(113, function(ev) {
                 $('#pan-zoom').click();
             });
 
             events.on('changeCoordinates',function(data) {
-            // gets called whenever cursor moves in editor
+                // gets called whenever cursor moves in editor
                 that.setHighlight(data);
                 that.render();
             
-            });
-
-            events.on('setZoom',function(data) {
-                that.setZoom(data);
-                that.render();
-            });
-
-            events.on('setOrigin',function(data) {
-                that.setOrigin(data.x,data.y);
-                that.render();
             });
 
         },
@@ -224,7 +215,8 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
             var xx = this.inVisibleX(cX,margin);
             var yy = this.inVisibleY(cY,margin);
 
-            var speed = 0.3 // speed of scroll 0 < speed <= 1
+            var speed = 0.25 // speed of scroll 0 < speed <= 1
+            var timeout = 40; // => about 25 frames per sec
             var margin = 50;
 
             if ((xx == 0) && (yy == 0)) {
@@ -244,18 +236,30 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
             this.setupScrollTo(scrollToX,scrollToY,speed,margin);
 
         },
-        setupScrollTo: function (x,y,speed,margin) {
+        setupScrollTo: function (x,y,speed,margin,timeout) {
 
             var that = this;
 
             if (this.scrollingTo === undefined) {
                 console.log('set');
-                setTimeout(function() {that.scrollOneStep(speed,margin);},50);
+                setTimeout(function() {that.scrollOneStep(speed,margin,timeout);},timeout);
             }
             else console.log('no set');
 
             this.scrollingTo = {x:x,y:y};
 
+        },
+        scrollOneStep: function (speed,margin,timeout) {
+            var that = this;
+            var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,margin) * speed);
+            var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,margin) * speed);
+            this.setOrigin(this.originX - xDelta, this.originY - yDelta);
+            this.render();
+            if ((xDelta != 0) || (yDelta != 0)) {
+                setTimeout(function() {that.scrollOneStep(speed,margin,timeout);},timeout);
+            } else {
+                this.scrollingTo = undefined;
+            }
         },
         inVisibleX: function (x,margin) {
             if (margin === undefined) margin = 0;
@@ -283,18 +287,6 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                 return y - bottom;
             } else {
                 return 0;
-            }
-        },
-        scrollOneStep: function (speed,margin) {
-            var that = this;
-            var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,margin) * speed);
-            var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,margin) * speed);
-            this.setOrigin(this.originX - xDelta, this.originY - yDelta);
-            this.render();
-            if ((xDelta != 0) || (yDelta != 0)) {
-                setTimeout(function() {that.scrollOneStep(speed,margin);},50);
-            } else {
-                this.scrollingTo = undefined;
             }
         },
         renderHighlight : function(ctx,hl) {

@@ -11,7 +11,12 @@
                     {{^toggle}}
                     <button type="button" class="btn" id="{{id}}" title="{{title}}">
                     {{/toggle}}
+                    {{#icon}}
                         <i class="{{icon}}"> </i>
+                    {{/icon}}
+                    {{#text}}
+                        {{text}}
+                    {{/text}}
                     </button>
                 {{/buttons}}
             </div>
