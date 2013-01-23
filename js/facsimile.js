@@ -1,5 +1,5 @@
 /*globals console:true setTimeout:false */
-define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backbone) {
+define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,toolbar,events,Backbone,mousetailstack) {
     "use strict";
 
     var EmptyView = Backbone.View.extend({
@@ -20,6 +20,7 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
         }
     });
 
+
     var View = Backbone.View.extend({
 
         initialize: function() {
@@ -30,6 +31,8 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
             this.originY = 0; //
             this.imageWidth = 500; // initial something
             this.imageHeight = 500; // initial something
+            this.mouseTailStack = new mousetailstack.MouseTailStack();
+            events.on('mousetail',function(data) {that.panTail(data);});
 
             toolbar.registerButton({
                 id:'zoom-in',
@@ -110,6 +113,7 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
         beginPan: function(ev) {
             this.propageteNextClick = true;
             this.panning = true;
+            this.mouseTailStack.init(ev);
             this.savedOriginX = this.originX;
             this.savedOriginY = this.originY;
 
@@ -120,6 +124,7 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
             ev.stopPropagation();
         },
         endPan: function(ev) {
+            this.mouseTailStack.end(ev);
             this.panning = false;
         },
         cancelPan: function(ev) {
@@ -133,6 +138,7 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
         pan: function(ev) {
             this.propageteNextClick = false;
             if (!this.panning) { return; }
+            this.mouseTailStack.push(ev);
             var offset = this.$el.offset();
             var currentX = ev.pageX - offset.left;
             var currentY = ev.pageY - offset.top;
@@ -142,6 +148,13 @@ define(['jquery','toolbar','events','backbone'],function ($,toolbar,events,Backb
                 this.savedOriginY - (this.panBeginY - currentY));
             this.render();
 
+        },
+        panTail: function(data) {
+            console.log('pt',data);
+            this.setOrigin(
+                this.originX + data[0],
+                this.originY + data[1]);
+            this.render();
         },
         propagateClick: function(ev) {
             if (!this.propageteNextClick) return;

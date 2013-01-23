@@ -19,6 +19,10 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 mode: 'ocrui',
                 getAlto: function() {return that.getAlto();}
             });
+
+            // Add reference to codemirror object to dom tree to help automatic testing
+            this.$el.data('CodeMirror',this.cMirror);
+
             toolbar.registerButton({
                 id:'show-saved-changes',
                 toggle:true,
