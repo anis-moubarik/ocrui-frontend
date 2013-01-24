@@ -57,8 +57,10 @@ require(
     ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo) {
         $(function() {
 
-            if (!(console in window)) {
-                window.console = {
+            try {
+                console.log;
+            } catch (err) {
+                console = {
                     log: function() {},
                     trace: function() {}
                 };
