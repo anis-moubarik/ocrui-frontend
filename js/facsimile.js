@@ -155,7 +155,6 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
 
         },
         panTail: function(data) {
-            console.log('pt',data);
             this.setOrigin(
                 this.originX + data[0],
                 this.originY + data[1]);

@@ -62,7 +62,9 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
         },
         handleClick: function (ev) {
             var id = ev.currentTarget.id;
-            var cb = buttons[id].click;
+            var b = buttons[id];
+            if (b === undefined) return;
+            var cb = b.click;
             cb.apply(ev.currentTarget,[ev]);
 
             var myEvent = 'button-'+id+'-clicked';

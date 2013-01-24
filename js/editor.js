@@ -165,20 +165,12 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             var s = this.alto.getString();
             this.cMirror.setValue(s);
             var that = this;
-            if (this.alto.get('status') == 'success') {
-                this.cMirror.on('cursorActivity',function (instance) {
-                    that.setupHighlightChange();
-                });
-                this.cMirror.on('change',function (instance) {
-                    that.changed(instance);
-                });
-            } else {
-            
-                var $e = $('<div> ' + this.alto.get('status') + '. </div>');
-                $e.css('width','100%');
-                $e.css('height','100%');
-                this.$el.html($e);
-            }
+            this.cMirror.on('cursorActivity',function (instance) {
+                that.setupHighlightChange();
+            });
+            this.cMirror.on('change',function (instance) {
+                that.changed(instance);
+            });
             var word = this.alto.getNthWord(0);
             events.trigger('changeCoordinates',word);
         }

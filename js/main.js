@@ -8,7 +8,7 @@ require.config({
         "mustache": "../lib/mustache",
         "underscore": "../lib/underscore-min",
         "jquery-ui": "../lib/jquery-ui.min",
-        "backbone": "../lib/backbone-min",
+        "backbone": "../lib/backbone",
         "jsdiff": "../lib/jsdiff",
         "spin": "../lib/spin",
         "mousewheel": "../lib/jquery-mousewheel"

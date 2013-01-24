@@ -1,5 +1,5 @@
-define(['jquery','diffmethod','backbone','mets'],
-        function ($,diffmethod,Backbone,mets) {
+define(['jquery','diffmethod','backbone','mybackbone','mets'],
+        function ($,diffmethod,Backbone,mybackbone,mets) {
     "use strict";
 
     var AltoModel = Backbone.Model.extend({
@@ -101,20 +101,27 @@ define(['jquery','diffmethod','backbone','mets'],
             return this.getStringSequence(dom).join(' ');
         },
 
-        fetch: function () {
+        parse: function (response) {
+            var data = {}
+            this.currentData = response;
+            this.originalData = response; // BUG! figure out how this goes
+            console.log(response);
+            var page = $(response).find('Page').get(0);
+            if (page) {
+                data.width = page.getAttribute("WIDTH");
+                data.height = page.getAttribute("HEIGHT");
+            }
+            return data
+        },
+
+        fetch: function (callback) {
             var that = this;
-            $.ajax(this.url).always(function(data,textStatus) {
-                that.currentData = data;
-                that.originalData = data; // BUG! figure out how this goes
-                var page = $(data).find('Page').get(0);
-                if (page) {
-                    that.set('width',page.getAttribute("WIDTH"));
-                    that.set('height',page.getAttribute("HEIGHT"));
-                }
-                that.set('status',textStatus);
-                that.loading.resolve();
-            });
-        }
+            var promise = Backbone.Model.prototype.fetch.apply(this);
+            promise.done( function() { that.loading.resolve();  });
+            promise.error( function(err,b) { that.loading.reject(); } );
+            return promise;
+        },
+        sync: mybackbone.sync
     });
 
     var altos = {};

@@ -1,4 +1,4 @@
-define(['jquery','backbone'],function ($,Backbone) {
+define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
     "use strict";
 
     var DocumentModel = Backbone.Model.extend({
@@ -74,17 +74,26 @@ define(['jquery','backbone'],function ($,Backbone) {
             }
             
         },
+        url: function () {
+            console.log('get url');
+            console.log(  this.urlBase+'/mets.xml');
+            return  this.urlBase+'/mets.xml';
+        },
+        parse: function (response) {
+            this.data = response;
+            this.parsePageInfo(response);
+            return {}
+        },
+
         fetch: function (callback) {
-            var url = this.urlBase+'/mets.xml';
             var that = this;
-            console.log(url);
-            $.get(url, function(data) {
-                that.data = data;
-                that.parsePageInfo(data);
-                that.set('status','');
-                that.loading.resolve();
-            });
-        }
+            var promise = Backbone.Model.prototype.fetch.apply(this);
+            promise.done( function() { that.loading.resolve();  });
+            promise.error( function(err,b) { that.loading.reject(); } );
+            return promise;
+        },
+        sync: mybackbone.sync
+
     });
 
     var documents = {};
@@ -106,7 +115,7 @@ define(['jquery','backbone'],function ($,Backbone) {
     }
 
     return {
-        get: get,
+        get: get
     };
 
 });
