@@ -1,5 +1,5 @@
 /*globals Image:false */
-define(['backbone','mets'],function (Backbone,mets) {
+define(['jquery','backbone','mets'],function ($,Backbone,mets) {
     "use strict";
 
     var ImageModel = Backbone.Model.extend({
@@ -30,7 +30,7 @@ define(['backbone','mets'],function (Backbone,mets) {
                 versionNumber: options.versionNumber,
                 id: options.docId+'/'+options.pageNumber,
                 url: doc.getImageUrl(options.pageNumber)
-            }
+            };
             var image = images[imageOptions.id];
             if (image === undefined) {
                 image = new ImageModel(imageOptions);

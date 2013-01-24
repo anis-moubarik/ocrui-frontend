@@ -285,7 +285,7 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
     }
 
     return {
-        createAlto : createAlto,
+        createAlto : createAlto
     };
 });
 

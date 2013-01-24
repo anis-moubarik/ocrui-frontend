@@ -1,4 +1,4 @@
-/*globals require:false $templates:false */
+/*globals console:false $templates:false */
 define(['jquery','events','mustache','backbone','toolbar'],
         function ($,events,mustache,Backbone,toolbar) {
     "use strict";
@@ -24,7 +24,6 @@ define(['jquery','events','mustache','backbone','toolbar'],
             'click #more-bib-info': 'moreBibInfo'
         },
         getMarcField : function(mets,tag,code) {
-            window.$mets = $(mets.data);
             var df = 'datafield[tag='+tag+']';
             var sf = 'subfield[code='+code+']';
             var $field = $(mets.data).

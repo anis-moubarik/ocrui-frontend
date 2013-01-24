@@ -1,5 +1,6 @@
 /*globals console:true setTimeout:false */
-define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,toolbar,events,Backbone,mousetailstack) {
+define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
+        function (_,$,toolbar,events,Backbone,mousetailstack) {
     "use strict";
 
     var EmptyView = Backbone.View.extend({
@@ -215,11 +216,11 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
             var xx = this.inVisibleX(cX,margin);
             var yy = this.inVisibleY(cY,margin);
 
-            var speed = 0.25 // speed of scroll 0 < speed <= 1
+            var speed = 0.25; // speed of scroll 0 < speed <= 1
             var timeout = 40; // => about 25 frames per sec
             var margin = 50;
 
-            if ((xx == 0) && (yy == 0)) {
+            if ((xx === 0) && (yy === 0)) {
                 return; // no need to scroll
             }
 
@@ -250,7 +251,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
             var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,margin) * speed);
             this.setOrigin(this.originX - xDelta, this.originY - yDelta);
             this.render();
-            if ((xDelta != 0) || (yDelta != 0)) {
+            if ((xDelta !== 0) || (yDelta !== 0)) {
                 setTimeout(function() {that.scrollOneStep(speed,margin,timeout);},timeout);
             } else {
                 this.scrollingTo = undefined;
@@ -341,7 +342,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
 
             this.setZoom(scale);
 
-            var newScale = this.pageScale
+            var newScale = this.pageScale;
 
             // (fixedX, fixedY) on screen point that should remain fixed to a
             // point in page soon to be calculated

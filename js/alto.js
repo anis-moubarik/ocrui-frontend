@@ -101,7 +101,7 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
         },
 
         parse: function (response) {
-            var data = {}
+            var data = {};
             this.currentData = response;
             this.originalData = response; // BUG! figure out how this goes
             var page = $(response).find('Page').get(0);
@@ -109,7 +109,7 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
                 data.width = page.getAttribute("WIDTH");
                 data.height = page.getAttribute("HEIGHT");
             }
-            return data
+            return data;
         },
 
         sync: mybackbone.sync
@@ -126,7 +126,7 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
                 versionNumber: options.versionNumber,
                 id: options.docId+'/'+options.pageNumber,
                 url: doc.getAltoUrl(options.pageNumber)
-            }
+            };
             var alto = altos[altoOptions.id];
             if (alto === undefined) {
                 alto = new AltoModel(altoOptions);
@@ -138,6 +138,6 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
     }
 
     return {
-        get: get,
+        get: get
     };
 });

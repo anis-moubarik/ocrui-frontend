@@ -1,3 +1,4 @@
+/*globals console:true */
 define(function () {
     "use strict";
 
@@ -21,7 +22,12 @@ define(function () {
 
         for (var i in listeners[ev]) {
             var cb = listeners[ev][i];
-            cb(data);
+            try {
+                cb(data);
+            } catch (err) {
+                console.log(err);
+                console.trace();
+            }
         }
 
     }

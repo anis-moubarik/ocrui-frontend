@@ -1,7 +1,11 @@
 /* A custom sync method to override backbone default */
 
-define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
+define(['backbone','underscore'],function (Backbone,_) {
     "use strict";
+
+    var urlError = function() {
+        throw new Error('A "url" property or function must be specified');
+    };
 
     function sync(method, model, options) {
 
@@ -30,7 +34,7 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
         }
 
         // Ensure that we have the appropriate request data.
-        if (options.data == null && model && (method === 'create' || method === 'update' || method === 'patch')) {
+        if (options.data === null && model && (method === 'create' || method === 'update' || method === 'patch')) {
             params.contentType = 'application/xml';
             params.data = JSON.stringify(options.attrs || model.toJSON(options));
         }
@@ -77,7 +81,7 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
     }
 
     return {
-        sync : sync,
+        sync : sync
     };
 });
 

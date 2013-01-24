@@ -18,7 +18,7 @@ define(['jquery','underscore','backbone','events'],function ($,_,Backbone,events
             this.$el.append($div);
 
             if (this.languages === undefined) {return;}
-            var chars = undefined;
+            var chars;
             for (var i in this.languages.get('languages')) {
                 var l = this.languages.get('languages')[i];
                 if (l.code==this.languages.get('selected')) {

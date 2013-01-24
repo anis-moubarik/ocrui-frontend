@@ -53,17 +53,16 @@ require(
         "pageselector",
         "mousewheel",
         "language",
-        "bibinfo",
+        "bibinfo"
     ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo) {
         $(function() {
 
-            try
-            {
-                console.log
-            } catch(err)
-            {
-                console.log = function() {}
-            };
+            if (!(console in window)) {
+                window.console = {
+                    log: function() {},
+                    trace: function() {}
+                };
+            }
 
             $.get('templates.html',function(html) {
                 $templates = $(html);

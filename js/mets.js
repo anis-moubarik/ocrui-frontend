@@ -77,7 +77,7 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
         parse: function (response) {
             this.data = response;
             this.parsePageInfo(response);
-            return {}
+            return {};
         },
 
         sync: mybackbone.sync
