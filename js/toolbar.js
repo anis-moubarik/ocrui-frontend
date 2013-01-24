@@ -49,7 +49,12 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
 
     var View = Backbone.View.extend({
         initialize: function() {
+            var that = this
             this.mode = 'empty';
+            events.on('changePage',function(pageNumber) {
+                that.setMode('page');
+                that.render();
+            });
         },
         el : '#toolbar',
         events: {

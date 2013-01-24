@@ -5,6 +5,7 @@ define(['jquery','backbone'],function ($,Backbone) {
         initialize: function (options) {
             this.id = options.id;
             this.urlBase = 'items/'+this.id;
+            this.loading = new $.Deferred();
         },
         pageInfo: [],
         getNumberOfPages : function () {
@@ -76,29 +77,36 @@ define(['jquery','backbone'],function ($,Backbone) {
         fetch: function (callback) {
             var url = this.urlBase+'/mets.xml';
             var that = this;
+            console.log(url);
             $.get(url, function(data) {
                 that.data = data;
                 that.parsePageInfo(data);
                 that.set('status','');
-                callback(that);
+                that.loading.resolve();
             });
         }
     });
 
     var documents = {};
 
-    function load(options,callback) {
-        if (options.id in documents) {
-            callback(documents[options.id]);
-        } else {
-            var doc = new DocumentModel(options);
-            documents[options.id] = doc;
-            doc.fetch(callback);
+    function get(options,callback) {
+
+        var doc = documents[options.docId];
+
+        if (doc === undefined) {
+
+            doc = new DocumentModel({id:options.docId});
+            documents[options.docId] = doc;
+            doc.fetch();
+
         }
+
+        $.when(doc.loading).then( function () { callback(doc); });
+
     }
 
     return {
-        load: load
+        get: get,
     };
 
 });

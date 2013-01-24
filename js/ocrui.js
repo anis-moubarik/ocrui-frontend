@@ -1,5 +1,5 @@
-define(['spinner','events','alto','mets','image','facsimile','editor','toolbar'],
-        function (spinner,events,alto,mets,image,facsimile,editor,toolbar) {
+define(['spinner','events','alto','mets','image','toolbar'],
+        function (spinner,events,alto,mets,image,toolbar) {
 
     var doc; // this is used to store mets currently being edited
 
@@ -8,75 +8,68 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
         toggle:false,
         text:"Save",
         title:"Save",
-        modes:["page"]});
-    events.on('button-save-clicked',function () {
-        console.log('should now PUT');
+        modes:["page"],
+        click: function () {
+            console.log('should now PUT');
+        }
     });
 
 
     function route_empty() {
 
 
+        /*
         toolbar.view.setMode('empty');
         toolbar.view.render();
         facsimile.empty.render();
         editor.empty.render();
+        */
         $(window).resize();
     }
 
     function route_doc(id) {
 
+        /*
         toolbar.view.setMode('doc');
         toolbar.view.render();
-        mets.load({id:id},function(_doc) {
-            doc = _doc;
+        mets.load({id:id},function(doc) {
             facsimile.thumbnails.render();
             editor.empty.render();
             $(window).resize();
         });
+        */
     }
 
-    function route_page(id,pageNumber) {
+    function route_page(docId,pageId) {
 
-        var intPageNumber = Math.floor(parseInt(pageNumber,10));
-        events.trigger('changePage',intPageNumber);
-        toolbar.view.setMode('page');
-        toolbar.view.render();
-        spinner.showSpinner(2);
-
+        var pageNumber = Math.floor(parseInt(pageId,10));
+        var data = {docId:docId, pageNumber:pageNumber};
         var imageRendered = new $.Deferred();
         var editorRendered = new $.Deferred();
-        mets.load({id:id},function(_doc) {
+        var allRendered = $.when(imageRendered,editorRendered);
 
+        events.trigger('changePage',pageNumber);
+        spinner.showSpinner();
 
-            var pages = _doc.getNumberOfPages();
-            events.trigger('changePageBounds',{min:1,max:pages});
-            spinner.hideSpinner();
+        mets.get(data,function(_doc) {
             doc = _doc;
-
-            var url = _doc.getImageUrl(intPageNumber);
-            image.load({url:url},function(image) {
-                facsimile.view.setImage(image);
-                facsimile.view.render();
-                spinner.hideSpinner();
-                imageRendered.resolve();
-            });
-
-            url = _doc.getAltoUrl(intPageNumber);
-            alto.load({url:url},function(alto) {
-                editor.view.setAlto(alto);
-                editor.view.render();
-                editorRendered.resolve();
-            });
-
+            var pages = doc.getNumberOfPages();
+            events.trigger('changePageBounds',{min:1,max:pages});
         });
 
-        $.when(imageRendered,editorRendered).then(function() {
-            facsimile.view.render();
-            $(window).resize();
-            if (editor.view.cMirror) {
-                editor.view.cMirror.focus();
-            }
+        image.get(data,function(image) {
+            events.trigger('changePageImage',image);
+            imageRendered.resolve();
+        });
+
+        alto.get(data,function(alto) {
+            events.trigger('changePageAlto',alto);
+            editorRendered.resolve();
+        });
+
+        allRendered.then(function() {
+            spinner.hideSpinner();
+            events.trigger('changePageDone');
         });
 
     }

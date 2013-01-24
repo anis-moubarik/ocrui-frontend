@@ -28,6 +28,7 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
                 modes:['page']});
 
             events.on('changeCoordinates',function(data) {
+                if (data === undefined) return; // do something else
                 var string = data.CONTENT;
                 //console.log('setting language selector for word ' + string);
             });

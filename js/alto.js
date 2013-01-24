@@ -1,9 +1,11 @@
-define(['jquery','diffmethod','backbone'],function ($,diffmethod,Backbone) {
+define(['jquery','diffmethod','backbone','mets'],
+        function ($,diffmethod,Backbone,mets) {
     "use strict";
 
     var AltoModel = Backbone.Model.extend({
         initialize: function (options) {
             this.url = options.url;
+            this.loading = new $.Deferred();
         },
         dom2Word: function(dom) {
             return {
@@ -99,7 +101,7 @@ define(['jquery','diffmethod','backbone'],function ($,diffmethod,Backbone) {
             return this.getStringSequence(dom).join(' ');
         },
 
-        fetch: function (callback) {
+        fetch: function () {
             var that = this;
             $.ajax(this.url).always(function(data,textStatus) {
                 that.currentData = data;
@@ -110,24 +112,34 @@ define(['jquery','diffmethod','backbone'],function ($,diffmethod,Backbone) {
                     that.set('height',page.getAttribute("HEIGHT"));
                 }
                 that.set('status',textStatus);
-                callback(that);
+                that.loading.resolve();
             });
         }
     });
 
     var altos = {};
 
-    function load(options,callback) {
-        if (options.url in altos) {
-            callback(altos[options.url]);
-        } else {
-            var alto = new AltoModel(options);
-            altos[options.url] = alto;
-            alto.fetch(callback);
-        }
+    function get(options,callback) {
+
+        mets.get(options,function (doc) {
+            var altoOptions = {
+                docId: options.docId,
+                pageNumber: options.pageNumber,
+                versionNumber: options.versionNumber,
+                id: options.docId+'/'+options.pageNumber,
+                url: doc.getAltoUrl(options.pageNumber)
+            }
+            var alto = altos[altoOptions.id];
+            if (alto === undefined) {
+                alto = new AltoModel(altoOptions);
+                altos[altoOptions.id] = alto;
+                alto.fetch();
+            }
+            $.when(alto.loading).then( function () { callback(alto); });
+        });
     }
 
     return {
-        load: load
+        get: get,
     };
 });

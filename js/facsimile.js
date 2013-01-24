@@ -80,6 +80,11 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
             
             });
 
+            events.on('changePageImage',function(image) {
+                that.setImage(image);
+                that.render();
+            });
+
         },
         el: '#facsimile-canvas',
         events: {
@@ -191,6 +196,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
             this.possiblyScrollToHighlight(highlight);
         },
         possiblyScrollToHighlight: function(hl) {
+            if (hl === undefined) return;
             var hScale = this.imageWidth * this.pageScale;
             var vScale = this.imageHeight * this.pageScale;
 

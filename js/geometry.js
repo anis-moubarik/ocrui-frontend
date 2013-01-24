@@ -7,7 +7,6 @@ define(['jquery'], function($) {
         var bottomHeight = $('#bottom-geometry').outerHeight();
         var wHeight = $(window).innerHeight();
         var availableH = wHeight - topHeight - bottomHeight;
-        console.log('height: ',wHeight,topHeight,bottomHeight,availableH);
         $('#editor').height(availableH-20);
         $('.CodeMirror').height(availableH-10); //TODO: what is -10?
         $('#facsimile').height(availableH-20); //TODO: what is -20?

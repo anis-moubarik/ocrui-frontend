@@ -63,6 +63,11 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 }
 
             });
+            events.on('changePageAlto',function(alto) {
+                that.setAlto(alto);
+                that.render();
+                that.cMirror.focus();
+            });
         },
         el: '#editor',
         moveCursorToWord: function(wordIndex) {
