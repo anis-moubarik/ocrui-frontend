@@ -75,7 +75,17 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
             
             var context = {
                 widgets: _.map(widgets,function(w) { return w; }),
-                buttons: _.map(buttons,function(b) { return b; })
+                buttons: _.map(buttons,function(b) {
+                    return {
+                        id: b.id,
+                        classes: 'btn'+ (b.active ? ' active' : ''),
+                        extraData: b.toggle && 'data-toggle="button"' || '',
+                        icon: b.icon,
+                        title: b.title,
+                        text: b.text,
+                        modes: b.modes
+                    };
+                })
             };
             var tpl = $templates.find('#toolbar-template').html();
             this.$el.html(mustache.render(tpl,context));

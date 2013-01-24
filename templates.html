@@ -5,12 +5,7 @@
         {{/widgets}}
             <div id="buttons" class="btn-group">
                 {{#buttons}}
-                    {{#toggle}}
-                    <button type="button" class="btn" id="{{id}}" data-toggle="button" title="{{title}}">
-                    {{/toggle}}
-                    {{^toggle}}
-                    <button type="button" class="btn" id="{{id}}" title="{{title}}">
-                    {{/toggle}}
+                    <button type="button" class="{{classes}}" id="{{id}}" {{extra}} title="{{title}}">
                     {{#icon}}
                         <i class="{{icon}}"> </i>
                     {{/icon}}

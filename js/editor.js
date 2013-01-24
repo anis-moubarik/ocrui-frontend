@@ -19,6 +19,7 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 mode: 'ocrui',
                 getAlto: function() {return that.getAlto();}
             });
+            that.cMirror.setOption('showOriginalChanges',true);
 
             // Add reference to codemirror object to dom tree to help automatic testing
             this.$el.data('CodeMirror',this.cMirror);
@@ -39,6 +40,7 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             toolbar.registerButton({
                 id:'show-original-changes',
                 toggle:true,
+                active:true,
                 icon:'icon-edit',
                 title:'Show changes made to original',
                 modes:['page'],
