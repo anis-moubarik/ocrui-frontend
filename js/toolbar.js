@@ -95,9 +95,7 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
             for (var i in widgets) {
                 //if (widgets[i].modes)
                 var view = widgets[i].view;
-                var selector = '#' + i;
-                view.setElement(selector);
-                console.log(selector);
+                view.setElement('#' + i);
                 view.render();
             }
 

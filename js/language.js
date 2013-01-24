@@ -56,7 +56,6 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
                 context.languages = languages.get('languages').map(function(e) {
                     if(e.code==languages.get('selected')) {
                         context.selectedName = e.name;
-                        console.log(e.name);
                         return undefined;
                     } else {
                         return e;

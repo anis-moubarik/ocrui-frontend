@@ -104,7 +104,6 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
             var data = {}
             this.currentData = response;
             this.originalData = response; // BUG! figure out how this goes
-            console.log(response);
             var page = $(response).find('Page').get(0);
             if (page) {
                 data.width = page.getAttribute("WIDTH");

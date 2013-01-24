@@ -5,6 +5,7 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
         initialize: function (options) {
             this.id = options.id;
             this.urlBase = 'items/'+this.id;
+            this.url = this.urlBase+'/mets.xml';
         },
         pageInfo: [],
         getNumberOfPages : function () {
@@ -72,11 +73,6 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
                 }
             }
             
-        },
-        url: function () {
-            console.log('get url');
-            console.log(  this.urlBase+'/mets.xml');
-            return  this.urlBase+'/mets.xml';
         },
         parse: function (response) {
             this.data = response;
