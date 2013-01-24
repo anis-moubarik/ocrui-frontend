@@ -43,9 +43,12 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
         toolbar.view.setMode('page');
         toolbar.view.render();
         spinner.showSpinner(2);
+
+        var imageRendered = new $.Deferred();
+        var editorRendered = new $.Deferred();
         mets.load({id:id},function(_doc) {
 
-            var progressCounter = 0;
+
             var pages = _doc.getNumberOfPages();
             events.trigger('changePageBounds',{min:1,max:pages});
             spinner.hideSpinner();
@@ -56,29 +59,25 @@ define(['spinner','events','alto','mets','image','facsimile','editor','toolbar']
                 facsimile.view.setImage(image);
                 facsimile.view.render();
                 spinner.hideSpinner();
-                progressCounter ++ ;
-                if (progressCounter == 2) doneLoading();
+                imageRendered.resolve();
             });
 
             url = _doc.getAltoUrl(intPageNumber);
             alto.load({url:url},function(alto) {
                 editor.view.setAlto(alto);
                 editor.view.render();
-            /*
-            */
-                progressCounter ++ ;
-                if (progressCounter == 2) doneLoading();
+                editorRendered.resolve();
             });
 
         });
 
-        function doneLoading() {
+        $.when(imageRendered,editorRendered).then(function() {
             facsimile.view.render();
             $(window).resize();
             if (editor.view.cMirror) {
                 editor.view.cMirror.focus();
             }
-        }
+        });
 
     }
 
