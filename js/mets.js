@@ -5,7 +5,6 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
         initialize: function (options) {
             this.id = options.id;
             this.urlBase = 'items/'+this.id;
-            this.loading = new $.Deferred();
         },
         pageInfo: [],
         getNumberOfPages : function () {
@@ -85,13 +84,6 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
             return {}
         },
 
-        fetch: function (callback) {
-            var that = this;
-            var promise = Backbone.Model.prototype.fetch.apply(this);
-            promise.done( function() { that.loading.resolve();  });
-            promise.error( function(err,b) { that.loading.reject(); } );
-            return promise;
-        },
         sync: mybackbone.sync
 
     });
@@ -106,7 +98,7 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
 
             doc = new DocumentModel({id:options.docId});
             documents[options.docId] = doc;
-            doc.fetch();
+            doc.loading = doc.fetch();
 
         }
 

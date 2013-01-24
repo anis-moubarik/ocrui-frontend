@@ -19,6 +19,12 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 mode: 'ocrui',
                 getAlto: function() {return that.getAlto();}
             });
+            this.cMirror.on('cursorActivity',function (instance) {
+                that.setupHighlightChange();
+            });
+            this.cMirror.on('change',function (instance) {
+                that.changed(instance);
+            });
             that.cMirror.setOption('showOriginalChanges',true);
 
             // Add reference to codemirror object to dom tree to help automatic testing
@@ -164,13 +170,6 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
         render: function() {
             var s = this.alto.getString();
             this.cMirror.setValue(s);
-            var that = this;
-            this.cMirror.on('cursorActivity',function (instance) {
-                that.setupHighlightChange();
-            });
-            this.cMirror.on('change',function (instance) {
-                that.changed(instance);
-            });
             var word = this.alto.getNthWord(0);
             events.trigger('changeCoordinates',word);
         }

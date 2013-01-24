@@ -5,7 +5,6 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
     var AltoModel = Backbone.Model.extend({
         initialize: function (options) {
             this.url = options.url;
-            this.loading = new $.Deferred();
         },
         dom2Word: function(dom) {
             return {
@@ -114,13 +113,6 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
             return data
         },
 
-        fetch: function (callback) {
-            var that = this;
-            var promise = Backbone.Model.prototype.fetch.apply(this);
-            promise.done( function() { that.loading.resolve();  });
-            promise.error( function(err,b) { that.loading.reject(); } );
-            return promise;
-        },
         sync: mybackbone.sync
     });
 
@@ -140,7 +132,7 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
             if (alto === undefined) {
                 alto = new AltoModel(altoOptions);
                 altos[altoOptions.id] = alto;
-                alto.fetch();
+                alto.loading = alto.fetch();
             }
             $.when(alto.loading).then( function () { callback(alto); });
         });
