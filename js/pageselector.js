@@ -25,8 +25,9 @@ define(['jquery','events','toolbar','mustache','backbone'],
                 that.options.pageNumber = data;
                 that.render();
             });
-            events.on('changePageBounds',function(data) {
-                that.setPageNumberBounds(data.min,data.max);
+            events.on('changePageMets',function(doc) {
+                var pages = doc.getNumberOfPages();
+                that.setPageNumberBounds(1,pages);
                 that.render();
             });
         },

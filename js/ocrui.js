@@ -53,8 +53,7 @@ define(['spinner','events','alto','mets','image','toolbar'],
 
         mets.get(data,function(_doc) {
             doc = _doc;
-            var pages = doc.getNumberOfPages();
-            events.trigger('changePageBounds',{min:1,max:pages});
+            events.trigger('changePageMets',doc);
         });
 
         image.get(data,function(image) {

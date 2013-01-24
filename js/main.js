@@ -52,8 +52,9 @@ require(
         "spinner",
         "pageselector",
         "mousewheel",
-        "language"
-    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language) {
+        "language",
+        "bibinfo",
+    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo) {
         $(function() {
             $.get('templates.html',function(html) {
                 $templates = $(html);
