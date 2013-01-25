@@ -53,8 +53,9 @@ require(
         "mousewheel",
         "language",
         "bibinfo",
-        'save'
-    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo,save) {
+        'save',
+        'events'
+    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo,save,events) {
         $(function() {
 
             try {
@@ -77,6 +78,8 @@ require(
                     $(window).resize(geometry.resizeHandler);
 
                     $(window).resize();
+
+                    events.trigger('appReady');
                 });
             });
         });

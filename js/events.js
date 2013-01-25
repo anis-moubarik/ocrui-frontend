@@ -22,11 +22,12 @@ define(function () {
 
         for (var i in listeners[ev]) {
             var cb = listeners[ev][i];
-            try {
                 cb(data);
+            try {
+                //cb(data);
             } catch (err) {
                 console.log(err);
-                console.trace();
+                console.log(err.get_stack());
             }
         }
 

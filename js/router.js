@@ -52,17 +52,17 @@ define(['spinner','events','alto','mets','image','backbone'],
 
     });
 
-    function gotoPage(pageNumber) {
+    events.on('requestChangePage',function gotoPage(number) {
+
+        // TODO: queue requests and only handle last one
 
         var parts = Backbone.history.fragment.split('/');
-        var route = parts[0]+'/'+pageNumber;
+        var route = parts[0]+'/'+number;
         router.navigate(route,{replace:true,trigger:true});
 
-    }
+    });
 
-    return {
-        gotoPage:gotoPage
-    };
+    return { };
 
 });
 

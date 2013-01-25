@@ -53,7 +53,7 @@ define(['jquery','events','toolbar','mustache','backbone'],
             return i;
         },
         setPageNumber : function (number) {
-                require('router').gotoPage(number);
+                events.trigger('requestChangePage',number);
         },
         boundedSetPage : function(number) {
             if (number < this.options.minPage) number = this.options.minPage;
