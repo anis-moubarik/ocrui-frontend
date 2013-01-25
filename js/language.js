@@ -14,7 +14,7 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
     }
 
     var Model = Backbone.Model.extend({
-        url: function () { return '/ocrui/languages.json';},
+        url: function () { return '/ocrui/languages.json';}
     });
 
     var View = Backbone.View.extend({
@@ -35,7 +35,7 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
         },
         el : '#language-selector',
         events: {
-            'click ul a': 'changeLanguage',
+            'click ul a': 'changeLanguage'
         },
         changeLanguage: function (ev) {
             var l = ev.currentTarget.getAttribute("data-value");
@@ -51,7 +51,7 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
                 events.trigger('languagesChanged',languages);
                 var context = {
                     selected: languages.get('selected'),
-                    selectedName: languages.get('selected'),
+                    selectedName: languages.get('selected')
                 };
                 context.languages = languages.get('languages').map(function(e) {
                     if(e.code==languages.get('selected')) {
@@ -60,7 +60,7 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
                     } else {
                         return e;
                     }
-                }).filter(function(e) { return !(e===undefined); })
+                }).filter(function(e) { return e!==undefined; });
                 var tpl = $templates.find('#language-selector-template').html();
                 that.$el.html(mustache.render(tpl,context));
                 that.$el.removeClass('open');

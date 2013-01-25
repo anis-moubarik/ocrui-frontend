@@ -8,7 +8,6 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
             startState: function() {
                 var alto = config.getAlto();
                 var changedSequence = [];
-                window.a=alto;
                 if (alto) {
                     changedSequence = alto.getChangedSequence();
                 }
@@ -27,10 +26,10 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
                     word += next;
                 }
                 stream.eatSpace();
-                var changed = state.changedSequence[state.wordIndex]
+                var changed = state.changedSequence[state.wordIndex];
                 state.wordIndex++;
                 if (config.showOriginalChanges && changed) {
-                    return "changed"
+                    return "changed";
                 } else {
                     return null;
                 }
