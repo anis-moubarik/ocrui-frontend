@@ -15,7 +15,7 @@ casper.then(function() {
 });
 
 casper.then(function() {
-    this.captureSelector('koe.png','body');
+    //this.captureSelector('koe.png','body');
 });
 
 casper.run(function() {
