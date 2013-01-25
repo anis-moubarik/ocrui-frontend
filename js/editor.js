@@ -2,12 +2,6 @@
 define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function ($,events,toolbar,CodeMirror,Backbone) {
     "use strict";
 
-    var EmptyView = Backbone.View.extend({
-        el: '#editor',
-        render: function() {
-            this.$el.html("<div>empty</div>");
-        }
-    });
     var View = Backbone.View.extend({
 
         initialize: function () {
@@ -73,7 +67,11 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             });
             events.on('changePageAlto',function(alto) {
                 that.setAlto(alto);
-                that.render();
+                var s = alto.getString();
+                that.cMirror.setValue(s);
+                that.cMirror.clearHistory();
+                var word = that.alto.getNthWord(0);
+                events.trigger('changeCoordinates',word);
                 that.cMirror.focus();
             });
         },
@@ -168,16 +166,12 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             this.alto = alto;
         },
         render: function() {
-            var s = this.alto.getString();
-            this.cMirror.setValue(s);
-            var word = this.alto.getNthWord(0);
-            events.trigger('changeCoordinates',word);
+            return;     // Nothing to do, CodeMirror renders itself
         }
     });
 
     return {
         view: new View(),
-        empty: new EmptyView()
     };
 
 });
