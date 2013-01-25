@@ -11,26 +11,16 @@ define(['spinner','events','alto','mets','image','backbone'],
     });
 
     var router = new Router();
-    router.on("route:default",routeEmpty);
-    router.on("route:document",routeDoc);
-    router.on("route:page",routePage);
 
-    function gotoPage(pageNumber) {
+    router.on("route:default", function routeEmpty() {
 
-        var parts = Backbone.history.fragment.split('/');
-        var route = parts[0]+'/'+pageNumber;
-        router.navigate(route,{replace:true,trigger:true});
-    }
+    });
 
-    function routeEmpty() {
+    router.on("route:document", function routeDoc(id) {
 
-    }
+    });
 
-    function routeDoc(id) {
-
-    }
-
-    function routePage(docId,pageId) {
+    router.on("route:page", function routePage(docId,pageId) {
 
         var pageNumber = Math.floor(parseInt(pageId,10));
         var data = {docId:docId, pageNumber:pageNumber};
@@ -59,6 +49,14 @@ define(['spinner','events','alto','mets','image','backbone'],
             spinner.hideSpinner();
             events.trigger('changePageDone');
         });
+
+    });
+
+    function gotoPage(pageNumber) {
+
+        var parts = Backbone.history.fragment.split('/');
+        var route = parts[0]+'/'+pageNumber;
+        router.navigate(route,{replace:true,trigger:true});
 
     }
 
