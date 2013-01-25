@@ -3,25 +3,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
         function (_,$,toolbar,events,Backbone,mousetailstack) {
     "use strict";
 
-    var EmptyView = Backbone.View.extend({
-        el: '#editor',
-        render: function() {
-            this.$el.html("<div>empty</div>");
-        }
-    });
-
-    var Thumbnails = Backbone.View.extend({
-        el: '#facsimile',
-        render: function() {
-            var $canvas = $('<canvas id="facsimile-canvas">HTML canvas required.</canvas>');
-            $canvas.attr(this.horizontalPixels,'width');
-            $canvas.attr(this.verticalPixels,'height');
-            this.$el.html('');
-            this.$el.append($canvas);
-        }
-    });
-
-
     var View = Backbone.View.extend({
 
         initialize: function() {
@@ -474,8 +455,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
 
     return {
         view: new View(),
-        thumbnails: new Thumbnails(),
-        empty: new EmptyView()
     };
 
 });
