@@ -6,8 +6,27 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
             this.id = options.id;
             this.urlBase = 'items/'+this.id;
             this.url = this.urlBase+'/mets.xml';
+            this.pageInfo = [];
         },
-        pageInfo: [],
+        dirtyPages: function() {
+            var dirtyPages = [];
+            for (var i in this.pageInfo) {
+                var pageNumber = i + 1;
+                var pageInfo = this.pageInfo[i];
+                if (pageInfo === undefined) { continue; }
+                var alto = [2];
+                if (alto === undefined) { continue; }
+                if (alto.isDirty()) { dirtyPages.push(alto); }
+            }
+            return dirtyPages;
+        },
+        registerAlto: function(pageNumber,alto) {
+            var i = pageNumber - 1;
+            this.pageInfo[i][2] = alto;
+        },
+        isDirty: function() {
+            return this.dirtyPages().length > 0;
+        },
         getNumberOfPages : function () {
             return this.pageInfo.length;
         },
@@ -35,7 +54,7 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
                     var element = $(this).find('FLocat').get(0);
                     var imageFilename = element.getAttribute('xlink:href');
                     imageFilename = imageFilename.replace(/^file:\/\//,'').replace(/.\//,'');
-                    that.pageInfo[seq] = [imageFilename,undefined];
+                    that.pageInfo[seq] = [imageFilename,undefined,undefined];
                 });
 
                 // loop through alto files
@@ -45,7 +64,7 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
                     var altoFilename = element.getAttribute('xlink:href');
                     altoFilename = altoFilename.replace(/^file:\/\//,'').replace(/.\//,'');
                     if (that.pageInfo[seq] === undefined) {
-                        that.pageInfo[seq] = [undefined,undefined];
+                        that.pageInfo[seq] = [undefined,undefined,undefined];
                     }
                     that.pageInfo[seq][1] = altoFilename;
                 });

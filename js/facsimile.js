@@ -1,4 +1,4 @@
-/*globals console:true setTimeout:false */
+/*globals console:true setTimeout:false setInterval:false */
 define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,toolbar,events,Backbone,mousetailstack) {
     "use strict";
 
@@ -76,15 +76,16 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
             events.on('changeCoordinates',function(data) {
                 // gets called whenever cursor moves in editor
                 that.setHighlight(data);
-                that.render();
+                that.scheduleRender();
             
             });
 
             events.on('changePageImage',function(image) {
                 that.setImage(image);
-                that.render();
+                that.scheduleRender();
             });
 
+            setInterval(function() {that.processRenderingRequests();},40);
         },
         el: '#facsimile-canvas',
         events: {
@@ -94,7 +95,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
             'mousedown': 'beginPan',
             'mouseup': 'endPan',
             'mouseout': 'endPan',
-            'set-scaling': 'render'
+            'set-scaling': 'scheduleRender'
         },
         wheel: function(ev,delta,deltaX,deltaY) {
             var offset = this.$el.offset();
@@ -105,7 +106,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
                         this.originX + 32*deltaX,
                         this.originY + 32*deltaY
                     );
-                this.render();
+                this.scheduleRender();
             } else {
                 if (delta > 0) {
                     this.zoomTo(1.5,x,y);
@@ -136,7 +137,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
 
             if (!this.panning) return;
             this.setOrigin(this.savedOriginX, this.savedOriginY);
-            this.render();
+            this.scheduleRender();
             this.panning = false;
 
         },
@@ -151,14 +152,14 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
             this.setOrigin(
                 this.savedOriginX - (this.panBeginX - currentX),
                 this.savedOriginY - (this.panBeginY - currentY));
-            this.render();
+            this.scheduleRender();
 
         },
         panTail: function(data) {
             this.setOrigin(
                 this.originX + data[0],
                 this.originY + data[1]);
-            this.render();
+            this.scheduleRender();
         },
         propagateClick: function(ev) {
             if (!this.propageteNextClick) return;
@@ -249,7 +250,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
             var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,margin) * speed);
             var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,margin) * speed);
             this.setOrigin(this.originX - xDelta, this.originY - yDelta);
-            this.render();
+            this.scheduleRender();
             if ((xDelta != 0) || (yDelta != 0)) {
                 setTimeout(function() {that.scrollOneStep(speed,margin,timeout);},timeout);
             } else {
@@ -356,7 +357,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
 
             this.setOrigin( newOriginX, newOriginY);
 
-            this.render();
+            this.scheduleRender();
         },
         setZoom: function (newScale) {
             // TODO: don't let zoom too far
@@ -425,6 +426,14 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
         setPixels: function (horizontal, vertical) {
             this.horizontalPixels = parseInt(horizontal,10);
             this.verticalPixels = parseInt(vertical,10);
+        },
+        scheduleRender: function () {
+            this.requestRendering = true;
+        },
+        processRenderingRequests: function() {
+            if (this.requestRendering == false) return;
+            this.requestRendering = false;
+            this.render();
         },
         render: function() {
 

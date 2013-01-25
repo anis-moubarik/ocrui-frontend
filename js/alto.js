@@ -4,7 +4,9 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
 
     var AltoModel = Backbone.Model.extend({
         initialize: function (options) {
-            this.url = options.url;
+            this.dirty = false;
+            this.url = options.doc.getAltoUrl(options.pageNumber);
+            options.doc.registerAlto(options.pageNumber,this);
         },
         dom2Word: function(dom) {
             return {
@@ -14,6 +16,9 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
                 width: parseInt(dom.getAttribute('WIDTH'),10)/this.get('width'),
                 height: parseInt(dom.getAttribute('HEIGHT'),10)/this.get('height')
             };
+        },
+        isDirty: function() {
+            return this.dirty;
         },
         getWords: function() {
 
@@ -75,6 +80,7 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
             if (words) {return;}
             var words = content.split(/\s+/);
             this.currentData = diffmethod.createAlto( this.originalData,words );
+            this.dirty = true;
 
         },
 
@@ -117,6 +123,10 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
 
     var altos = {};
 
+    function getAltoId(options) {
+        return options.docId+'/'+options.pageNumber;
+    }
+
     function get(options,callback) {
 
         mets.get(options,function (doc) {
@@ -124,8 +134,8 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
                 docId: options.docId,
                 pageNumber: options.pageNumber,
                 versionNumber: options.versionNumber,
-                id: options.docId+'/'+options.pageNumber,
-                url: doc.getAltoUrl(options.pageNumber)
+                id: getAltoId(options),
+                doc: doc
             }
             var alto = altos[altoOptions.id];
             if (alto === undefined) {

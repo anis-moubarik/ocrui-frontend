@@ -54,7 +54,8 @@ require(
         "mousewheel",
         "language",
         "bibinfo",
-    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo) {
+        'save'
+    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, ocrui, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo,save) {
         $(function() {
 
             try

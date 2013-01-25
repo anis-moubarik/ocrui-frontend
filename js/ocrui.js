@@ -1,18 +1,5 @@
-define(['spinner','events','alto','mets','image','toolbar'],
-        function (spinner,events,alto,mets,image,toolbar) {
-
-    var doc; // this is used to store mets currently being edited
-
-    toolbar.registerButton({
-        id:"save",
-        toggle:false,
-        text:"Save",
-        title:"Save",
-        modes:["page"],
-        click: function () {
-            console.log('should now PUT');
-        }
-    });
+define(['spinner','events','alto','mets','image'],
+        function (spinner,events,alto,mets,image) {
 
 
     function route_empty() {
@@ -51,8 +38,7 @@ define(['spinner','events','alto','mets','image','toolbar'],
         events.trigger('changePage',pageNumber);
         spinner.showSpinner();
 
-        mets.get(data,function(_doc) {
-            doc = _doc;
+        mets.get(data,function(doc) {
             events.trigger('changePageMets',doc);
         });
 
