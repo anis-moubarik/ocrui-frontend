@@ -32,10 +32,10 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
                 }
                 stream.eatSpace();
                 var features = [];
-                if (config.showSinceSavedChanges &&
+                if (config.showUnsavedChanges &&
                     state.changedSequence[state.wordIndex]) {
 
-                    features.push('changed-since-save');
+                    features.push('changed-unsaved');
 
                 }
                 if (config.showOriginalChanges &&

@@ -18,27 +18,14 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             // to help automatic testing
             this.$el.data('CodeMirror',this.cMirror);
 
-            this.cMirror.on('cursorActivity',function (instance) {
-                that.setupHighlightChange();
-            });
-            this.cMirror.on('change',function (instance) {
-                that.changed(instance);
-            });
-            that.cMirror.setOption('showSinceSavedChanges',false);
-            that.cMirror.setOption('showOriginalChanges',true);
-            that.cMirror.setOption('showLanguage',true);
-
             toolbar.registerButton({
                 id:'show-saved-changes',
                 toggle:true,
                 icon:'icon-check',
-                title:'Show changes made to last saved version',
+                title:'Show unsaved changes',
                 modes:['page'],
-                click:function() {
-                    var toggled = !($(this).hasClass("active"));
-                    that.cMirror.setOption('showSavedChanges',toggled);
-
-                    // trigger change to rehighlight
+                toggleCB:function(newState) {
+                    that.cMirror.setOption('showUnsavedChanges',newState);
                     that.cMirror.replaceSelection(that.cMirror.getSelection());
                 }});
             toolbar.registerButton({
@@ -48,11 +35,8 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 icon:'icon-edit',
                 title:'Show changes made to original',
                 modes:['page'],
-                click:function() {
-                    var toggled = !($(this).hasClass("active"));
-                    that.cMirror.setOption('showOriginalChanges',toggled);
-
-                    // trigger change to rehighlight
+                toggleCB:function(newState) {
+                    that.cMirror.setOption('showOriginalChanges',newState);
                     that.cMirror.replaceSelection(that.cMirror.getSelection());
                 }});
             toolbar.registerButton({
@@ -62,11 +46,8 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 icon:'icon-globe',
                 title:'Show language of words',
                 modes:['page'],
-                click:function() {
-                    var toggled = !($(this).hasClass("active"));
-                    that.cMirror.setOption('showLanguage',toggled);
-
-                    // trigger change to rehighlight
+                toggleCB:function(newState) {
+                    that.cMirror.setOption('showLanguage',newState);
                     that.cMirror.replaceSelection(that.cMirror.getSelection());
                 }});
             events.on('virtualKeyboard',function(data) {
@@ -95,6 +76,14 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             events.on('requestLanguageChange',function(selected) {
                 that.requestLanguageChange(selected);
             });
+
+            this.cMirror.on('cursorActivity',function (instance) {
+                that.setupHighlightChange();
+            });
+            this.cMirror.on('change',function (instance) {
+                that.changed(instance);
+            });
+
         },
         requestLanguageChange: function(selected) {
             var wordIndexes = this.getCurrentWordIndexes();
@@ -132,15 +121,8 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
         },
         changed: function (instance) {
             var content = instance.getValue();
-            this.setupAltoUpdate(content);
-        },
-        setupAltoUpdate: function (content) {
-            // instead of seting up timeout, call it strait away
-            // to stay in sync with codemirror highlighter
-            this.altoUpdatePending = true;
-            var that = this;
-            that.alto.updateAlto(content);
-            that.setupHighlightChange();
+            this.alto.updateAlto(content);
+            this.setupHighlightChange();
         },
         setupHighlightChange: function () {
             this.highlightChangePending = true;

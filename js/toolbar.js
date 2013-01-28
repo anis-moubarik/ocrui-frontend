@@ -38,6 +38,9 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
             throw "Trying to reregister button " + id;
         }
         buttons [id] = data;
+        if (data.toggle && data.toggleCB) {
+            data.toggleCB.apply(undefined,[data.active]);
+        }
     }
 
     $('body').on('keydown',function(ev) {
@@ -65,7 +68,14 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
             var b = buttons[id];
             if (b === undefined) return;
             var cb = b.click;
-            cb.apply(ev.currentTarget,[ev]);
+            if (cb) {
+                cb.apply(ev.currentTarget,[ev]);
+            }
+            cb = b.toggleCB;
+            if (cb) {
+                var toggled = !($(ev.currentTarget).hasClass("active"));
+                cb.apply(ev.currentTarget,[toggled]);
+            }
 
             var myEvent = 'button-'+id+'-clicked';
             events.trigger(myEvent);
