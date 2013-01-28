@@ -320,7 +320,9 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
 
             } else if (seq[i] == 'add') {
 
-                $strings.eq(si).attr('LANGUAGE',currentLangs[wi]);
+                if (wi > 0) {
+                    $strings.eq(si).attr('LANGUAGE',currentLangs[wi - 1]);
+                }
                 si ++;
 
             }

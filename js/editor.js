@@ -97,8 +97,11 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             });
         },
         requestLanguageChange: function(selected) {
-            var wordIndex = this.getCurrentWordIndex();
-            this.alto.setNthWordLanguage(wordIndex,selected);
+            var wordIndexes = this.getCurrentWordIndexes();
+            console.log(wordIndexes);
+            for (var wordIndex in wordIndexes) {
+                this.alto.setNthWordLanguage(wordIndex,selected);
+            }
             this.cMirror.replaceSelection(this.cMirror.getSelection());
             this.cMirror.focus();
         },
@@ -145,6 +148,44 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             setTimeout(function() {
                     that.triggerHighlightChange();
                 }, 100);
+        },
+        getCurrentWordIndexes: function () {
+            var wordIndexes = {};
+            var wordIndex = 0;
+            var content = this.cMirror.getValue();
+            var start = this.cMirror.getCursor('start');
+            var end = this.cMirror.getCursor('end');
+            var s_line = start.line;
+            var s_ch = start.ch;
+            var e_line = end.line;
+            var e_ch = end.ch;
+            var inMiddleOfWord = false;
+            for (var i in content) {
+                var c = content[i];
+                if (c == '\n') {
+                    s_line --;
+                    e_line --;
+                }
+                if (c.match(/\S/)) {
+                    if (inMiddleOfWord) wordIndex ++;
+                    inMiddleOfWord = false;
+                } else {
+                    inMiddleOfWord = true;
+                }
+                if (s_line <= 0) {
+
+                    if (s_ch <= 0) {
+
+                        wordIndexes[wordIndex] = true;
+                    }
+                    s_ch --;
+                }
+                if (e_line <=0) {
+                    if (e_ch === 0) break;
+                    e_ch --;
+                }
+            }
+            return wordIndexes;
         },
         getCurrentWordIndex: function () {
             var wordIndex = 0;
