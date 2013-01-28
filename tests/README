@@ -1,3 +1,5 @@
 Testattavia asioita:
 
-
+toolbar:
+    kaikki buttonit ovat olemassa
+    togglebuttonit vaihtaa toggle-tilaa painettaessa.

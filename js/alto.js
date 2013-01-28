@@ -9,8 +9,10 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
             options.doc.registerAlto(options.pageNumber,this);
         },
         dom2Word: function(dom) {
+            // see also setNthWord
             return {
                 content: dom.getAttribute('CONTENT'),
+                language: dom.getAttribute('LANGUAGE'),
                 hpos: parseInt(dom.getAttribute('HPOS'),10)/this.get('width'),
                 vpos: parseInt(dom.getAttribute('VPOS'),10)/this.get('height'),
                 width: parseInt(dom.getAttribute('WIDTH'),10)/this.get('width'),
@@ -79,11 +81,20 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
             if (this.originalData === undefined) {return;}
             if (words) {return;}
             var words = content.split(/\s+/);
-            this.currentData = diffmethod.createAlto( this.originalData,words );
+            this.currentData = diffmethod.createAlto(
+                this.originalData,
+                this.currentData
+                ,words );
             this.dirty = true;
 
         },
 
+        setNthWordLanguage: function(index,language) {
+            var $dom =  $(this.currentData).find('String').eq(index);
+            $dom.attr('LANGUAGE',language);
+            console.dirxml($dom.get(0));
+            return this.dom2Word($dom.get(0));
+        },
         getNthWord: function(index) {
             var dom =  $(this.currentData).find('String').get(index);
             if (dom === undefined) {return undefined;}
@@ -98,7 +109,29 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
         getChangedSequence: function(dom) {
             if (dom === undefined) {dom = this.currentData;}
             return $(dom).find('String').map(
-                function() { return this.getAttribute('CHANGED') ? true : false; }
+                function() {
+                    return this.getAttribute('CHANGED') ? true : false;
+                }
+            ).get();
+        },
+
+        getChangedSinceSaveSequence: function(dom) {
+            if (dom === undefined) {dom = this.currentData;}
+            return $(dom).find('String').map(
+                function() {
+                    return this.getAttribute('CHANGED_SINCE_SAVE') ?
+                        true :
+                        false;
+                }
+            ).get();
+        },
+
+        getLanguageSequence: function(dom) {
+            if (dom === undefined) {dom = this.currentData;}
+            return $(dom).find('String').map(
+                function() {
+                    return this.getAttribute('LANGUAGE') ? true : false;
+                }
             ).get();
         },
 

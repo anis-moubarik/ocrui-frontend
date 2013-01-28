@@ -4,7 +4,7 @@ define(['jquery','underscore','backbone','events'],function ($,_,Backbone,events
     var View = Backbone.View.extend({
         initialize:function() {
             var that = this;
-            events.on('languagesChanged',function(languages) {
+            events.on('languageChanged',function(languages) {
                 that.languages = languages;
                 that.render();
                 });

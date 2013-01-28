@@ -7,15 +7,20 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
         return {
             startState: function() {
                 var alto = config.getAlto();
-                var changedSequence = [];
-                if (alto) {
-                    changedSequence = alto.getChangedSequence();
-                }
-                return {
+                var state = {
                     language:'fi',
                     wordIndex:0,
-                    changedSequence:changedSequence
+                    changedSequence:[],
+                    changedSinceSaveSequence:[],
+                    languageSequence:[],
                 };
+                if (alto) {
+                    state.changedSinceSaveSequence =
+                            alto.getChangedSinceSaveSequence();
+                    state.changedSequence = alto.getChangedSequence();
+                    state.languageSequence = alto.getLanguageSequence();
+                }
+                return state;
             },
             token: function(stream,state) {
                 stream.eatSpace();
@@ -26,13 +31,27 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
                     word += next;
                 }
                 stream.eatSpace();
-                var changed = state.changedSequence[state.wordIndex];
-                state.wordIndex++;
-                if (config.showOriginalChanges && changed) {
-                    return "changed";
-                } else {
-                    return null;
+                var features = [];
+                if (config.showSinceSavedChanges &&
+                    state.changedSequence[state.wordIndex]) {
+
+                    features.push('changed-since-save');
+
                 }
+                if (config.showOriginalChanges &&
+                    state.changedSequence[state.wordIndex]) {
+
+                    features.push('changed');
+
+                }
+                if (config.showLanguage &&
+                    state.languageSequence[state.wordIndex]) {
+
+                    features.push('language');
+
+                }
+                state.wordIndex++;
+                return features.join(' ');;
             }
         };
     }

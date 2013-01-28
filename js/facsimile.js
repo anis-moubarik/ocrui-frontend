@@ -267,6 +267,15 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
                 return 0;
             }
         },
+        hlRGB: [255,255,0],
+        hlPixel : function (buffer,index,alpha) {
+            for (var i=0; i<3; i++) {
+                buffer[index + i] = (
+                    (buffer[index + i] * (1-alpha)) +
+                    (this.hlRGB[i] * alpha)
+                );
+            }
+        },
         renderHighlight : function(ctx,hl) {
             if (!hl) { return; }
 
@@ -303,13 +312,9 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
                 var iy = Math.floor(i / 4 / rect.width);
                 if ( (ix === 0) || (ix === rect.width-1) ||
                         (iy === 0) || (iy === rect.height-1)) {
-                    pix[i  ] = (pix[i  ] + 144) / 2; // red
-                    pix[i+1] = (pix[i+1] + 133) / 2; // green
-                    pix[i+2] = (pix[i+2] +  22) / 2; // blue
+                    this.hlPixel(pix,i,0.7);
                 } else {
-                    pix[i  ] = (pix[i  ] + 244) / 2; // red
-                    pix[i+1] = (pix[i+1] + 233) / 2; // green
-                    pix[i+2] = (pix[i+2] +  55) / 2; // blue
+                    this.hlPixel(pix,i,0.2);
                 }
             }
 

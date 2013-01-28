@@ -2,8 +2,12 @@
     color: #ffaa00;
 }
 
+.cm-changed-since-save {
+    color: #aaaa00;
+}
+
 .cm-language {
-    color: #aaff00;
+    background-color: #bbddff;
 }
 
 #facsimile {

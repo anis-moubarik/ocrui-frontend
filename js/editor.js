@@ -13,16 +13,20 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 mode: 'ocrui',
                 getAlto: function() {return that.getAlto();}
             });
+
+            // Add reference to codemirror object to dom tree
+            // to help automatic testing
+            this.$el.data('CodeMirror',this.cMirror);
+
             this.cMirror.on('cursorActivity',function (instance) {
                 that.setupHighlightChange();
             });
             this.cMirror.on('change',function (instance) {
                 that.changed(instance);
             });
+            that.cMirror.setOption('showSinceSavedChanges',false);
             that.cMirror.setOption('showOriginalChanges',true);
-
-            // Add reference to codemirror object to dom tree to help automatic testing
-            this.$el.data('CodeMirror',this.cMirror);
+            that.cMirror.setOption('showLanguage',true);
 
             toolbar.registerButton({
                 id:'show-saved-changes',
@@ -51,6 +55,20 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                     // trigger change to rehighlight
                     that.cMirror.replaceSelection(that.cMirror.getSelection());
                 }});
+            toolbar.registerButton({
+                id:'show-language',
+                toggle:true,
+                active:true,
+                icon:'icon-globe',
+                title:'Show language of words',
+                modes:['page'],
+                click:function() {
+                    var toggled = !($(this).hasClass("active"));
+                    that.cMirror.setOption('showLanguage',toggled);
+
+                    // trigger change to rehighlight
+                    that.cMirror.replaceSelection(that.cMirror.getSelection());
+                }});
             events.on('virtualKeyboard',function(data) {
                 that.cMirror.replaceSelection(data);
                 that.cMirror.focus();
@@ -74,6 +92,15 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 events.trigger('changeCoordinates',word);
                 that.cMirror.focus();
             });
+            events.on('requestLanguageChange',function(selected) {
+                that.requestLanguageChange(selected);
+            });
+        },
+        requestLanguageChange: function(selected) {
+            var wordIndex = this.getCurrentWordIndex();
+            this.alto.setNthWordLanguage(wordIndex,selected);
+            this.cMirror.replaceSelection(this.cMirror.getSelection());
+            this.cMirror.focus();
         },
         el: '#editor',
         moveCursorToWord: function(wordIndex) {
@@ -119,15 +146,12 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                     that.triggerHighlightChange();
                 }, 100);
         },
-        triggerHighlightChange: function () {
-
-            if (!this.highlightChangePending) return;
-            this.highlightChangePending = false;
+        getCurrentWordIndex: function () {
+            var wordIndex = 0;
             var content = this.cMirror.getValue();
             var cursor = this.cMirror.getCursor();
             var line = cursor.line;
             var ch = cursor.ch;
-            var wordIndex = 0;
             var inMiddleOfWord = false;
             for (var i in content) {
                 var c = content[i];
@@ -145,6 +169,13 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                     ch --;
                 }
             }
+            return wordIndex;
+        },
+        triggerHighlightChange: function () {
+
+            if (!this.highlightChangePending) return;
+            this.highlightChangePending = false;
+            var wordIndex = this.getCurrentWordIndex();
             var word = this.alto.getNthWord(wordIndex);
             if (
                 (this.wordUnderCursor && !word) ||

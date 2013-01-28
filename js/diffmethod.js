@@ -114,6 +114,68 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
         this.resetLine();
     }
 
+    ProcessingState.prototype.createTarget = function ( original ) {
+         this.$target = $(original).find('alto').clone();
+    }
+    ProcessingState.prototype.createAltoFromOriginalAndWords = function (
+            original, words) {
+
+        words = words.map(_.identity); // jsdiff.diff edits second argument!!
+        var originalWords = $(original).find('String').map( function() {
+                return this.getAttribute('CONTENT') || '';
+            }).get();
+        var diff = jsdiff.diff(originalWords,words);
+        var seq = getEditSequence(diff);
+        var $strings = this.$target.find('String');
+        var wi = 0;
+        var si = 0;
+
+        this.$textline = this.$target.find('TextLine').first();
+        for (var i = 0; i < seq.length; i++) {
+            // Iterating simultaneously three sequences
+            //  i indexes edit edit sequence
+            // wi indexes editor words sequence
+            // si indexes alto string elements
+
+            var $currentString = $strings.eq(si);
+            var currentWord = words[wi];
+            var oldSi = si;
+            this.prepareString($currentString);
+
+            if (seq[i] == 'match') {
+
+                wi ++;
+                si ++;
+                this.processPending();
+                $currentString.removeAttr('CHANGED');
+
+            } else if (seq[i] == 'replace') {
+
+                si ++;
+                wi ++;
+                this.pushEdit( currentWord, $currentString);
+
+            } else if (seq[i] == 'delete') {
+
+                si ++;
+                this.pushEdit( undefined, $currentString);
+
+            } else if (seq[i] == 'add') {
+
+                wi ++;
+                this.pushEdit( currentWord, undefined);
+
+            }
+
+            if (si != oldSi) {
+                this.stringDone();
+            }
+
+        }
+
+        this.processPending();
+    };
+
     ProcessingState.prototype.resetLine = function () {
         this.wordStack = []; // stack of pending words to add
         this.$$elementStack = []; // stack of pending elements to replace
@@ -225,69 +287,67 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
 
     };
 
-    function createAlto (source,words) {
-        var originalWords = $(source).find('String').map(
-            function() { return this.getAttribute('CONTENT'); }
+    ProcessingState.prototype.updateLanguages = function(current,words) {
+
+        words = words.map(_.identity); // jsdiff.diff edits second argument!!
+        var currentWords = $(current).find('String').map(
+            function() { return this.getAttribute('CONTENT') || ''; }
         ).get();
-        var diff = jsdiff.diff(originalWords,words);
+        var currentLangs = $(current).find('String').map(
+            function() { return this.getAttribute('LANGUAGE') || ''; }
+        ).get();
+        var diff = jsdiff.diff(currentWords,words);
         var seq = getEditSequence(diff);
-        var $target = $(source).find('alto').clone();
-        var $strings = $target.find('String');
+        var $strings = this.$target.find('String');
+        var wi = 0;
+        var si = 0;
 
-        var processingState = new ProcessingState();
-
-        processingState.$textline = $target.find('TextLine').first();
-        for (var i = 0, wi=0, si=0; i < seq.length; i++) {
+        for (var i = 0; i < seq.length; i++) {
             // Iterating simultaneously three sequences
             //  i indexes edit edit sequence
             // wi indexes editor words sequence
             // si indexes alto string elements
 
-            var $currentString = $strings.eq(si);
-            var currentWord = words[wi];
-            var oldSi = si;
-            processingState.prepareString($currentString);
+            if ((seq[i] == 'match') || (seq[i] == 'replace')) {
 
-            if (seq[i] == 'match') {
-
+                $strings.eq(si).attr('LANGUAGE',currentLangs[wi]);
                 wi ++;
                 si ++;
-                processingState.processPending();
-                $currentString.removeAttr('CHANGED');
-
-            } else if (seq[i] == 'replace') {
-
-                si ++;
-                wi ++;
-                processingState.pushEdit( currentWord, $currentString);
 
             } else if (seq[i] == 'delete') {
 
-                si ++;
-                processingState.pushEdit( undefined, $currentString);
+                wi ++;
 
             } else if (seq[i] == 'add') {
 
-                wi ++;
-                processingState.pushEdit( currentWord, undefined);
+                $strings.eq(si).attr('LANGUAGE',currentLangs[wi]);
+                si ++;
 
-            }
-
-            if (si != oldSi) {
-                processingState.stringDone();
             }
 
         }
+    };
 
-        processingState.processPending();
+    function createAlto (original, current, words) {
 
-        return $target.get(0);
+        // Returns a new Alto DOM from three input objects:
+        // original - the Original alto dom (bounding boxes come from here)
+        // current - the alto just before the last change (word language and
+        //   layout box information come from here)
+        // words - sequence of words from editor.
+
+        var processingState = new ProcessingState();
+
+        processingState.createTarget(original);
+        processingState.createAltoFromOriginalAndWords(original, words);
+        processingState.updateLanguages(current,words);
+
+        return processingState.$target.get(0);
     }
 
     return {
         createAlto : createAlto
     };
 });
-
 
 
