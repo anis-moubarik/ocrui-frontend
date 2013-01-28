@@ -46,9 +46,19 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
                 icon:'icon-move',
                 title:'Mouse wheel pan/zoom',
                 modes:['page'],
-                click:function(data) {
-                    var toggled = !($('#pan-zoom').hasClass("active"));
-                    that.wheelPan = toggled;
+                toggleCB:function(newState) {
+                    that.wheelPan = newState;
+                }});
+
+            toolbar.registerButton({
+                id:'show-layout',
+                toggle:true,
+                icon:'icon-th',
+                title:'Show page layout',
+                modes:['page'],
+                toggleCB:function(newState) {
+                    that.showLayout = newState;
+                    that.scheduleRender();
                 }});
 
             toolbar.registerKeyboardShortcut(113, function(ev) {
@@ -422,6 +432,9 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
             this.requestRendering = false;
             this.render();
         },
+        renderLayout : function(ctx) {
+            return;
+        },
         render: function() {
 
             this.setPixels(
@@ -454,6 +467,7 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
             ctx.shadowBlur = 0;
 
             this.renderHighlight(ctx,this.highlight);
+            if (this.showLayout) this.renderLayout();
 
         }
     });
