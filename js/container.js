@@ -14,7 +14,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
             this.imageWidth = 500; // initial something
             this.imageHeight = 500; // initial something
             this.mouseTailStack = new mousetailstack.MouseTailStack();
-            events.on('mousetail',function(data) {that.panTail(data);});
 
             toolbar.registerButton({
                 id:'zoom-in',
@@ -71,6 +70,8 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
             events.on('set-scaling', function() {
                 that.scheduleRender ();
             });
+
+            events.on('mousetail',function(data) {that.panTail(data);});
 
             setInterval(function() {
                 that.processRenderingRequests();
@@ -160,7 +161,7 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
 
             var hScale = this.imageWidth * this.pageScale;
             var vScale = this.imageHeight * this.pageScale;
-            return {
+            var imageCoords = {
                 x: (screenCoords.x - this.originX) / hScale,
                 y: (screenCoords.y - this.originY) / vScale
             };
@@ -377,12 +378,16 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
             }
 
         },
+        setImageSize: function(w,h) {
+            this.imageWidth = w;
+            this.imageHeight = h;
+        },
         scheduleRender: function () {
-            this.requestRendering = true;
+            this.renderingRequest = true;
         },
         processRenderingRequests: function() {
-            if (this.requestRendering === false) return;
-            this.requestRendering = false;
+            if (this.renderingRequest === false) return;
+            this.renderingRequest = false;
             events.trigger('scheduledRender');
             this.render();
         },

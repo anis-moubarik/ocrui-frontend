@@ -39,6 +39,7 @@
     height: 100%;
     overflow: hidden;
     z-index:500000;
+    pointer-events: none;
 }
 
 .highlight-box, .layout-box {

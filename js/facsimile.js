@@ -24,8 +24,7 @@ define(['jquery','events','backbone','container'],
 
         setImage: function(image) {
             this.image = image;
-            this.imageWidth = this.image.width;
-            this.imageHeight = this.image.height;
+            container.view.setImageSize(image.width,image.height);
             this.render();
         },
         render: function() {
@@ -37,6 +36,7 @@ define(['jquery','events','backbone','container'],
             var originX = container.view.getOriginX();
             var originY = container.view.getOriginY();
 
+            console.log(w,h,zoom,originX,originY);
             if (!this.image) { return; }
 
             ctx.setTransform(1,0,0,1,0,0);
