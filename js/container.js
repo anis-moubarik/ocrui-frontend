@@ -173,9 +173,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
             var vScale = this.imageHeight * this.pageScale;
             return Math.round(pageHeight * vScale) + 2;
         },
-        setImage: function(image) {
-            this.image = image;
-        },
         possiblyScrollToHighlight: function(hl) {
             if (hl === undefined) return;
             var hScale = this.imageWidth * this.pageScale;
@@ -377,7 +374,7 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
     });
 
     return {
-        //view: new View(),
+        view: new View(),
     };
 
 });
