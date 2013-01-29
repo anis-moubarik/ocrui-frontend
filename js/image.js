@@ -6,16 +6,19 @@ define(['jquery','backbone','mets'],function ($,Backbone,mets) {
         initialize: function (options) {
             this.url = options.url;
             this.loading = new $.Deferred();
-        },
-        fetch: function (callback) {
-            var that = this;
             this.image = new Image();
+        },
+        fetch: function () {
             this.image.src = this.url;
+            var that = this;
             this.image.onload = function() { 
                 that.width = this.width;
                 that.height = this.height;
-                that.loading.resolve();
+                that.loading.resolve(that);
             };
+            this.image.onerror = function() { 
+                that.loading.reject(that);
+            }
         }
     });
 
@@ -23,22 +26,38 @@ define(['jquery','backbone','mets'],function ($,Backbone,mets) {
 
     function get(options,callback) {
 
-        mets.get(options,function (doc) {
-            var imageOptions = {
-                docId: options.docId,
-                pageNumber: options.pageNumber,
-                versionNumber: options.versionNumber,
-                id: options.docId+'/'+options.pageNumber,
-                url: doc.getImageUrl(options.pageNumber)
-            };
-            var image = images[imageOptions.id];
-            if (image === undefined) {
-                image = new ImageModel(imageOptions);
-                images[imageOptions.id] = image;
-                image.fetch();
-            }
-            $.when(image.loading).then( function () { callback(image); });
-        });
+        var promise = new $.Deferred();
+
+        mets.get(options).then(
+            function (doc) {
+                var imageOptions = {
+                    docId: options.docId,
+                    pageNumber: options.pageNumber,
+                    versionNumber: options.versionNumber,
+                    id: options.docId+'/'+options.pageNumber,
+                    url: doc.getImageUrl(options.pageNumber)
+                };
+                var image = images[imageOptions.id];
+                if (image === undefined) {
+                    try {
+                        image = new ImageModel(imageOptions);
+                    } catch (err) {
+                        promise.reject(err);
+                        return;
+                    }
+
+                    images[imageOptions.id] = image;
+                    image.fetch();
+                }
+                image.loading.then(
+                    function () {promise.resolve(image);},
+                    function () {promise.reject("Cannot load image");}
+                );
+            },
+            function (arg) { promise.reject(arg); }
+        );
+
+        return promise;
     }
 
     return {

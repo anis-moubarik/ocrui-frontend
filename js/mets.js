@@ -25,7 +25,7 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
             if (myPageInfo) {
                 myPageInfo[2] = alto;
             } else {
-                console.log('Cannot register alto!');
+                throw 'Pagenumber ' + pageNumber + ' does not exist';
             }
         },
         isDirty: function() {
@@ -109,20 +109,31 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
 
     var documents = {};
 
-    function get(options,callback) {
+    function get(options) {
+
+        var promise = new $.Deferred();
 
         var doc = documents[options.docId];
 
         if (doc === undefined) {
 
-            doc = new DocumentModel({id:options.docId});
+            try {
+                doc = new DocumentModel({id:options.docId});
+            } catch (err) {
+                promise.reject(err);
+                return;
+            }
             documents[options.docId] = doc;
             doc.loading = doc.fetch();
 
         }
 
-        $.when(doc.loading).then( function () { callback(doc); });
+        doc.loading.then(
+            function () {promise.resolve(doc);},
+            function () {promise.reject("Cannot load document.");}
+        );
 
+        return promise;
     }
 
     return {

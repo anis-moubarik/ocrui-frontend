@@ -56,8 +56,9 @@ require(
         'save',
         'container',
         'boxes',
+        'dialog',
         'events'
-    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo,save,container,boxes,events) {
+    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo,save,container,boxes,dialog,events) {
         $(function() {
 
             try {

@@ -14,9 +14,12 @@ define(['spinner','events','alto','mets','image','backbone'],
 
     router.on("route:default", function routeEmpty() {
 
+        events.trigger('message','Default view');
     });
 
     router.on("route:document", function routeDoc(id) {
+
+        events.trigger('message','Document view');
 
     });
 
@@ -24,31 +27,35 @@ define(['spinner','events','alto','mets','image','backbone'],
 
         var pageNumber = Math.floor(parseInt(pageId,10));
         var data = {docId:docId, pageNumber:pageNumber};
-        var imageRendered = new $.Deferred();
-        var editorRendered = new $.Deferred();
-        var allRendered = $.when(imageRendered,editorRendered);
 
         events.trigger('changePage',pageNumber);
         spinner.showSpinner();
 
-        mets.get(data,function(doc) {
-            events.trigger('changePageMets',doc);
-        });
+        var imageLoaded = image.get(data);
+        var altoLoaded = alto.get(data);
+        var allLoaded = $.when(imageLoaded,altoLoaded);
 
-        image.get(data,function(image) {
-            events.trigger('changePageImage',image);
-            imageRendered.resolve();
-        });
+        mets.get(data).then(
+            function(doc) { events.trigger('changePageMets',doc); },
+            function(msg) { events.trigger('changePageMetsError',msg); });
 
-        alto.get(data,function(alto) {
-            events.trigger('changePageAlto',alto);
-            editorRendered.resolve();
-        });
+        imageLoaded.then(
+            function(img) { events.trigger('changePageImage',img); },
+            function(msg) { events.trigger('changePageImageError',msg); });
 
-        allRendered.then(function() {
-            spinner.hideSpinner();
-            events.trigger('changePageDone');
-        });
+        altoLoaded.then(
+            function(myAlto) { events.trigger('changePageAlto',myAlto); },
+            function(msg) { events.trigger('changePageAltoError',msg); });
+
+        allLoaded.then(
+            function() {
+                events.trigger('changePageDone');
+                spinner.hideSpinner();
+            },
+            function(msg) {
+                events.trigger('changePageError',msg);
+                spinner.hideSpinner();
+            });
 
     });
 

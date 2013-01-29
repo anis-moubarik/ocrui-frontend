@@ -174,24 +174,38 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
         return options.docId+'/'+options.pageNumber;
     }
 
-    function get(options,callback) {
+    function get(options) {
 
-        mets.get(options,function (doc) {
-            var altoOptions = {
-                docId: options.docId,
-                pageNumber: options.pageNumber,
-                versionNumber: options.versionNumber,
-                id: getAltoId(options),
-                doc: doc
-            };
-            var alto = altos[altoOptions.id];
-            if (alto === undefined) {
-                alto = new AltoModel(altoOptions);
-                altos[altoOptions.id] = alto;
-                alto.loading = alto.fetch();
-            }
-            $.when(alto.loading).then( function () { callback(alto); });
-        });
+        var promise = new $.Deferred();
+
+        mets.get(options).then(
+            function (doc) {
+                var altoOptions = {
+                    docId: options.docId,
+                    pageNumber: options.pageNumber,
+                    versionNumber: options.versionNumber,
+                    id: getAltoId(options),
+                    doc: doc
+                };
+                var alto = altos[altoOptions.id];
+                if (alto === undefined) {
+                    try {
+                        alto = new AltoModel(altoOptions);
+                    } catch (err) {
+                        promise.reject(err);
+                        return;
+                    }
+                    altos[altoOptions.id] = alto;
+                    alto.loading = alto.fetch();
+                }
+                alto.loading.then(
+                    function () {promise.resolve(alto);},
+                    function () {promise.reject("Cannot load alto file");}
+                );
+            },
+            function (arg) { promise.reject(arg); }
+        );
+        return promise;
     }
 
     return {
