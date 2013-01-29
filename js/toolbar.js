@@ -54,14 +54,18 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
         initialize: function() {
             var that = this;
             this.mode = 'empty';
-            events.on('changePage',function(pageNumber) {
+            events.on('changePage',function() {
                 that.setMode('page');
-                that.render();
             });
         },
         el : '#toolbar',
         events: {
             'click button': 'handleClick'
+        },
+        setMode: function(mode) {
+            if (this.mode == mode) { return; }
+            this.mode = mode;
+            this.render();
         },
         handleClick: function (ev) {
             var id = ev.currentTarget.id;
@@ -81,9 +85,6 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
 
             var myEvent = 'button-'+id+'-clicked';
             events.trigger(myEvent);
-        },
-        setMode: function(mode) {
-            this.mode = mode;
         },
         render: function() {
             

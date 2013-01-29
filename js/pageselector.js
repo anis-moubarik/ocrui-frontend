@@ -7,6 +7,8 @@ define(['jquery','events','toolbar','mustache','backbone'],
         initialize: function() {
             this.options = {};
             var that = this;
+            this.pageChangeQueue = [];
+            this.pageChangeRequested = false;
 
             toolbar.registerKeyboardShortcut(33, function() {
                 that.pagePrevious();
@@ -38,10 +40,12 @@ define(['jquery','events','toolbar','mustache','backbone'],
             'change #page-number': 'pageNumber'
         },
         pageNext : function (ev) {
-            this.boundedSetPage(this.getPageNumber() + 1);
+            $('#page-number').attr('value',this.getPageNumber() + 1);
+            this.pageNumber();
         },
         pagePrevious : function (ev) {
-            this.boundedSetPage(this.getPageNumber() - 1);
+            $('#page-number').attr('value',this.getPageNumber() - 1);
+            this.pageNumber();
         },
         pageNumber : function (ev) {
             this.boundedSetPage(this.getPageNumber());
@@ -53,7 +57,20 @@ define(['jquery','events','toolbar','mustache','backbone'],
             return i;
         },
         setPageNumber : function (number) {
-                events.trigger('requestChangePage',number);
+                // queues page changes
+
+                var that = this;
+                this.pageChangeQueue.push(number);
+                if (this.pageChangeRequested) return;
+                this.pageChangeRequested = true;
+                setTimeout(function() {that.processPageChange();},100);
+        },
+        processPageChange: function () {
+            // TODO: this don't work properly yet.
+            var number = this.pageChangeQueue[this.pageChangeQueue.length-1];
+            this.pageChangeRequested = false;
+            this.pageChangeQueue = [];
+            events.trigger('requestChangePage',number);
         },
         boundedSetPage : function(number) {
             if (number < this.options.minPage) number = this.options.minPage;

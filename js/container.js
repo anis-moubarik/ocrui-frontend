@@ -390,7 +390,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
 
         },
         processRenderingRequests: function() {
-            if (this.renderingRequest === false) return;
             this.renderingRequest = false;
             events.trigger('scheduledRender');
             this.render();
