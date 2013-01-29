@@ -60,49 +60,44 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
         setLayoutBoxes : function(alto) {
             this.layoutBoxes = alto.getLayoutBoxes();
         },
-        createBox : function(rect,cls) {
-            var $div = $('<div> </div>');
-            $div.attr('class',cls);
-            $div.css('left',rect.hpos);
-            $div.css('top',rect.vpos);
-            $div.css('width',rect.width);
-            $div.css('height',rect.height);
-            return $div;
+        renderBoxes : function(boxes,cls) {
+            var box;
+            var rect;
+            var $div;
+
+            for (var i in boxes) {
+
+                box = boxes[i];
+                rect = {
+                    hpos : container.view.getScreenX(box.hpos)-3,
+                    vpos : container.view.getScreenY(box.vpos)-3,
+                    width : container.view.getScreenWidth(box.width)+6,
+                    height : container.view.getScreenHeight(box.height)+6
+                }
+
+                $div = $('<div> </div>');
+                $div.attr('class',cls);
+                $div.css('left',rect.hpos);
+                $div.css('top',rect.vpos);
+                $div.css('width',rect.width);
+                $div.css('height',rect.height);
+                this.$el.append($div);
+
+            }
+
         },
         render: function() {
             this.$el.html('');
-            var hl = this.highlight;
-            var box;
-            var rect;
 
             if (this.showHighlight && this.highlight) {
 
-                rect = {
-                    hpos : container.view.getScreenX(hl.hpos)-3,
-                    vpos : container.view.getScreenY(hl.vpos)-3,
-                    width : container.view.getScreenWidth(hl.width)+6,
-                    height : container.view.getScreenHeight(hl.height)+6
-                }
-
-                this.$el.append(this.createBox(rect,"highlight-box"));
+                this.renderBoxes(this.highlight,"highlight-box");
 
             }
 
             if (this.showLayout) {
 
-                for (var i in this.layoutBoxes) {
-
-                    box = this.layoutBoxes[i];
-                    rect = {
-                        hpos : container.view.getScreenX(box.hpos)-3,
-                        vpos : container.view.getScreenY(box.vpos)-3,
-                        width : container.view.getScreenWidth(box.width)+6,
-                        height : container.view.getScreenHeight(box.height)+6
-                    }
-
-                    this.$el.append(this.createBox(rect,"layout-box"));
-
-                }
+                this.renderBoxes(this.layoutBoxes,"layout-box");
 
             }
 

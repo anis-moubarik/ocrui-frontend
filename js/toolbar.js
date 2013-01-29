@@ -77,6 +77,8 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
                 cb.apply(ev.currentTarget,[toggled]);
             }
 
+            events.trigger('refocus');
+
             var myEvent = 'button-'+id+'-clicked';
             events.trigger(myEvent);
         },

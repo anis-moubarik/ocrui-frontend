@@ -1,6 +1,6 @@
 /*globals console:true setTimeout:false setInterval:false */
-define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
-        function (_,$,toolbar,events,Backbone,mousetailstack) {
+define(['underscore','jquery','toolbar','events','backbone','mousetailstack','diffmethod'],
+        function (_,$,toolbar,events,Backbone,mousetailstack,diffmethod) {
     "use strict";
 
     var View = Backbone.View.extend({
@@ -198,8 +198,10 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
         getOriginY: function() {
             return this.originY;
         },
-        possiblyScrollToHighlight: function(hl) {
-            if (hl === undefined) return;
+        possiblyScrollToHighlight: function(highlight) {
+            if (highlight === []) return;
+            var hl = diffmethod.getCombinedBoundingBox(highlight);
+
             var hScale = this.imageWidth * this.pageScale;
             var vScale = this.imageHeight * this.pageScale;
 

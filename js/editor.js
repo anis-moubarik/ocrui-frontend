@@ -1,11 +1,10 @@
 /*global setTimeout:false */
-define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function ($,events,toolbar,CodeMirror,Backbone) {
+define(['underscore','jquery','events','toolbar','codemirror','backbone','cmmode'],function (_,$,events,toolbar,CodeMirror,Backbone) {
     "use strict";
 
     var View = Backbone.View.extend({
 
         initialize: function () {
-            this.wordUnderCursor = {};
             var that = this;
             this.cMirror = new CodeMirror(this.$el.get(0), {
                 value: "",
@@ -57,11 +56,12 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
                 that.cMirror.setCursor(cursor);
             });
             events.on('cursorToCoordinate',function(data) {
+                
+                that.moveCursorToWord(data);    
 
-                if (!that.alto) { return; }
-                var index = that.alto.getWordIndexAt(data.x,data.y);
-                that.moveCursorToWord(index);    
-
+            });
+            events.on('refocus',function(data) {
+                that.refocus();
             });
             events.on('changePageAlto',function(alto) {
                 that.setAlto(alto);
@@ -88,11 +88,16 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             this.cMirror.focus();
         },
         el: '#editor',
-        moveCursorToWord: function(wordIndex) {
+        refocus: function(ev) {
+            this.cMirror.focus();
+        },
+        moveCursorToWord: function(coords) {
             var content = this.cMirror.getValue();
             var line = 0;
             var ch = 0;
             var inMiddleOfWord = false;
+            if (!this.alto) { return; }
+            var wordIndex = this.alto.getWordIndexAt(coords.x,coords.y);
             if (wordIndex === undefined) {return;}
             for (var i in content) {
                 var c = content[i];
@@ -162,49 +167,19 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             }
             return wordIndexes;
         },
-        getCurrentWordIndex: function () {
-            var wordIndex = 0;
-            var content = this.cMirror.getValue();
-            var cursor = this.cMirror.getCursor();
-            var line = cursor.line;
-            var ch = cursor.ch;
-            var inMiddleOfWord = false;
-            for (var i in content) {
-                var c = content[i];
-                if (c == '\n') line --;
-                if (c.match(/\S/)) {
-                    if (inMiddleOfWord) wordIndex ++;
-                    inMiddleOfWord = false;
-                } else {
-                    inMiddleOfWord = true;
-                }
-                if (line === 0) {
-                    if (ch === 0) {
-                        break;
-                    }
-                    ch --;
-                }
-            }
-            return wordIndex;
-        },
         triggerHighlightChange: function () {
 
             if (!this.highlightChangePending) return;
             this.highlightChangePending = false;
-            var wordIndex = this.getCurrentWordIndex();
-            var word = this.alto.getNthWord(wordIndex);
-            if (
-                (this.wordUnderCursor && !word) ||
-                (!this.wordUndeCursor && word) ||
-                (word && (
-                    (word.hpos != this.wordUnderCursor.hpos) ||
-                    (word.vpos != this.wordUnderCursor.vpos) ||
-                    (word.width != this.wordUnderCursor.width) ||
-                    (word.height != this.wordUnderCursor.height)
-                ))) {
-                this.wordUnderCursor = word;
-                events.trigger('changeCoordinates',word);
-            }
+            var wordIndexes = this.getCurrentWordIndexes();
+            var that = this;
+            var words = _.map(wordIndexes,function (v,k) {
+
+                return that.alto.getNthWord(k);
+
+            });
+
+            events.trigger('changeCoordinates',words);
         },
         getAlto: function(alto) {
             return this.alto;
