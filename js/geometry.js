@@ -1,5 +1,5 @@
 /*globals window:false */
-define(['jquery'], function($) {
+define(['jquery','events'], function($,events) {
     "use strict";
 
     function resizeHandler (ev) {
@@ -9,13 +9,13 @@ define(['jquery'], function($) {
         var availableH = wHeight - topHeight - bottomHeight;
         $('#editor').height(availableH-20);
         $('.CodeMirror').height(availableH-10); //TODO: what is -10?
-        $('#facsimile').height(availableH-20); //TODO: what is -20?
+        $('#facsimile-container').height(availableH-20); //TODO: what is -20?
         $('#spinner').height(availableH);
-        var facsimileWidth = $('#facsimile').innerWidth();
-        var facsimileHeight = $('#facsimile').innerHeight();
+        var facsimileWidth = $('#facsimile-container').innerWidth();
+        var facsimileHeight = $('#facsimile-container').innerHeight();
         $('#facsimile-canvas').attr('height',facsimileHeight);
         $('#facsimile-canvas').attr('width',facsimileWidth);
-        $('#facsimile-canvas').trigger('set-scaling');
+        events.trigger('set-scaling');
     }
 
     return {
