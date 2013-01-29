@@ -44,6 +44,14 @@
 
 .highlight-box, .layout-box {
     position: absolute;
+}
+
+.layout-box {
+    outline: 1px solid rgb(255,0,0);
+    background: rgba(255,0,0,0.2);
+}
+
+.highlight-box {
     outline: 1px solid rgb(255,255,0);
     background: rgba(255,255,0,0.2);
 }

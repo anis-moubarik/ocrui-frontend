@@ -169,19 +169,19 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
         },
         getScreenX: function(pageX) {
             var hScale = this.imageWidth * this.pageScale;
-            return Math.round(pageX * hScale + this.originX) - 2;
+            return Math.round(pageX * hScale + this.originX);
         },
         getScreenY: function(pageY) {
             var vScale = this.imageHeight * this.pageScale;
-            return Math.round(pageY * vScale + this.originY) - 2;
+            return Math.round(pageY * vScale + this.originY);
         },
         getScreenWidth: function(pageWidth) {
             var hScale = this.imageWidth * this.pageScale;
-            return Math.round(pageWidth * hScale) + 2;
+            return Math.round(pageWidth * hScale);
         },
         getScreenHeight: function(pageHeight) {
             var vScale = this.imageHeight * this.pageScale;
-            return Math.round(pageHeight * vScale) + 2;
+            return Math.round(pageHeight * vScale);
         },
         getWidth: function() {
             return this.horizontalPixels;

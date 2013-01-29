@@ -139,6 +139,20 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
             return this.getStringSequence(dom).join(' ');
         },
 
+        getLayoutBoxes: function () {
+
+            var that = this;
+            var tb = $(this.currentData).find('TextBlock').map(function () {
+                var $strings = $(this).find('String');
+                var words = $strings.map(function() {
+                    return that.dom2Word(this);
+                }).get();
+                var combined = diffmethod.getCombinedBoundingBox(words);
+                return combined;
+            });
+            return tb;
+        },
+
         parse: function (response) {
             var data = {};
             this.currentData = response;

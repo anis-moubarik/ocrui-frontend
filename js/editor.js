@@ -58,20 +58,13 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
             });
             events.on('cursorToCoordinate',function(data) {
 
-                if (that.alto) {
-                    var index = that.alto.getWordIndexAt(data.x,data.y);
-                    that.moveCursorToWord(index);    
-                }
+                if (!that.alto) { return; }
+                var index = that.alto.getWordIndexAt(data.x,data.y);
+                that.moveCursorToWord(index);    
 
             });
             events.on('changePageAlto',function(alto) {
                 that.setAlto(alto);
-                var s = alto.getString();
-                that.cMirror.setValue(s);
-                that.cMirror.clearHistory();
-                var word = that.alto.getNthWord(0);
-                events.trigger('changeCoordinates',word);
-                that.cMirror.focus();
             });
             events.on('requestLanguageChange',function(selected) {
                 that.requestLanguageChange(selected);
@@ -218,6 +211,12 @@ define(['jquery','events','toolbar','codemirror','backbone','cmmode'],function (
         },
         setAlto: function(alto) {
             this.alto = alto;
+            var s = alto.getString();
+            this.cMirror.setValue(s);
+            this.cMirror.clearHistory();
+            var word = this.alto.getNthWord(0);
+            events.trigger('changeCoordinates',word);
+            this.cMirror.focus();
         },
         render: function() {
             return;     // Nothing to do, CodeMirror renders itself

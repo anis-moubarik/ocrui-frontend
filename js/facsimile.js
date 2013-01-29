@@ -36,7 +36,6 @@ define(['jquery','events','backbone','container'],
             var originX = container.view.getOriginX();
             var originY = container.view.getOriginY();
 
-            console.log(w,h,zoom,originX,originY);
             if (!this.image) { return; }
 
             ctx.setTransform(1,0,0,1,0,0);

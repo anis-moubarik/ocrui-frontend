@@ -8,6 +8,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
         initialize: function() {
 
             var that = this;
+            this.layoutBoxes = []
             //events.on('mousetail',function(data) {that.panTail(data);});
 
             toolbar.registerButton({
@@ -41,6 +42,9 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
             events.on('scheduledRender', function() {
                 that.render();
             });
+            events.on('changePageAlto',function(alto) {
+                that.setLayoutBoxes(alto);
+            });
 
         },
         el: '#boxes',
@@ -53,33 +57,54 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
 */
         },
 
-        renderLayout : function(ctx) {
-            return;
+        setLayoutBoxes : function(alto) {
+            this.layoutBoxes = alto.getLayoutBoxes();
+        },
+        createBox : function(rect,cls) {
+            var $div = $('<div> </div>');
+            $div.attr('class',cls);
+            $div.css('left',rect.hpos);
+            $div.css('top',rect.vpos);
+            $div.css('width',rect.width);
+            $div.css('height',rect.height);
+            return $div;
         },
         render: function() {
             this.$el.html('');
+            var hl = this.highlight;
+            var box;
+            var rect;
+
             if (this.showHighlight && this.highlight) {
 
-                var hl = this.highlight;
-
-                var rect = {
-                    hpos : container.view.getScreenX(hl.hpos)-2,
-                    vpos : container.view.getScreenY(hl.vpos)-2,
-                    width : container.view.getScreenWidth(hl.width)+2,
-                    height : container.view.getScreenHeight(hl.height)+2
+                rect = {
+                    hpos : container.view.getScreenX(hl.hpos)-3,
+                    vpos : container.view.getScreenY(hl.vpos)-3,
+                    width : container.view.getScreenWidth(hl.width)+6,
+                    height : container.view.getScreenHeight(hl.height)+6
                 }
-                console.log('draw',rect);
 
-                var $div = $('<div class="highlight-box"> </div>');
-                $div.css('left',rect.hpos);
-                $div.css('top',rect.vpos);
-                $div.css('width',rect.width);
-                $div.css('height',rect.height);
-                this.$el.append($div);
+                this.$el.append(this.createBox(rect,"highlight-box"));
 
             }
 
-            if (this.showLayout) this.renderLayout();
+            if (this.showLayout) {
+
+                for (var i in this.layoutBoxes) {
+
+                    box = this.layoutBoxes[i];
+                    rect = {
+                        hpos : container.view.getScreenX(box.hpos)-3,
+                        vpos : container.view.getScreenY(box.vpos)-3,
+                        width : container.view.getScreenWidth(box.width)+6,
+                        height : container.view.getScreenHeight(box.height)+6
+                    }
+
+                    this.$el.append(this.createBox(rect,"layout-box"));
+
+                }
+
+            }
 
         }
     });
