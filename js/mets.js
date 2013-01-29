@@ -21,8 +21,12 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
             return dirtyPages;
         },
         registerAlto: function(pageNumber,alto) {
-            var i = pageNumber - 1;
-            this.pageInfo[i][2] = alto;
+            var myPageInfo = this.pageInfo[pageNumber - 1];
+            if (myPageInfo) {
+                myPageInfo[2] = alto;
+            } else {
+                console.log('Cannot register alto!');
+            }
         },
         isDirty: function() {
             return this.dirtyPages().length > 0;

@@ -15,7 +15,12 @@ define(['jquery','events'], function($,events) {
         var facsimileHeight = $('#facsimile-container').innerHeight();
         $('#facsimile-canvas').attr('height',facsimileHeight);
         $('#facsimile-canvas').attr('width',facsimileWidth);
-        events.trigger('setGeometry');
+        var data = {
+            facsimileWidth: facsimileWidth,
+            facsimileHeight: facsimileHeight
+        };
+
+        events.trigger('setGeometry',data);
     }
 
     return {

@@ -1,6 +1,6 @@
 /*globals console:true setTimeout:false setInterval:false */
-define(['jquery','toolbar','events','backbone','mousetailstack','facsimile'],
-        function ($,toolbar,events,Backbone,mousetailstack,facsimile) {
+define(['jquery','toolbar','events','backbone','mousetailstack','container'],
+        function ($,toolbar,events,Backbone,mousetailstack,container) {
     "use strict";
 
     var View = Backbone.View.extend({
@@ -18,7 +18,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack','facsimile'],
                 modes:['page'],
                 toggleCB:function(newState) {
                     that.showLayout = newState;
-                    that.scheduleRender();
+                    that.render();
                 }});
 
             toolbar.registerButton({
@@ -30,18 +30,18 @@ define(['jquery','toolbar','events','backbone','mousetailstack','facsimile'],
                 modes:['page'],
                 toggleCB:function(newState) {
                     that.showHighlight = newState;
-                    that.scheduleRender();
+                    that.render();
                 }});
 
             events.on('changeCoordinates',function(data) {
                 that.highlight = data;
-                that.scheduleRender();
-            });
-            events.on('set-scaling', function() {
-                that.scheduleRender ();
+                that.render();
             });
 
-            setInterval(function() {that.processRenderingRequests();},40);
+            events.on('scheduledRender', function() {
+                that.render();
+            });
+
         },
         el: '#boxes',
         events: {
@@ -56,14 +56,6 @@ define(['jquery','toolbar','events','backbone','mousetailstack','facsimile'],
         renderLayout : function(ctx) {
             return;
         },
-        scheduleRender: function () {
-            this.requestRendering = true;
-        },
-        processRenderingRequests: function() {
-            if (this.requestRendering === false) return;
-            this.requestRendering = false;
-            this.render();
-        },
         render: function() {
             this.$el.html('');
             if (this.showHighlight && this.highlight) {
@@ -71,10 +63,10 @@ define(['jquery','toolbar','events','backbone','mousetailstack','facsimile'],
                 var hl = this.highlight;
 
                 var rect = {
-                    hpos : facsimile.view.getScreenX(hl.hpos)-2,
-                    vpos : facsimile.view.getScreenY(hl.vpos)-2,
-                    width : facsimile.view.getScreenWidth(hl.width)+2,
-                    height : facsimile.view.getScreenHeight(hl.height)+2
+                    hpos : container.view.getScreenX(hl.hpos)-2,
+                    vpos : container.view.getScreenY(hl.vpos)-2,
+                    width : container.view.getScreenWidth(hl.width)+2,
+                    height : container.view.getScreenHeight(hl.height)+2
                 }
                 console.log('draw',rect);
 

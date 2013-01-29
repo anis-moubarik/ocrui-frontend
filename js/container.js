@@ -59,14 +59,23 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
             });
 
             events.on('changePageImage',function(image) {
-                that.setImage(image);
                 that.scheduleRender();
+            });
+
+            events.on('setGeometry', function(data) {
+                that.horizontalPixels = data.facsimileWidth;
+                that.verticalPixels = data.facsimileHeight;
+                that.scheduleRender ();
             });
 
             events.on('set-scaling', function() {
                 that.scheduleRender ();
             });
-            setInterval(function() {that.processRenderingRequests();},40);
+
+            setInterval(function() {
+                that.processRenderingRequests();
+            },40);
+
         },
         el: '#facsimile-canvas',
         events: {
@@ -172,6 +181,21 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
         getScreenHeight: function(pageHeight) {
             var vScale = this.imageHeight * this.pageScale;
             return Math.round(pageHeight * vScale) + 2;
+        },
+        getWidth: function() {
+            return this.horizontalPixels;
+        },
+        getHeight: function() {
+            return this.verticalPixels;
+        },
+        getZoom: function() {
+            return this.pageScale;
+        },
+        getOriginX: function() {
+            return this.originX;
+        },
+        getOriginY: function() {
+            return this.originY;
         },
         possiblyScrollToHighlight: function(hl) {
             if (hl === undefined) return;
@@ -353,16 +377,13 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack'],
             }
 
         },
-        setPixels: function (horizontal, vertical) {
-            this.horizontalPixels = parseInt(horizontal,10);
-            this.verticalPixels = parseInt(vertical,10);
-        },
         scheduleRender: function () {
             this.requestRendering = true;
         },
         processRenderingRequests: function() {
             if (this.requestRendering === false) return;
             this.requestRendering = false;
+            events.trigger('scheduledRender');
             this.render();
         },
         render: function() {
