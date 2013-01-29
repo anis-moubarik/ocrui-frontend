@@ -73,10 +73,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
 
             events.on('mousetail',function(data) {that.panTail(data);});
 
-            setInterval(function() {
-                that.processRenderingRequests();
-            },40);
-
         },
         el: '#facsimile-canvas',
         events: {
@@ -385,7 +381,13 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
             this.imageHeight = h;
         },
         scheduleRender: function () {
+            var that = this;
+            if (this.renderingRequest == true) return;
             this.renderingRequest = true;
+            setTimeout(function() {
+                that.processRenderingRequests();
+            },20);
+
         },
         processRenderingRequests: function() {
             if (this.renderingRequest === false) return;
