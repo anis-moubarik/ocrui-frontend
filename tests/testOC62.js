@@ -9,7 +9,7 @@ var cursor;
 
 casper.start(url);
 
-casper.echo("OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan kohtaan");
+casper.echo("OC-62: Virtuaalinäppäimistö: klikattava näppäin tulee editoriin, kielen vaihtaminen vaihtaa näppäimistön halutuksi");
 
 casper.then(function() {
     this.test.assertExists('#boxes');

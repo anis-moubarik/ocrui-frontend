@@ -1,4 +1,3 @@
-// OC-67 click on editor moves highlight on facsimile
 var settings = require('./settings');
 var myutils = require('./myutils');
 var utils = require('utils');
@@ -35,8 +34,6 @@ function getHLB() {
 casper.start(url);
 
 casper.echo("OC-67: Siirrettäessä kursoria editorissa faksimiilin highlight siirtyy oikeaan kohtaan");
-
-casper.viewport(1024,768);
 
 casper.then(function() {
     this.test.assertExists('#editor');

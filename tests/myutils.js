@@ -1,3 +1,8 @@
+viewportSize = {
+    width:1024,
+    height:768
+};
+
 exports.cmpObjects = function (o1,o2) {
     for (var key in o1) {
         if (o1[key] != o2[key]) return false;
@@ -6,7 +11,7 @@ exports.cmpObjects = function (o1,o2) {
         if (o1[key] != o2[key]) return false;
     }
     return true;
-}
+};
 
 exports.debugOptions = {
 
@@ -38,9 +43,12 @@ exports.debugOptions = {
             });
         }
         console.error(msgStack.join('\n'));
-    }
+    },
 
-}
+    viewportSize: viewportSize
+};
 
 
-exports.normalOptions = {}
+exports.normalOptions = {
+    viewportSize: viewportSize
+};
