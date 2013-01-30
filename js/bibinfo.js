@@ -34,8 +34,8 @@ define(['jquery','events','mustache','backbone','toolbar'],
             return text.replace(/[ \/.]*$/,'');
         },
         setDocument : function (mets) {
-            this.title = this.getMarcField(mets,'100','a');
-            this.author = this.getMarcField(mets,'245','a');
+            this.author = this.getMarcField(mets,'100','a');
+            this.title = this.getMarcField(mets,'245','a');
         },
         moreBibInfo : function (number) {
                 console.log('x');

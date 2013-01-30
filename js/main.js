@@ -70,34 +70,6 @@ require(
                 };
             }
 
-            // This is used to make tests able to access modules
-            window.testing = {
-                $ : $,
-                bootstrap : bootstrap,
-                mustache : mustache,
-                underscore : underscore,
-                jqueryui : jqueryui,
-                backbone : backbone,
-                codemirror : codemirror,
-                toolbar : toolbar,
-                facsimile : facsimile,
-                editor : editor,
-                vkeyboard : vkeyboard,
-                router : router,
-                geometry : geometry,
-                spin : spin,
-                spinner : spinner,
-                pageselector : pageselector,
-                mousewheel : mousewheel,
-                language : language,
-                bibinfo : bibinfo,
-                save : save,
-                container : container,
-                boxes : boxes,
-                dialog : dialog,
-                events : events
-            }
-
             $.get('templates.html',function(html) {
                 $templates = $(html);
                 $(document).ready(function() {

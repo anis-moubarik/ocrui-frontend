@@ -1,5 +1,7 @@
 exports.url = 'http://localhost/ocrui/'
 exports.testItem = 'URN:NBN:fi-fd2011-00003252'
+exports.testAuthor = 'Kaukoranta, Heikki'
+exports.testTitle = 'Sarjakuvat'
 exports.expectedContent = "Sisällys LUKIJALLE I Sarjakuvan tausta 11. Ns. " +
 "sarjakuva 11. Sarjakuva on huono peili 15. Juuret 15. Viestintä ja " +
 "kuva 19. Gutenbergin järjestelmä 25. Sarjakuvan esi-isät 29. " +

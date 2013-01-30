@@ -6,6 +6,7 @@ casper.start(url, function() {
     this.echo (url);
 });
 
+casper.echo("OC-63: HTML-sivun komonentit ovat paikallaan");
 casper.then(function() {
 
     var title = this.getElementInfo('title').text;

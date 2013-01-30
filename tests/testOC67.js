@@ -2,11 +2,7 @@
 var settings = require('./settings');
 var myutils = require('./myutils');
 var utils = require('utils');
-var casper = require('casper').create({
-    //clientScripts: 'jquery-1.8.1.js'
-});
-var content = '';
-
+var casper = require('casper').create(myutils.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 function assertHighlightBoxes(c,hbs1,hbs2) {
@@ -33,60 +29,44 @@ function cmpObjects(o1,o2) {
 }
 
 function getHLB() {
-    return window.testing.boxes.view.highlight;
+    return require('boxes').view.highlight;
 }
-
-function getEditorContent() {
-    return window.testing.editor.view.cMirror.getValue();
-}
-
-
-function moveCursor () {
-    testing.renderedHighlightBoxes = undefined;
-    /*
-    window.events.on('highlightBoxesRendered',function(data) {
-        testing.renderedHighlightBoxes = data
-    });
-    */
-    // beginning of word "kuva"
-    testing.editor.view.cMirror.setCursor(0,120);
-    return testing.editor.view.cMirror.getCursor();
-}
-
 
 casper.start(url);
+
+casper.echo("OC-67: Siirrettäessä kursoria editorissa faksimiilin highlight siirtyy oikeaan kohtaan");
 
 casper.viewport(1024,768);
 
 casper.then(function() {
-    this.page.onConsoleMessage = myutils.onConsoleMessage;
-    this.page.onError = myutils.onError;
     this.test.assertExists('#editor');
 });
 
 casper.waitForText( "Pienet" );
 
+/*
 casper.waitFor( function () {
-    return casper.evaluate( function (name) {
-        var parts = name.split('.');
-        var o = window;
-        for (var i in parts) {
-            var p = parts[i];
-            if (p in o) o = o[p];
-            else return false;
-        }
-        return true;
-    }, 'testing.editor');
+    return casper.evaluate( function () {
+        require('editor') !== undefined;
+    });
 });
+*/
 
 casper.then(function() {
 
-    content = this.evaluate( getEditorContent );
+    var content = this.evaluate( function () {
+        return require('editor').view.cMirror.getValue();
+    });
     this.test.assertEqual(content,settings.expectedContent, "editor content");
-    newCursor = this.evaluate( moveCursor );
+    newCursor = this.evaluate( function () {
+        require('editor').view.cMirror.setCursor(0,120);
+        return require('editor').view.cMirror.getCursor();
+    });
+
     for (var x in newCursor) {
         this.echo('newcursor.'+x+' = ' + newCursor[x]);
     }
+    this.test.assert((!!newCursor),'new cursor was read');
     this.test.assertEqual(newCursor.line,0, "cursor move line");
     this.test.assertEqual(newCursor.ch,120, "cursor move ch");
 
@@ -130,12 +110,13 @@ casper.waitFor(function () {
     var bounds = casper.getElementBounds(".highlight-box");
 
     if (cmpObjects(bounds,expectedBounds)) {
-        this.test.assert(true, "Got correct highlight box position after click");
+        this.test.assert(true, "Got correct highlight box after click");
         return true;
     }
     return false;
 
 });
+
 casper.run(function() {
     this.test.done();
     this.exit();

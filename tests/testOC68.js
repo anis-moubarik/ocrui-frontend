@@ -3,7 +3,7 @@
 var settings = require('./settings');
 var myutils = require('./myutils');
 var utils = require('utils');
-var casper = require('casper').create({ });
+var casper = require('casper').create(myutils.normalOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 
@@ -33,11 +33,11 @@ function moveCursor () {
 
 casper.start(url);
 
+casper.echo("OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan kohtaan");
+
 casper.viewport(1024,768);
 
 casper.then(function() {
-    this.page.onConsoleMessage = myutils.onConsoleMessage;
-    this.page.onError = myutils.onError;
     this.test.assertExists('#boxes');
 });
 
