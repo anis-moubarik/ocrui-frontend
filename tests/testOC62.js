@@ -26,7 +26,13 @@ casper.waitForText( "Pienet" ); // ensure editor is there
 casper.then(function() {
     var selectorButton = this.getElementInfo("#language-selector a");
     casper.echo("T: ");
-    utils.dump(selectorButton);
+    casper.echo(selectorButton.text);
+    casper.echo(selectorButton.html);
+});
+casper.then(function() {
+    casper.page.evaluate(function() {
+        setTimeout(function() {console.log("timeout joo.");}, 1000);
+    });
 });
 
 casper.then(function() {
@@ -43,6 +49,15 @@ casper.waitFor(function () {
 
     var bounds = casper.getElementBounds(".CodeMirror-cursor");
 
+    this.echo('new cursor:' + JSON.stringify(bounds));
+    var slice = this.evaluate(function() {
+        var content = require('editor').view.cMirror.getContent();
+        var cursor = require('editor').view.cMirror.getCursor();
+        var i = cursor.ch;
+        var slice = content.substring(i-5,i+5);
+        return content;
+    });
+    this.echo(slice);
     if (myutils.cmpObjects(bounds,cursor)) { return false; }
     return true;
 
