@@ -190,7 +190,6 @@ define(['underscore','jquery','events','toolbar','codemirror','backbone','cmmode
             this.cMirror.setValue(s);
             this.cMirror.clearHistory();
             var word = this.alto.getNthWord(0);
-            events.trigger('changeCoordinates',word);
             this.cMirror.focus();
         },
         render: function() {

@@ -71,6 +71,10 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
                 that.scheduleRender ();
             });
 
+            events.on('newViewportRequest', function(vp) {
+                that.setViewport(vp);
+            });
+
             events.on('mousetail',function(data) {that.panTail(data);});
 
         },
@@ -82,6 +86,13 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
             'mousedown': 'beginPan',
             'mouseup': 'endPan',
             'mouseout': 'endPan',
+        },
+        setViewport: function(vp) {
+            console.log('c:',vp);
+            this.setOrigin(vp.originX,vp.originY);
+            this.setZoom(vp.pageScale);
+            this.scrollingTo = undefined;
+            this.scheduleRender();
         },
         wheel: function(ev,delta,deltaX,deltaY) {
             var offset = this.$el.offset();
@@ -247,6 +258,7 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
 
         },
         scrollOneStep: function (speed,margin,timeout) {
+            if (this.scrollingTo == undefined) return;
             var that = this;
             var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,margin) * speed);
             var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,margin) * speed);
@@ -341,6 +353,7 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
 
             // select maximum of requested scale and two minimums
             this.pageScale = _.max([newScale,newHScale,newVScale]);
+            this.triggerNewViewport();
         },
         setOrigin: function (originX,originY) {
             this.originX = parseInt(originX,10); // logical coordinate origin for panning
@@ -374,7 +387,15 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
             } else if (canvasBottom > pageMarginBottom) {
                 this.originY = - ( pageBottom - this.verticalPixels + margin);
             }
+            this.triggerNewViewport();
 
+        },
+        triggerNewViewport: function() {
+            events.delay('newViewport',{
+                originX:this.originX,
+                originY:this.originY,
+                pageScale:this.pageScale,
+            });
         },
         setImageSize: function(w,h) {
             this.imageWidth = w;

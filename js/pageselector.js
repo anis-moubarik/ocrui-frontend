@@ -1,4 +1,4 @@
-/*globals require:false $templates:false */
+/*globals $templates:false */
 define(['jquery','events','toolbar','mustache','backbone'],
         function ($,events,toolbar,mustache,Backbone) {
     "use strict";
