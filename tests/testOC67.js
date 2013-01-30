@@ -1,4 +1,6 @@
+// OC-67 click on editor moves highlight on facsimile
 var settings = require('./settings');
+var myutils = require('./myutils');
 var utils = require('utils');
 var casper = require('casper').create({
     //clientScripts: 'jquery-1.8.1.js'
@@ -57,8 +59,8 @@ casper.start(url);
 casper.viewport(1024,768);
 
 casper.then(function() {
-    this.page.onConsoleMessage = settings.onConsoleMessage;
-    this.page.onError = settings.onError;
+    this.page.onConsoleMessage = myutils.onConsoleMessage;
+    this.page.onError = myutils.onError;
     this.test.assertExists('#editor');
 });
 
@@ -114,7 +116,7 @@ casper.then(function() {
     var x = 680;
     var y = 130;
     this.echo('click',x,y);
-    this.page.sendEvent('click',x,y); // on word 'think'
+    this.page.sendEvent('click',x,y); // on word 'päässä'
 });
 
 casper.waitFor(function () {

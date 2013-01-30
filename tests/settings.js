@@ -1,19 +1,3 @@
-exports.onConsoleMessage = function (msg, lineNum, sourceId) {
-    console.log('CONSOLE: ' + msg + ' (from line #' + lineNum +
-        ' in "' + sourceId + '")');
-};
-
-exports.onError = function (msg, trace) {
-    var msgStack = ['ERROR: ' + msg];
-    if (trace) {
-        msgStack.push('TRACE:');
-        trace.forEach(function(t) {
-            msgStack.push(' -> ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function + '")' : ''));
-        });
-    }
-    console.error(msgStack.join('\n'));
-};
-
 exports.url = 'http://localhost/ocrui/'
 exports.testItem = 'URN:NBN:fi-fd2011-00003252'
 exports.expectedContent = "Sisällys LUKIJALLE I Sarjakuvan tausta 11. Ns. " +
