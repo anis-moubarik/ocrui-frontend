@@ -102,9 +102,9 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
                 this.scheduleRender();
             } else {
                 if (delta > 0) {
-                    this.zoomTo(1.5,x,y);
+                    this.zoomTo(1.4,x,y);
                 } else {
-                    this.zoomTo(0.75,x,y);
+                    this.zoomTo(1/1.4,x,y);
                 }
             }
         },

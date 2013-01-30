@@ -35,8 +35,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
                 }});
 
             events.on('changeCoordinates',function(data) {
-                that.highlight = data;
-                that.render();
+                that.setHighlightBoxes(data);
             });
 
             events.on('scheduledRender', function() {
@@ -59,6 +58,11 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
 
         setLayoutBoxes : function(alto) {
             this.layoutBoxes = alto.getLayoutBoxes();
+            this.render();
+        },
+        setHighlightBoxes : function(data) {
+            this.highlight = data;
+            this.render();
         },
         renderBoxes : function(boxes,cls) {
             var box;
@@ -92,12 +96,14 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
             if (this.showHighlight && this.highlight) {
 
                 this.renderBoxes(this.highlight,"highlight-box");
+                events.trigger('highlightBoxesRendered',this.highlight);
 
             }
 
             if (this.showLayout) {
 
                 this.renderBoxes(this.layoutBoxes,"layout-box");
+                events.trigger('layoutBoxesRendered',this.layoutBoxes);
 
             }
 
