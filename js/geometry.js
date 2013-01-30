@@ -7,9 +7,10 @@ define(['jquery','events'], function($,events) {
         var bottomHeight = $('#bottom-geometry').outerHeight();
         var wHeight = $(window).innerHeight();
         var availableH = wHeight - topHeight - bottomHeight;
-        $('#editor').height(availableH-20);
-        $('.CodeMirror').height(availableH-10); //TODO: what is -10?
-        $('#facsimile-container').height(availableH-20); //TODO: what is -20?
+        availableH -= 30; // TODO: what is 30!
+        $('#editor').height(availableH);
+        $('.CodeMirror').height(availableH);
+        $('#facsimile-container').height(availableH);
         $('#spinner').height(availableH);
         var facsimileWidth = $('#facsimile-container').innerWidth();
         var facsimileHeight = $('#facsimile-container').innerHeight();

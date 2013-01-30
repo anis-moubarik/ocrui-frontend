@@ -67,10 +67,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
                 that.scheduleRender ();
             });
 
-            events.on('set-scaling', function() {
-                that.scheduleRender ();
-            });
-
             events.on('newViewportRequest', function(vp) {
                 that.setViewport(vp);
             });

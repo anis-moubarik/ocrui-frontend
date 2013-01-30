@@ -2,7 +2,7 @@
 define(function () {
     "use strict";
 
-    var debug = true;
+    var debug = false;
     var listeners = {};
     var queues = {};
 

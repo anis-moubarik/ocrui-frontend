@@ -15,6 +15,7 @@
     position:relative;
     top:0px;
     left:0px;
+    outline: 1px solid #aaaaaa;
 }
 
 #editor {
