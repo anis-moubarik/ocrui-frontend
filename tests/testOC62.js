@@ -12,17 +12,27 @@ casper.start(url);
 casper.echo("OC-62: Virtuaalinäppäimistö: klikattava näppäin tulee editoriin, kielen vaihtaminen vaihtaa näppäimistön halutuksi");
 
 casper.then(function() {
-    this.test.assertExists('#boxes');
+    this.test.assertExists('#vkeyboard');
+});
+
+casper.waitForSelector("#language-selector");
+
+casper.then(function() {
+    this.test.assertExists('#language-selector');
 });
 
 casper.waitForText( "Pienet" ); // ensure editor is there
 
-casper.then(function() { casper.echo("Found editor text");});
+casper.then(function() {
+    var selectorButton = this.getElementInfo("#language-selector a");
+    casper.echo("T: ");
+    utils.dump(selectorButton);
+});
 
 casper.then(function() {
     cursor = casper.getElementBounds(".CodeMirror-cursor");
-    var x = 450;
-    var y = 660;
+    var x = 700;
+    var y = 605;
     this.echo('cursor originally:' + JSON.stringify(cursor));
     this.echo('click',x,y);
     this.page.sendEvent('click',x,y); // on word 'sylikummit'
@@ -39,17 +49,8 @@ casper.waitFor(function () {
 });
 
 casper.then(function() {
-    var expectedBounds = {
-        "height": 18,
-        "left": 845,
-        "top": 80,
-        "width": 9
-    }
-
-    var bounds = casper.getElementBounds(".CodeMirror-cursor");
-    this.echo('new cursor:' + JSON.stringify(bounds));
-    this.test.assert(myutils.cmpObjects(bounds,expectedBounds),
-        "Cursor moves to right place");
+    var selectorButton = this.getElementInfo("#language-selector a");
+    casper.echo("T: "+selectorButton.text);
 });
 
 casper.run(function() {

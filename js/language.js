@@ -35,16 +35,22 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
         events: {
             'click ul a': 'changeLanguage'
         },
-        changeCoordinates: function (word) {
-            if (word === undefined) return; // do something else
-            var l = word.language;
-            model.set('selected', l);
+        changeCoordinates: function (words) {
+            if (words === undefined) return; // do something else
+            var newLanguage = words.reduce( function (prev,cur) {
+                var l = cur.language;
+                if (prev == null) return l;
+                if (prev != l) return undefined;
+                return l;
+            }, null)
+            model.set('selected', newLanguage);
 
             this.render();
             //console.log('setting language selector for word ' + string);
         },
         changeLanguage: function (ev) {
             var l = ev.currentTarget.getAttribute("data-value");
+            console.log('l: ', l);
             ev.preventDefault();
             ev.stopPropagation();
             model.set('selected',l);
