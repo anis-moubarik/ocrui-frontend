@@ -1,4 +1,4 @@
-/*globals console:true, $templates:false*/
+/*globals $templates:false*/
 define(['events','mustache','backbone'],function (events,mustache,Backbone) {
     "use strict";
 

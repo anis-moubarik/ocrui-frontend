@@ -92,7 +92,6 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
         setNthWordLanguage: function(index,language) {
             var $dom =  $(this.currentData).find('String').eq(index);
             $dom.attr('LANGUAGE',language);
-            console.dirxml($dom.get(0));
             return this.dom2Word($dom.get(0));
         },
         getNthWord: function(index) {

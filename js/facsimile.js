@@ -55,6 +55,7 @@ define(['jquery','events','backbone','container'],
                 console.log(err);
 
             }
+            events.trigger('facsimileRendered');
 
         }
     });

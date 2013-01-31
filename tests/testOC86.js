@@ -8,7 +8,7 @@ var cursor;
 
 casper.start(url);
 
-casper.log("OC-62: Virtuaalinäppäimistö: klikattava näppäin tulee editoriin, kielen vaihtaminen vaihtaa näppäimistön halutuksi","info");
+casper.log("OC-86: kielivalitsin, editorin kursorin alla olevan sanan kieli näkyy kielivalitsimessa oikein.","info");
 
 casper.then(function() {
     casper.test.assertExists('#vkeyboard');

@@ -29,6 +29,10 @@ function onResourceRequested (casper,request) {
         JSON.stringify(request.url),'info');
 }
 
+function initCasper () {
+    this.page.onError = onError;
+}
+
 function cmpObjects (o1,o2) {
     for (var key in o1) {
         if (o1[key] != o2[key]) return false;
@@ -68,6 +72,7 @@ exports.onResourceRequested = onResourceRequested;
 exports.onResourceReceived = onResourceReceived;
 exports.onError = onError;
 exports.onConsoleMessage = onConsoleMessage;
+exports.initCasper = initCasper
 
 exports.viewportSize= viewportSize;
 exports.normalOptions = normalOptions;

@@ -80,7 +80,6 @@ define(['underscore','jquery','events','toolbar','codemirror','backbone','cmmode
         },
         requestLanguageChange: function(selected) {
             var wordIndexes = this.getCurrentWordIndexes();
-            console.log(wordIndexes);
             for (var wordIndex in wordIndexes) {
                 this.alto.setNthWordLanguage(wordIndex,selected);
             }

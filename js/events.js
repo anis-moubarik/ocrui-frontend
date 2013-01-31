@@ -1,10 +1,14 @@
-/*globals console:true */
 define(function () {
     "use strict";
 
-    var debug = false;
     var listeners = {};
+    var anyListeners = [];
     var queues = {};
+
+    // listen to all sent events, for testing and debugging
+    function onAny (cb) {
+        anyListeners.push(cb);
+    }
 
     function on (ev,cb) {
 
@@ -18,8 +22,6 @@ define(function () {
 
     function trigger (ev,data) {
 
-        if (debug) { console.log(ev); }
-
         if (!(ev in listeners)) {
             listeners[ev] = [];
         }
@@ -28,14 +30,12 @@ define(function () {
 
         for (var i in listeners[ev]) {
             var cb = listeners[ev][i];
-                cb(data);
-            try {
-                //cb(data);
-            } catch (err) {
-                console.log(err);
-                console.log(err.get_stack());
-            }
+            cb(data);
         }
+        for (var i in anyListeners) {
+            var cb = anyListeners[i];
+            cb(ev,data);
+        };
 
     }
 
@@ -82,6 +82,8 @@ define(function () {
 
     return {
         on:on,
+        onAny:onAny,
+        anyListeners:anyListeners,
         trigger:trigger,
         delay:delay
     };

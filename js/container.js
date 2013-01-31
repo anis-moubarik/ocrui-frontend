@@ -1,4 +1,4 @@
-/*globals console:true setTimeout:false setInterval:false */
+/*globals setTimeout:false setInterval:false */
 define(['underscore','jquery','toolbar','events','backbone','mousetailstack','diffmethod'],
         function (_,$,toolbar,events,Backbone,mousetailstack,diffmethod) {
     "use strict";
@@ -21,11 +21,8 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
                 icon:'icon-zoom-in',
                 title:'Zoom in',
                 modes:['page'],
-                click:function(data) {
-                    var x = that.horizontalPixels / 2;
-                    var y = that.verticalPixels / 2;
-                    that.zoomTo(2,x,y);
-                }});
+                click:function(data) { that.zoomTo(2); }
+            });
 
             toolbar.registerButton({
                 id:'zoom-out',
@@ -33,11 +30,9 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
                 icon:'icon-zoom-out',
                 title:'Zoom out',
                 modes:['page'],
-                click:function(data) {
-                    var x = that.horizontalPixels / 2;
-                    var y = that.verticalPixels / 2;
-                    that.zoomTo(0.5,x,y);
-                }});
+                click:function(data) { that.zoomTo(0.5); }
+            
+            });
 
             toolbar.registerButton({
                 id:'pan-zoom',
@@ -47,7 +42,7 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
                 modes:['page'],
                 toggleCB:function(newState) {
                     that.wheelPan = newState;
-                }});
+            }});
 
             toolbar.registerKeyboardShortcut(113, function(ev) {
                 $('#pan-zoom').click();
@@ -84,7 +79,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
             'mouseout': 'endPan',
         },
         setViewport: function(vp) {
-            console.log('c:',vp);
             this.setOrigin(vp.originX,vp.originY);
             this.setZoom(vp.pageScale);
             this.scrollingTo = undefined;
@@ -295,6 +289,12 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','di
             }
         },
         zoomTo: function(amount,fixedX,fixedY) {
+            if (fixedX === undefined) {
+                fixedX = this.horizontalPixels / 2;
+            }
+            if (fixedY === undefined) {
+                fixedY = this.verticalPixels / 2;
+            }
             var scale = this.pageScale * amount;
             if (scale < 0.01) scale = 0.01;
             if (scale > 2) scale = 2;

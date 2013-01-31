@@ -1,4 +1,4 @@
-/*globals console:true setTimeout:false setInterval:false */
+/*globals setTimeout:false setInterval:false */
 define(['jquery','toolbar','events','backbone','mousetailstack','container'],
         function ($,toolbar,events,Backbone,mousetailstack,container) {
     "use strict";

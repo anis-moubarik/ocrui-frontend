@@ -1,4 +1,4 @@
-/*globals console:true, $templates:false*/
+/*globals $templates:false*/
 define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,events,mustache,Backbone,vkeyboard) {
     "use strict";
 
@@ -46,11 +46,9 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
             model.set('selected', newLanguage);
 
             this.render();
-            //console.log('setting language selector for word ' + string);
         },
         changeLanguage: function (ev) {
             var l = ev.currentTarget.getAttribute("data-value");
-            console.log('l: ', l);
             ev.preventDefault();
             ev.stopPropagation();
             model.set('selected',l);
