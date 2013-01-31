@@ -90,7 +90,11 @@ define(['spinner','events','alto','mets','image','backbone'],
 
     });
 
-    return { };
+    return {
+        // expose these for testing
+        fragment: Backbone.history.fragment,
+        router: router
+    };
 
 });
 
