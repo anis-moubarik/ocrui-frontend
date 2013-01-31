@@ -36,12 +36,6 @@ casper.then(function() {
     var selectorText = selectorButton.text.replace(/\s+/g, '');
     casper.test.assertEqual(selectorText,'');
 });
-casper.then(function() {
-    casper.evaluate(function() {
-        console.log('setting timeout');
-        setTimeout(function() {console.log("timeout joo.");}, 200);
-    });
-});
 
 casper.then(function() {
     cursor = casper.getElementBounds(".CodeMirror-cursor");

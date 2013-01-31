@@ -1,5 +1,4 @@
 .*.swp
 items
 npm-debug.log
-tests/images/out-*
-
+tests/images

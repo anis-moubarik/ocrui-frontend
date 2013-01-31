@@ -1,4 +1,3 @@
-
 function onError  (casper, msg, trace) {
     var msgStack = ['ERROR: ' + msg];
     if (trace) {

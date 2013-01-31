@@ -1,11 +1,11 @@
-//var spawn = require("child_process").spawn;
 var settings = require('./settings');
 var myutils = require('./myutils');
 var utils = require('utils');
 var casper = require('casper').create(myutils.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
-var md5sumsChecked = false;
+var expected_canvas = require('./expected_canvas').b64;
+var expected_canvas_zoomed = require('./expected_canvas_zoomed').b64;
 
 casper.start(url,myutils.initCasper);
 
@@ -34,7 +34,9 @@ casper.waitFor(function() {
 });
 
 casper.then(function() {
-    casper.captureSelector('images/out-canvas.png','#facsimile-canvas');
+    var canvas = casper.captureBase64('png','#facsimile-canvas');
+    casper.test.assert(canvas == expected_canvas,
+        "Canvas renders correctly");
     casper.evaluate(function() {
         window.facsimileRendered = false;
     });
@@ -52,32 +54,12 @@ casper.waitFor(function() {
 });
 
 casper.then(function() {
-    casper.captureSelector('images/out-canvas-zoomed.png','#facsimile-canvas');
+    var canvas = casper.captureBase64('png','#facsimile-canvas');
+    casper.test.assert(canvas == expected_canvas_zoomed,
+        "Canvas renders correctly zoomed");
 
-    casper.test.assert(true,'not checking image md5sums');
-
-    md5sumsChecked = true;
-    return
-
-    var md5sum = spawn('/usr/bin/md5sum',[
-        'images/out-canvas.png',
-        'images/expected-canvas.png',
-        'images/out-canvas-zoomed.png',
-        'images/expected-canvas-zoomed.png',
-    ]);
-
-    var out = "";
-
-    md5sum.stdout.on('data',function (data) {
-        out = out + data;
-    });
-    md5sum.on('exit',function () {
-        console.log(out);
-        md5sumsOk = true;
-    });
 });
 
-casper.waitFor(function() { return md5sumsChecked == true; });
 casper.run(function() {
     casper.test.done();
     casper.exit();
