@@ -109,6 +109,7 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
         },
 
         beginPan: function(ev) {
+            if (ev.which != 1) return;
             this.propageteNextClick = true;
             this.panning = true;
             this.mouseTailStack.init(ev);
@@ -155,6 +156,7 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
         },
         propagateClick: function(ev) {
             if (!this.propageteNextClick) return;
+            if (ev.which != 1) return;
             var offset = this.$el.offset();
             var screenCoords = {
                 x:ev.pageX - offset.left,

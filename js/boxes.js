@@ -85,6 +85,7 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
                 $div.css('top',rect.vpos);
                 $div.css('width',rect.width);
                 $div.css('height',rect.height);
+                //$div.resizable();
                 this.$el.append($div);
 
             }
