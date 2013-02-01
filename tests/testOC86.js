@@ -3,7 +3,6 @@ var testName = "OC-86: kielivalitsin, editorin kursorin alla olevan sanan kieli 
 var settings = require('./settings');
 var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var cursor;
@@ -65,8 +64,8 @@ casper.then(function() {
 });
 
 casper.run(function() {
-    casper.test.done();
-    casper.exit();
+    this.test.done();
+    this.test.renderResults();
 });
 
 

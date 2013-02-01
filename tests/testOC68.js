@@ -3,7 +3,6 @@ var testName = "OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan 
 var settings = require('./settings');
 var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(mytests.normalOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 
@@ -57,7 +56,7 @@ casper.then(function() {
 
 casper.run(function() {
     this.test.done();
-    this.exit();
+    this.test.renderResults();
 });
 
 

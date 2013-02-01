@@ -3,7 +3,6 @@ var testName = "OC-72: Sivun vaihto toimii. Uusi sivunumero näkyy oikein ja val
 var settings = require('./settings');
 var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var myButton = "#page-next";
@@ -42,7 +41,7 @@ casper.waitFor( function () {
 });
 
 casper.run(function() {
-    casper.test.done();
-    casper.exit();
+    this.test.done();
+    this.test.renderResults();
 });
 

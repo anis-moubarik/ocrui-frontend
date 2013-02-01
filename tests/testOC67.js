@@ -1,9 +1,6 @@
 var testName = "OC-67: Siirrettäessä kursoria editorissa faksimiilin highlight siirtyy oikeaan kohtaan"
 
-var settings = require('./settings');
-var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 function assertHighlightBoxes(c,hbs1,hbs2) {
@@ -40,14 +37,6 @@ casper.then(function() {
 });
 
 casper.waitForText( "Pienet" );
-
-/*
-casper.waitFor( function () {
-    return casper.evaluate( function () {
-        require('editor') !== undefined;
-    });
-});
-*/
 
 casper.then(function() {
 
@@ -116,7 +105,7 @@ casper.waitFor(function () {
 
 casper.run(function() {
     this.test.done();
-    this.exit();
+    this.test.renderResults();
 });
 
 

@@ -1,7 +1,6 @@
 var testName = "OC-64: Editoitavan itemin tekijä ja otsikko näkyvät oikein"
 
 var settings = require('./settings');
-var casper = require('casper').create();
 var utils = require('utils');
 var mytests = require('./mytests');
 
@@ -29,6 +28,6 @@ casper.then(function() {
 
 casper.run(function() {
     this.test.done();
-    this.exit();
+    this.test.renderResults();
 });
 

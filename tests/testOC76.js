@@ -3,7 +3,6 @@ var testName = "OC-76: Työkalupalkki: Buttonit ja widgetit löytyvät dom-puust
 var settings = require('./settings');
 var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var myButton = "#show-original-changes";
@@ -72,7 +71,7 @@ casper.then(function() {
 });
 
 casper.run(function() {
-    casper.test.done();
-    casper.exit();
+    this.test.done();
+    this.test.renderResults();
 });
 

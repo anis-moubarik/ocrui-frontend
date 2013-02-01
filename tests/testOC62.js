@@ -3,7 +3,6 @@ var testName = "OC-62: Virtuaalinäppäimistö: klikattava näppäin tulee edito
 var settings = require('./settings');
 var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var cursor;
@@ -73,8 +72,8 @@ casper.waitFor(function () {
 });
 
 casper.run(function() {
-    casper.test.done();
-    casper.exit();
+    this.test.done();
+    this.test.renderResults();
 });
 
 

@@ -3,7 +3,6 @@ var testName = "OC-75: Zoom: Zoom button renderöi faksimiilin zoomatussa muodos
 var settings = require('./settings');
 var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var expected_canvas = require('./expected_canvas').b64;
@@ -56,8 +55,8 @@ casper.then(function() {
 });
 
 casper.run(function() {
-    casper.test.done();
-    casper.exit();
+    this.test.done();
+    this.test.renderResults();
 });
 
 

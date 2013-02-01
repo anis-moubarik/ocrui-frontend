@@ -78,7 +78,6 @@ viewportSize = {
     height:768
 };
 
-
 debugOptions = {
 
     //onResourceRequested : onResourceRequested,

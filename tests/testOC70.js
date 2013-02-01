@@ -3,7 +3,6 @@ var testName = "OC-70: Tekstiä editoitaessa muutetut sanat renderöidään omal
 var settings = require('./settings');
 var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 casper.start(url,mytests.initCasper(testName));
@@ -37,8 +36,8 @@ casper.then(function() {
 });
 
 casper.run(function() {
-    casper.test.done();
-    casper.exit();
+    this.test.done();
+    this.test.renderResults();
 });
 
 

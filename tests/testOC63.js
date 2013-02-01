@@ -2,7 +2,6 @@ var testName = "OC-63: HTML-sivun komonentit ovat paikallaan"
 
 var settings = require('./settings');
 var mytests = require('./mytests');
-var casper = require('casper').create();
 
 var url = settings.url+'#'+settings.testItem+'/11';
 casper.start(url,mytests.initCasper(testName));
@@ -26,6 +25,6 @@ casper.then(function() {
 
 casper.run(function() {
     this.test.done();
-    this.exit();
+    this.test.renderResults();
 });
 
