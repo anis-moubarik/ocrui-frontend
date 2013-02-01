@@ -1,5 +1,6 @@
 /*globals $templates:false*/
-define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,events,mustache,Backbone,vkeyboard) {
+
+define(['jquery','underscore','events','mustache','backbone'],function ($,_,events,mustache,Backbone) {
     "use strict";
 
     var model;
@@ -18,20 +19,21 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
     });
 
     var View = Backbone.View.extend({
-        initialize: function() {
+        initialize:function() {
             var that = this;
-
-            toolbar.registerWidget({
-                id:'language-selector',
-                view:this,
-                classes:'btn-group',
-                modes:['page']});
-
+            events.on('appReady',function() {
+                that.render();
+            });
+            events.on('languageChanged',function(languages) {
+                that.languages = languages;
+                that.render();
+            });
             events.on('changeCoordinates',function(data) {
                 that.changeCoordinates(data);
             });
+
         },
-        el : '#language-selector',
+        el: '#vkeyboard',
         events: {
             'click ul a': 'changeLanguage'
         },
@@ -42,8 +44,10 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
                 if (prev == null) return l;
                 if (prev != l) return undefined;
                 return l;
-            }, null)
-            model.set('selected', newLanguage);
+            }, null);
+            if (model) {
+                model.set('selected', newLanguage);
+            }
 
             this.render();
         },
@@ -57,7 +61,57 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
             this.render();
         },
         render: function() {
-            var that = this;
+
+                console.log('render!');
+            this.$el.html('');
+            var $li = $('<li></li>');
+            var $li2 = $('<li></li>');
+            var $div = $('<div id="language-selector" class="btn-group">');
+            $li.append($div);
+            this.$el.append($li);
+
+            var $div2 = $('<div id="keyboard" class="btn-group"/>');
+            $li2.append($div2);
+            this.$el.append($li2);
+
+            if (this.languages === undefined) {return;}
+            var chars;
+            for (var i in this.languages.get('languages')) {
+                var l = this.languages.get('languages')[i];
+                if (l.code==this.languages.get('selected')) {
+                    chars = l.keyboard;
+                }
+            }
+            if (chars === undefined) {return;}
+
+            _.each(chars,function(v) {
+                var $a = $('<a />');
+                $a.attr("href","#");
+                $a.attr("class","btn");
+                $a.attr("data-character",v);
+                $a.text(v);
+                $a.click(function(ev) {
+                    var ch = ev.currentTarget.getAttribute('data-character');
+                    events.trigger('virtualKeyboard',ch);
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                });
+            $div2.append($a);
+            });
+
+                var $a = $('<a />');
+                $a.attr("href","#");
+                $a.attr("class","btn");
+                $a.attr("data-character","koe");
+                $a.text("koe");
+                $a.click(function(ev) {
+                    var ch = ev.currentTarget.getAttribute('data-character');
+                    events.trigger('virtualKeyboard',ch);
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                });
+            $div2.append($a);
+
             load(function(languages) {
                 events.trigger('languageChanged',languages);
                 var context = {
@@ -73,14 +127,17 @@ define(['toolbar','events','mustache','backbone','vkeyboard'],function (toolbar,
                     }
                 }).filter(function(e) { return e!==undefined; });
                 var tpl = $templates.find('#language-selector-template').html();
-                that.$el.html(mustache.render(tpl,context));
-                that.$el.removeClass('open');
+                $div.html(mustache.render(tpl,context));
+                $div.removeClass('open');
+                console.log('r');
             });
+            console.log('r1');
+
         }
+
     });
 
-    var view = new View();
-
-    return {};
+    return {
+        view: new View()
+    };
 });
-

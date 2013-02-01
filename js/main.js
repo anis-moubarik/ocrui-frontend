@@ -44,7 +44,6 @@ require(
         "toolbar",
         "facsimile",
         "editor",
-        "vkeyboard",
         "router",
         "geometry",
         "spin",
@@ -58,7 +57,7 @@ require(
         'boxes',
         'dialog',
         'events'
-    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, toolbar, facsimile, editor, vkeyboard, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo,save,container,boxes,dialog,events) {
+    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, toolbar, facsimile, editor, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo,save,container,boxes,dialog,events) {
         $(function() {
 
             try {
@@ -74,7 +73,6 @@ require(
                 $templates = $(html);
                 $(document).ready(function() {
 
-                    vkeyboard.view.render();
                     Backbone.history.start();
 
                     // keep element sizes ok, when window size changes
