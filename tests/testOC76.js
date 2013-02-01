@@ -1,13 +1,9 @@
-var testName = "OC-76: Työkalupalkki: Buttonit ja widgetit löytyvät dom-puusta. Show changes -toggle-nappulan tila vaihtuu klikatessa."
+casper.echo( "OC-76: Työkalupalkki: Buttonit ja widgetit löytyvät dom-puusta. Show changes -toggle-nappulan tila vaihtuu klikatessa." );
 
-var settings = require('./settings');
-var mytests = require('./mytests');
-var utils = require('utils');
-var url = settings.url+'#'+settings.testItem+'/11';
 
 var myButton = "#show-original-changes";
 
-casper.start(url,mytests.initCasper(testName));
+casper.start(settings.defaultPageUrl,mytests.initCasper());
 
 casper.waitForSelector( myButton ); // wait for my button
 

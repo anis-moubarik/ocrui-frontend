@@ -28,10 +28,9 @@ function onResourceRequested (casper,request) {
         JSON.stringify(request.url),'info');
 }
 
-function initCasper (name) {
+function initCasper () {
     return function () {
         this.on('error',onError);
-        this.log(name,"info");
     }
 }
 

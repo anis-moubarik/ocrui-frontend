@@ -1,14 +1,9 @@
-var testName = "OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan kohtaan"
-
-var settings = require('./settings');
-var mytests = require('./mytests');
-var utils = require('utils');
-var url = settings.url+'#'+settings.testItem+'/11';
+casper.echo( "OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan kohtaan" );
 
 
 var cursor;
 
-casper.start(url,mytests.initCasper(testName));
+casper.start(settings.defaultPageUrl,mytests.initCasper());
 
 casper.then(function() {
     this.test.assertExists('#boxes');

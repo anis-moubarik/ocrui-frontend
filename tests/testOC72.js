@@ -1,13 +1,9 @@
-var testName = "OC-72: Sivun vaihto toimii. Uusi sivunumero näkyy oikein ja valitun sivun teksti ja faksimiili renderöityvät oikein."
+casper.echo( "OC-72: Sivun vaihto toimii. Uusi sivunumero näkyy oikein ja valitun sivun teksti ja faksimiili renderöityvät oikein." );
 
-var settings = require('./settings');
-var mytests = require('./mytests');
-var utils = require('utils');
-var url = settings.url+'#'+settings.testItem+'/11';
 
 var myButton = "#page-next";
 
-casper.start(url,mytests.initCasper(testName));
+casper.start(settings.defaultPageUrl,mytests.initCasper());
 
 casper.waitForSelector( myButton ); // wait for my button
 

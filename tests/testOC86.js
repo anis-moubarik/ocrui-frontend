@@ -1,13 +1,9 @@
-var testName = "OC-86: kielivalitsin, editorin kursorin alla olevan sanan kieli näkyy kielivalitsimessa oikein."
+casper.echo( "OC-86: kielivalitsin, editorin kursorin alla olevan sanan kieli näkyy kielivalitsimessa oikein." );
 
-var settings = require('./settings');
-var mytests = require('./mytests');
-var utils = require('utils');
-var url = settings.url+'#'+settings.testItem+'/11';
 
 var cursor;
 
-casper.start(url,mytests.initCasper(testName));
+casper.start(settings.defaultPageUrl,mytests.initCasper());
 
 casper.then(function() {
     casper.test.assertExists('#vkeyboard');

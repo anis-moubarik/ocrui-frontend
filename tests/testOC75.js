@@ -1,14 +1,10 @@
-var testName = "OC-75: Zoom: Zoom button renderöi faksimiilin zoomatussa muodossa"
+casper.echo( "OC-75: Zoom: Zoom button renderöi faksimiilin zoomatussa muodossa" );
 
-var settings = require('./settings');
-var mytests = require('./mytests');
-var utils = require('utils');
-var url = settings.url+'#'+settings.testItem+'/11';
 
 var expected_canvas = require('./expected_canvas').b64;
 var expected_canvas_zoomed = require('./expected_canvas_zoomed').b64;
 
-casper.start(url,mytests.initCasper(testName));
+casper.start(settings.defaultPageUrl,mytests.initCasper());
 
 casper.then(function() {
     var r = casper.evaluate(function() {

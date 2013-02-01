@@ -1,11 +1,7 @@
-var testName = "OC-70: Tekstiä editoitaessa muutetut sanat renderöidään omalla tyylillään"
+casper.echo( "OC-70: Tekstiä editoitaessa muutetut sanat renderöidään omalla tyylillään" );
 
-var settings = require('./settings');
-var mytests = require('./mytests');
-var utils = require('utils');
-var url = settings.url+'#'+settings.testItem+'/11';
 
-casper.start(url,mytests.initCasper(testName));
+casper.start(settings.defaultPageUrl,mytests.initCasper());
 
 casper.waitForText( "Pienet" ); // ensure editor is there
 

@@ -1,5 +1,6 @@
-exports.url = 'http://localhost/ocrui/'
+exports.url = 'http://localhost/ocrui/';
 exports.testItem = 'URN:NBN:fi-fd2011-00003252'
+exports.defaultPageUrl = exports.url+'#'+exports.testItem+'/11';
 exports.testAuthor = 'Kaukoranta, Heikki'
 exports.testTitle = 'Sarjakuvat'
 exports.expectedContent = "Sisällys LUKIJALLE I Sarjakuvan tausta 11. Ns. " +
