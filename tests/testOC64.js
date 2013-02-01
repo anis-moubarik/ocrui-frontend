@@ -1,17 +1,16 @@
+var testName = "OC-64: Editoitavan itemin tekijä ja otsikko näkyvät oikein"
+
 var settings = require('./settings');
 var casper = require('casper').create();
 var utils = require('utils');
+var mytests = require('./mytests');
 
 
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var selector = '#bib-info';
 
-casper.start(url, function() {
-    this.echo (url);
-});
-
-casper.echo("OC-64: Editoitavan itemin tekijä ja otsikko näkyvät oikein");
+casper.start(url,mytests.initCasper(testName));
 
 casper.waitForSelector(selector,undefined,function() {
     casper.echo( 'not found.' );

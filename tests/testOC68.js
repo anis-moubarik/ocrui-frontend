@@ -1,23 +1,26 @@
+var testName = "OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan kohtaan"
+
 var settings = require('./settings');
-var myutils = require('./myutils');
+var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(myutils.normalOptions);
+var casper = require('casper').create(mytests.normalOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 
 var cursor;
 
-casper.start(url);
-
-casper.echo("OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan kohtaan");
+casper.start(url,mytests.initCasper(testName));
 
 casper.then(function() {
     this.test.assertExists('#boxes');
 });
 
-casper.waitForText( "Pienet" ); // ensure editor is there
-
-casper.then(function() { casper.echo("Found editor text");});
+casper.waitForText( "Pienet",
+    function () { casper.test.assert(true, "Found editor text");},
+    function () {
+        casper.test.assert(true, "Editor text not found.");
+        casper.die();
+    });
 
 casper.then(function() {
     cursor = casper.getElementBounds(".CodeMirror-cursor");
@@ -33,7 +36,7 @@ casper.waitFor(function () {
 
     var bounds = casper.getElementBounds(".CodeMirror-cursor");
 
-    if (myutils.cmpObjects(bounds,cursor)) { return false; }
+    if (mytests.cmpObjects(bounds,cursor)) { return false; }
     return true;
 
 });
@@ -48,7 +51,7 @@ casper.then(function() {
 
     var bounds = casper.getElementBounds(".CodeMirror-cursor");
     this.echo('new cursor:' + JSON.stringify(bounds));
-    this.test.assert(myutils.cmpObjects(bounds,expectedBounds),
+    this.test.assert(mytests.cmpObjects(bounds,expectedBounds),
         "Cursor moves to right place");
 });
 

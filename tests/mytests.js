@@ -1,4 +1,4 @@
-function onError  (casper, msg, trace) {
+function onError  (msg, trace) {
     var msgStack = ['ERROR: ' + msg];
     if (trace) {
         msgStack.push('TRACE:');
@@ -7,7 +7,7 @@ function onError  (casper, msg, trace) {
                 (t.function ? ' (in function "' + t.function + '")' : ''));
         });
     }
-    casper.log(msgStack.join('\n'),'error');
+    this.log(msgStack.join('\n'),'error');
 }
 
 function onConsoleMessage  (casper,msg, lineNum, sourceId) {
@@ -28,8 +28,11 @@ function onResourceRequested (casper,request) {
         JSON.stringify(request.url),'info');
 }
 
-function initCasper () {
-    this.page.onError = onError;
+function initCasper (name) {
+    return function () {
+        this.on('error',onError);
+        this.log(name,"info");
+    }
 }
 
 function cmpObjects (o1,o2) {
@@ -42,6 +45,34 @@ function cmpObjects (o1,o2) {
     return true;
 }
 
+function getEditorData(casper) {
+    var data = casper.evaluate(function () {
+        var cMirror = require('editor').view.cMirror;
+        return {
+            cursor : cMirror.getCursor(),
+            content : cMirror.getValue()
+        };
+    });
+
+    if (data == null) {
+        casper.assert(false,'Got null while fetching editor content');
+        casper.die();
+    }
+
+    return data;
+}
+
+function elementInfoContainsClass(info,cls) {
+    var classes = info.attributes.class.split(' ');
+    var contains = false;
+    for (var i in classes) {
+        if (classes[i] == cls) {
+            return true;
+        }
+    }
+    return false;
+}
+
 viewportSize = {
     width:1024,
     height:768
@@ -52,7 +83,6 @@ debugOptions = {
 
     //onResourceRequested : onResourceRequested,
     //onResourceReceived : onResourceReceived,
-    onError : onError,
     viewportSize: viewportSize,
     verbose: true,
     logLevel: 'debug'
@@ -66,14 +96,15 @@ normalOptions = {
 };
 
 
+exports.elementInfoContainsClass = elementInfoContainsClass;
 exports.cmpObjects = cmpObjects;
 exports.onResourceRequested = onResourceRequested;
 exports.onResourceReceived = onResourceReceived;
-exports.onError = onError;
 exports.onConsoleMessage = onConsoleMessage;
 exports.initCasper = initCasper
+exports.getEditorData = getEditorData
 
-exports.viewportSize= viewportSize;
+exports.viewportSize = viewportSize;
 exports.normalOptions = normalOptions;
 exports.debugOptions = debugOptions
 

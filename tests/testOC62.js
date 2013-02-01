@@ -1,14 +1,16 @@
+var testName = "OC-62: Virtuaalinäppäimistö: klikattava näppäin tulee editoriin, kielen vaihtaminen vaihtaa näppäimistön halutuksi"
+
 var settings = require('./settings');
-var myutils = require('./myutils');
+var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(myutils.debugOptions);
+var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var cursor;
 
-casper.start(url);
+casper.start(url,mytests.initCasper(testName));
 
-casper.log("OC-62: Virtuaalinäppäimistö: klikattava näppäin tulee editoriin, kielen vaihtaminen vaihtaa näppäimistön halutuksi","info");
+casper.log("","info");
 
 casper.then(function() {
     casper.test.assertExists('#vkeyboard');
@@ -57,7 +59,6 @@ casper.then(function() {
 });
 
 casper.waitFor(function () {
-    casper.log('x');
     var contentNow = casper.evaluate(function () {
         return require('editor').view.cMirror.getValue();
     });

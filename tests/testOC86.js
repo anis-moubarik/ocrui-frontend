@@ -1,14 +1,14 @@
+var testName = "OC-86: kielivalitsin, editorin kursorin alla olevan sanan kieli näkyy kielivalitsimessa oikein."
+
 var settings = require('./settings');
-var myutils = require('./myutils');
+var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(myutils.debugOptions);
+var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var cursor;
 
-casper.start(url);
-
-casper.log("OC-86: kielivalitsin, editorin kursorin alla olevan sanan kieli näkyy kielivalitsimessa oikein.","info");
+casper.start(url,mytests.initCasper(testName));
 
 casper.then(function() {
     casper.test.assertExists('#vkeyboard');
@@ -53,22 +53,7 @@ casper.waitFor(function () {
     var bounds = casper.getElementBounds(".CodeMirror-cursor");
 
     casper.log('new cursor:' + JSON.stringify(bounds));
-    var slice = casper.evaluate(function() {
-        console.log('xx');
-        try {
-            var content = require('editor').view.cMirror.getValue();
-        } catch(e)  {
-            console.log('yy',e);
-        }
-        console.log('aa');
-        var cursor = require('editor').view.cMirror.getCursor();
-        console.log('zz');
-        var i = cursor.ch;
-        var slice = content.substring(i-5,i+5);
-        return slice;
-    });
-    casper.log(slice);
-    if (myutils.cmpObjects(bounds,cursor)) { return false; }
+    if (mytests.cmpObjects(bounds,cursor)) { return false; }
     return true;
 
 });

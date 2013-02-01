@@ -1,12 +1,12 @@
+var testName = "OC-63: HTML-sivun komonentit ovat paikallaan"
+
 var settings = require('./settings');
+var mytests = require('./mytests');
 var casper = require('casper').create();
 
 var url = settings.url+'#'+settings.testItem+'/11';
-casper.start(url, function() {
-    this.echo (url);
-});
+casper.start(url,mytests.initCasper(testName));
 
-casper.echo("OC-63: HTML-sivun komonentit ovat paikallaan");
 casper.then(function() {
 
     var title = this.getElementInfo('title').text;

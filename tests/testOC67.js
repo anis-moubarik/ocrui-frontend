@@ -1,7 +1,9 @@
+var testName = "OC-67: Siirrettäessä kursoria editorissa faksimiilin highlight siirtyy oikeaan kohtaan"
+
 var settings = require('./settings');
-var myutils = require('./myutils');
+var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(myutils.debugOptions);
+var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 function assertHighlightBoxes(c,hbs1,hbs2) {
@@ -31,9 +33,7 @@ function getHLB() {
     return require('boxes').view.highlight;
 }
 
-casper.start(url);
-
-casper.echo("OC-67: Siirrettäessä kursoria editorissa faksimiilin highlight siirtyy oikeaan kohtaan");
+casper.start(url,mytests.initCasper(testName));
 
 casper.then(function() {
     this.test.assertExists('#editor');

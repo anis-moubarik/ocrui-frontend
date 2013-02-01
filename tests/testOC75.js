@@ -1,27 +1,22 @@
+var testName = "OC-75: Zoom: Zoom button renderöi faksimiilin zoomatussa muodossa"
+
 var settings = require('./settings');
-var myutils = require('./myutils');
+var mytests = require('./mytests');
 var utils = require('utils');
-var casper = require('casper').create(myutils.debugOptions);
+var casper = require('casper').create(mytests.debugOptions);
 var url = settings.url+'#'+settings.testItem+'/11';
 
 var expected_canvas = require('./expected_canvas').b64;
 var expected_canvas_zoomed = require('./expected_canvas_zoomed').b64;
 
-casper.start(url,myutils.initCasper);
-
-casper.log("OC-75: Zoom: Zoom button renderöi faksimiilin zoomatussa muodossa","info");
+casper.start(url,mytests.initCasper(testName));
 
 casper.then(function() {
     var r = casper.evaluate(function() {
         window.facsimileRendered = false;
-        console.log('setup');
-        require('events').onAny(function(ev,data) {
-            console.log(ev,JSON.stringify(data));
-            if (ev == 'facsimileRendered') {
-                window.facsimileRendered = true;
-            }
+        require('events').on('facsimileRendered',function(data) {
+            window.facsimileRendered = true;
         });
-        console.log('setup ok');
     });
     casper.test.assertExists('#facsimile-canvas');
 });
