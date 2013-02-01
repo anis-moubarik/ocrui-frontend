@@ -89,15 +89,15 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         }
     }
 
-    function ProcessingState() {
+    function ContentUpdateProcess() {
         this.$nextPosition = undefined; // next $position to come
         this.resetLine();
     }
 
-    ProcessingState.prototype.createTarget = function ( original ) {
+    ContentUpdateProcess.prototype.createTarget = function ( original ) {
          this.$target = $(original).find('alto').clone();
     }
-    ProcessingState.prototype.createAltoFromOriginalAndWords = function (
+    ContentUpdateProcess.prototype.createAltoFromOriginalAndWords = function (
             original, words) {
 
         words = words.map(_.identity); // jsdiff.diff edits second argument!!
@@ -156,14 +156,14 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         this.processPending();
     };
 
-    ProcessingState.prototype.resetLine = function () {
+    ContentUpdateProcess.prototype.resetLine = function () {
         this.wordStack = []; // stack of pending words to add
         this.$$elementStack = []; // stack of pending elements to replace
         this.$textline = undefined; // textline of pending changes
         this.$position = undefined; // element just before pending changes
     };
 
-    ProcessingState.prototype.pushEdit = function(word, $string) {
+    ContentUpdateProcess.prototype.pushEdit = function(word, $string) {
         // push edit and process earlier stack if this is a new line
 
         var $nextTextline = this.$textline;
@@ -189,19 +189,19 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
     };
 
-    ProcessingState.prototype.prepareString = function($string) {
+    ContentUpdateProcess.prototype.prepareString = function($string) {
         this.$nextPosition = $string;
 
     };
 
-    ProcessingState.prototype.stringDone = function() {
+    ContentUpdateProcess.prototype.stringDone = function() {
         this.$position = this.$nextPosition;
         this.$textline = this.$position.parent();
 
 
     };
 
-    ProcessingState.prototype.processPending = function() {
+    ContentUpdateProcess.prototype.processPending = function() {
 
         var elementsAdded = 0;
         var needToAddNextElement = false;
@@ -267,7 +267,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
     };
 
-    ProcessingState.prototype.updateLanguages = function(current,words) {
+    ContentUpdateProcess.prototype.updateLanguages = function(current,words) {
 
         words = words.map(_.identity); // jsdiff.diff edits second argument!!
         var currentWords = $(current).find('String').map(
@@ -310,6 +310,10 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         }
     };
 
+    ContentUpdateProcess.prototype.getNewAlto = function() {
+        return this.$target.get(0);
+    }
+
     function createAlto (original, current, words) {
 
         // Returns a new Alto DOM from three input objects:
@@ -318,16 +322,79 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         //   layout box information come from here)
         // words - sequence of words from editor.
 
-        var processingState = new ProcessingState();
+        var process = new ContentUpdateProcess();
 
-        processingState.createTarget(original);
-        processingState.createAltoFromOriginalAndWords(original, words);
-        processingState.updateLanguages(current,words);
+        process.createTarget(original);
+        process.createAltoFromOriginalAndWords(original, words);
+        process.updateLanguages(current,words);
 
-        return processingState.$target.get(0);
+        return process.getNewAlto();
+    }
+
+    function Alto () {
+
+        this.dirty = false;
+
+    }
+
+    Alto.prototype.isDirty = function() {
+        return this.dirty;
+    }
+
+    Alto.prototype.dom2Word = function(dom) {
+        // see also setNthWord
+        return {
+            content: dom.getAttribute('CONTENT'),
+            language: dom.getAttribute('LANGUAGE'),
+            hpos: parseInt(dom.getAttribute('HPOS'),10),
+            vpos: parseInt(dom.getAttribute('VPOS'),10),
+            width: parseInt(dom.getAttribute('WIDTH'),10),
+            height: parseInt(dom.getAttribute('HEIGHT'),10),
+        };
+    },
+
+    Alto.prototype.getLayoutBoxes = function () {
+
+        var that = this;
+        var tb = $(this.current).find('TextBlock').map(function () {
+            var $strings = $(this).find('String');
+            var words = $strings.map(function() {
+                return that.dom2Word(this);
+            }).get();
+            var combined = utils.getCombinedBoundingBox(words);
+            return combined;
+        });
+        return tb;
+    },
+
+    Alto.prototype.setOriginalXML = function (xml) {
+        this.original = xml;
+    }
+
+    Alto.prototype.setCurrentXML = function (xml) {
+        this.current = xml;
+    }
+
+    Alto.prototype.updateStringContent = function (content) {
+        // Create new current structure from string content and
+        // original alto structure
+
+        if (this.original === undefined) {return;}
+        var words = content.split(/\s+/);
+
+        var process = new ContentUpdateProcess();
+
+        process.createTarget(this.original);
+        process.createAltoFromOriginalAndWords(this.original, words);
+        process.updateLanguages(this.current,words);
+
+        this.current = process.getNewAlto();
+
+        this.dirty = true;
     }
 
     return {
+        Alto : Alto,
         createAlto : createAlto,
     };
 });

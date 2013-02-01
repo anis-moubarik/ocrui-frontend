@@ -1,26 +1,18 @@
-define(['jquery','libalto','backbone','mybackbone','mets','utils'],
-        function ($,libalto,Backbone,mybackbone,mets,utils) {
+define(['jquery','libalto','backbone','mybackbone','mets','utils','events'],
+        function ($,libalto,Backbone,mybackbone,mets,utils,events) {
     "use strict";
 
     var AltoModel = Backbone.Model.extend({
         initialize: function (options) {
-            this.dirty = false;
             this.url = options.doc.getAltoUrl(options.pageNumber);
             options.doc.registerAlto(options.pageNumber,this);
+            this.alto = new libalto.Alto()
         },
         dom2Word: function(dom) {
-            // see also setNthWord
-            return {
-                content: dom.getAttribute('CONTENT'),
-                language: dom.getAttribute('LANGUAGE'),
-                hpos: parseInt(dom.getAttribute('HPOS'),10)/this.get('width'),
-                vpos: parseInt(dom.getAttribute('VPOS'),10)/this.get('height'),
-                width: parseInt(dom.getAttribute('WIDTH'),10)/this.get('width'),
-                height: parseInt(dom.getAttribute('HEIGHT'),10)/this.get('height')
-            };
+            return this.alto.dom2Word(dom);
         },
         isDirty: function() {
-            return this.dirty;
+            return this.alto.isDirty();
         },
         getWords: function() {
 
@@ -76,16 +68,16 @@ define(['jquery','libalto','backbone','mybackbone','mets','utils'],
         },
         updateAlto: function (content) {
 
+            this.alto.updateStringContent(content);
+
             // create new Alto based on string in content and
             // original alto structure
             if (this.originalData === undefined) {return;}
-            if (words) {return;}
             var words = content.split(/\s+/);
             this.currentData = libalto.createAlto(
                 this.originalData,
                 this.currentData
                 ,words );
-            this.dirty = true;
 
         },
 
@@ -134,33 +126,26 @@ define(['jquery','libalto','backbone','mybackbone','mets','utils'],
             ).get();
         },
 
+        getLayoutBoxes: function() {
+            return this.alto.getLayoutBoxes();
+        },
+
         getString: function(dom) {
             return this.getStringSequence(dom).join(' ');
         },
 
-        getLayoutBoxes: function () {
-
-            var that = this;
-            var tb = $(this.currentData).find('TextBlock').map(function () {
-                var $strings = $(this).find('String');
-                var words = $strings.map(function() {
-                    return that.dom2Word(this);
-                }).get();
-                var combined = utils.getCombinedBoundingBox(words);
-                return combined;
-            });
-            return tb;
-        },
-
         parse: function (response) {
             var data = {};
-            this.currentData = response;
-            this.originalData = response; // BUG! figure out how this goes
             var page = $(response).find('Page').get(0);
             if (page) {
                 data.width = page.getAttribute("WIDTH");
                 data.height = page.getAttribute("HEIGHT");
             }
+            events.trigger('setPageGeometry',data);
+            this.alto.setOriginalXML(response);
+            this.alto.setCurrentXML(response);
+            this.currentData = response;
+            this.originalData = response; // BUG! figure out how this goes
             return data;
         },
 

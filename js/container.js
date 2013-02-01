@@ -68,6 +68,11 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
 
             events.on('mousetail',function(data) {that.panTail(data);});
 
+            events.on('setPageGeometry',function(data) {
+                that.pageWidth = data.width;
+                that.pageHeight = data.height;
+            });
+
         },
         el: '#facsimile-canvas',
         events: {
@@ -156,29 +161,29 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
                 y:ev.pageY - offset.top
             };
 
-            var hScale = this.imageWidth * this.pageScale;
-            var vScale = this.imageHeight * this.pageScale;
             var imageCoords = {
-                x: (screenCoords.x - this.originX) / hScale,
-                y: (screenCoords.y - this.originY) / vScale
+                x: (screenCoords.x - this.originX) / this.hScale(),
+                y: (screenCoords.y - this.originY) / this.vScale()
             };
             events.trigger('cursorToCoordinate',imageCoords);
         },
+        hScale: function () {
+            return this.imageWidth * this.pageScale / this.pageWidth;
+        },
+        vScale: function () {
+            return this.imageHeight * this.pageScale / this.pageHeight;
+        },
         getScreenX: function(pageX) {
-            var hScale = this.imageWidth * this.pageScale;
-            return Math.round(pageX * hScale + this.originX);
+            return Math.round(pageX * this.hScale() + this.originX);
         },
         getScreenY: function(pageY) {
-            var vScale = this.imageHeight * this.pageScale;
-            return Math.round(pageY * vScale + this.originY);
+            return Math.round(pageY * this.vScale() + this.originY);
         },
         getScreenWidth: function(pageWidth) {
-            var hScale = this.imageWidth * this.pageScale;
-            return Math.round(pageWidth * hScale);
+            return Math.round(pageWidth * this.hScale());
         },
         getScreenHeight: function(pageHeight) {
-            var vScale = this.imageHeight * this.pageScale;
-            return Math.round(pageHeight * vScale);
+            return Math.round(pageHeight * this.vScale());
         },
         getWidth: function() {
             return this.horizontalPixels;
@@ -199,13 +204,10 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
             if (highlight === []) return;
             var hl = utils.getCombinedBoundingBox(highlight);
 
-            var hScale = this.imageWidth * this.pageScale;
-            var vScale = this.imageHeight * this.pageScale;
-
-            var hpos = Math.round(hl.hpos * hScale);
-            var vpos = Math.round(hl.vpos * vScale);
-            var width = Math.round(hl.width * hScale);
-            var height = Math.round(hl.height * vScale);
+            var hpos = Math.round(hl.hpos * this.hScale());
+            var vpos = Math.round(hl.vpos * this.vScale());
+            var width = Math.round(hl.width * this.hScale());
+            var height = Math.round(hl.height * this.vScale());
             var cX = hpos + width / 2;
             var cY = vpos + height / 2;
             var vLeft = -this.originX;
