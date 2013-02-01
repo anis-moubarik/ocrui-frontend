@@ -1,5 +1,5 @@
-define(['jquery','diffmethod','backbone','mybackbone','mets'],
-        function ($,diffmethod,Backbone,mybackbone,mets) {
+define(['jquery','libalto','backbone','mybackbone','mets','utils'],
+        function ($,libalto,Backbone,mybackbone,mets,utils) {
     "use strict";
 
     var AltoModel = Backbone.Model.extend({
@@ -81,7 +81,7 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
             if (this.originalData === undefined) {return;}
             if (words) {return;}
             var words = content.split(/\s+/);
-            this.currentData = diffmethod.createAlto(
+            this.currentData = libalto.createAlto(
                 this.originalData,
                 this.currentData
                 ,words );
@@ -146,7 +146,7 @@ define(['jquery','diffmethod','backbone','mybackbone','mets'],
                 var words = $strings.map(function() {
                     return that.dom2Word(this);
                 }).get();
-                var combined = diffmethod.getCombinedBoundingBox(words);
+                var combined = utils.getCombinedBoundingBox(words);
                 return combined;
             });
             return tb;

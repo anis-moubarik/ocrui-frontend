@@ -1,4 +1,4 @@
-define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
+define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     "use strict";
 
     function getEditSequence (diff) {
@@ -58,26 +58,6 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
             height : parseInt($object.attr('HEIGHT'),10)
         };
     }
-    function getCombinedBoundingBox(bbs) {
-        
-        var xs = [];
-        var ys = [];
-        for (var i in bbs) {
-            xs.push(bbs[i].hpos);
-            xs.push(bbs[i].hpos + bbs[i].width);
-            ys.push(bbs[i].vpos);
-            ys.push(bbs[i].vpos + bbs[i].height);
-        }
-        var bb = {
-            hpos: _.min(xs),
-            vpos: _.min(ys)
-        };
-        bb.width = _.max(xs) - bb.hpos;
-        bb.height = _.max(ys) - bb.vpos;
-
-        return bb;
-
-    }
 
     function splitBoundingBoxes($$elements,bbs) {
         var stringLengths = _.map($$elements,function(element) {
@@ -86,7 +66,7 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
         var totalLength = _.reduce(stringLengths,function(subTotal,length) {
             return subTotal + length;
         }, 0);
-        var combinedBB = getCombinedBoundingBox(bbs);
+        var combinedBB = utils.getCombinedBoundingBox(bbs);
         var elements = $$elements.length;
         var precedingProportion = 0;
         for (var i in $$elements) {
@@ -349,7 +329,6 @@ define(['jquery','underscore','jsdiff'],function ($,_,jsdiff) {
 
     return {
         createAlto : createAlto,
-        getCombinedBoundingBox : getCombinedBoundingBox
     };
 });
 
