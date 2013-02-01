@@ -67,11 +67,10 @@ casper.then(function() {
 
     var hbs = this.evaluate( getHLB );
     expectedHbs = [{
-        hpos:0.4607792207792208,
-        vpos:0.14865844815083393,
-        width:0.0212987012987013,
-        height:0.009064539521392313}];
-
+        hpos:887,
+        vpos:410,
+        width:41,
+        height:25}];
     assertHighlightBoxes(this,hbs,expectedHbs);
 
 });

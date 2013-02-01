@@ -118,7 +118,7 @@ define(['underscore','jquery','events','toolbar','codemirror','backbone','cmmode
         },
         changed: function (instance) {
             var content = instance.getValue();
-            this.alto.updateAlto(content);
+            this.alto.updateStringContent(content);
             this.setupHighlightChange();
         },
         setupHighlightChange: function () {

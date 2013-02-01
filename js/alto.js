@@ -14,138 +14,44 @@ define(['jquery','libalto','backbone','mybackbone','mets','utils','events'],
         isDirty: function() {
             return this.alto.isDirty();
         },
-        getWords: function() {
-
-            var that = this;
-            var words = $(this.currentData).find('String').map(function() {
-                return that.dom2Word(this);
-            }).get();
-            return words;
-
-        },
         getWordIndexAt: function(x,y) {
-            var selection;
-
-            var minDistance;
-            var minDistanceIndex;
-            var that=this;
-            // find bounding box under or closest to the cursor.
-            $(this.currentData).find('String').each(function(i) {
-
-                var word = that.dom2Word(this);
-
-                // look for an exact match
-                if ((x >= word.hpos) && (x <= word.hpos + word.width) &&
-                    (y >= word.vpos) && (y <= word.vpos + word.height)) {
-
-                    selection = i;
-                    return false;
-
-                }
-
-                // look for a bounding box nearby
-                function tryToSetClosestCorner(cornerX,cornerY) {
-                    var distance = Math.sqrt(
-                        Math.pow((cornerX - x), 2) +
-                        Math.pow((cornerY - y), 2)
-                    );
-                    if ((minDistance === undefined) || (distance < minDistance))
-                    {
-                        minDistance = distance;
-                        minDistanceIndex = i;
-                    }
-                }
-                tryToSetClosestCorner(word.hpos,word.vpos);
-                tryToSetClosestCorner(word.hpos+word.width,word.vpos);
-                tryToSetClosestCorner(word.hpos,word.vpos+word.height);
-                tryToSetClosestCorner(word.hpos+word.width,word.vpos+word.height);
-
-            });
-            if (selection === undefined) {
-                selection = minDistanceIndex;
-            }
-            return selection;
+            return this.alto.getWordIndexAt(x,y);
         },
-        updateAlto: function (content) {
-
-            this.alto.updateStringContent(content);
-
-            // create new Alto based on string in content and
-            // original alto structure
-            if (this.originalData === undefined) {return;}
-            var words = content.split(/\s+/);
-            this.currentData = libalto.createAlto(
-                this.originalData,
-                this.currentData
-                ,words );
-
+        updateStringContent: function (content) {
+            return this.alto.updateStringContent(content);
         },
-
         setNthWordLanguage: function(index,language) {
-            var $dom =  $(this.currentData).find('String').eq(index);
-            $dom.attr('LANGUAGE',language);
-            return this.dom2Word($dom.get(0));
+            return this.alto.setNthWordLanguage(index,language);
         },
         getNthWord: function(index) {
-            var dom =  $(this.currentData).find('String').get(index);
-            if (dom === undefined) {return undefined;}
-            return this.dom2Word(dom);
+            return this.alto.getNthWord(index);
         },
         getStringSequence: function(dom) {
-            if (dom === undefined) {dom = this.currentData;}
-            return $(dom).find('String').map(
-                function() { return this.getAttribute('CONTENT'); }
-            ).get();
+            return this.alto.getStringSequence(dom);
         },
         getChangedSequence: function(dom) {
-            if (dom === undefined) {dom = this.currentData;}
-            return $(dom).find('String').map(
-                function() {
-                    return this.getAttribute('CHANGED') ? true : false;
-                }
-            ).get();
+            return this.alto.getChangedSequence(dom);
         },
-
         getChangedSinceSaveSequence: function(dom) {
-            if (dom === undefined) {dom = this.currentData;}
-            return $(dom).find('String').map(
-                function() {
-                    return this.getAttribute('CHANGED_SINCE_SAVE') ?
-                        true :
-                        false;
-                }
-            ).get();
+            return this.alto.getChangedSinceSaveSequence(dom);
         },
-
         getLanguageSequence: function(dom) {
-            if (dom === undefined) {dom = this.currentData;}
-            return $(dom).find('String').map(
-                function() {
-                    return this.getAttribute('LANGUAGE') ? true : false;
-                }
-            ).get();
+            return this.alto.getLanguageSequence(dom);
         },
-
         getLayoutBoxes: function() {
             return this.alto.getLayoutBoxes();
         },
-
         getString: function(dom) {
             return this.getStringSequence(dom).join(' ');
         },
-
         parse: function (response) {
             var data = {};
             var page = $(response).find('Page').get(0);
-            if (page) {
-                data.width = page.getAttribute("WIDTH");
-                data.height = page.getAttribute("HEIGHT");
-            }
+            data.width = page.getAttribute("WIDTH");
+            data.height = page.getAttribute("HEIGHT");
             events.trigger('setPageGeometry',data);
             this.alto.setOriginalXML(response);
             this.alto.setCurrentXML(response);
-            this.currentData = response;
-            this.originalData = response; // BUG! figure out how this goes
             return data;
         },
 
