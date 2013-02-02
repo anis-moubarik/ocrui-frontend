@@ -149,6 +149,8 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
 
         },
         panTail: function(data) {
+            //console.log(this.stack);
+            //console.log(data);
             this.setOrigin(
                 this.originX + data[0],
                 this.originY + data[1]);
