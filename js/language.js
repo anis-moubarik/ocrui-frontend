@@ -23,7 +23,6 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
         },
         vkeyboardClick: function(ev) {
             var ch = ev.currentTarget.getAttribute('data-character');
-            console.log(ch);
             events.trigger('virtualKeyboard',ch);
             ev.preventDefault();
             ev.stopPropagation();
