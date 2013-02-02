@@ -1,5 +1,5 @@
 <div id="templates">
-    <div id="toolbar-template" class="btn-toolbar">
+    <template id="toolbar-template">
         {{#widgets}}
             <div class="{{classes}}" id="{{id}}"> </div>
         {{/widgets}}
@@ -15,9 +15,9 @@
                     </button>
                 {{/buttons}}
             </div>
-    </div>
+    </template>
 
-    <div id="page-selector-template">
+    <template id="page-selector-template">
         <button class="btn" id="page-previous" title="Previous page">
             <i class="icon-arrow-left"> </i>
         </button>
@@ -27,26 +27,33 @@
         <button class="btn" id="page-next" title="Next page">
             <i class="icon-arrow-right"> </i>
         </button>
-    </div>
+    </template>
 
-    <div id="bib-info-template">
+    <template id="bib-info-template">
         <input class="span4" type="text" disabled value="{{author}}: {{title}}" />
-    </div>
+    </template>
 
-    <div id="language-selector-template">
-        <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
-            {{selectedName}}
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-            {{#languages}}
-            <li>
-                <a href="#" data-value="{{code}}">{{name}}</a>
-            </li>
-            {{/languages}}
-        </ul>
-    </div>
-    <div id="dialog-template">
+    <template id="language-selector-template">
+        <div class="pull-right">
+            <form id="language-selector-template" class="navbar-form">
+                <select>
+                {{#languages}}
+                    <option {{{selected}}} data-value="{{code}}" >
+                        {{name}}
+                    </option>
+                {{/languages}}
+                </select>
+            </form>
+        </div>
+        <div>
+            <div id="keyboard" class="btn-group">
+                {{#chars}}
+                    <a href="#" class="btn" data-character="{{.}}">{{.}}</a>
+                {{/chars}}
+            </div>
+        </div>
+    </template>
+    <template id="dialog-template">
         {{#dialogs}}
         <div class="modal hide" id="{{id}}">
 
@@ -68,5 +75,5 @@
 
         </div>
         {{/dialogs}}
-    </div>
+    </template>
 </div>
