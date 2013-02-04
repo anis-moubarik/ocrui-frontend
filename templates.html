@@ -38,19 +38,15 @@
             <form id="language-selector-template" class="navbar-form">
                 <select>
                 {{#languages}}
-                    <option {{{selected}}} data-value="{{code}}" >
-                        {{name}}
-                    </option>
+                    <option {{{selected}}} value="{{code}}" >{{name}}</option>
                 {{/languages}}
                 </select>
             </form>
         </div>
-        <div>
-            <div id="keyboard" class="btn-group">
-                {{#chars}}
-                    <a href="#" class="btn" data-character="{{.}}">{{.}}</a>
-                {{/chars}}
-            </div>
+        <div id="keyboard" class="btn-group">
+            {{#chars}}
+                <a href="#" class="btn" data-character="{{.}}">{{.}}</a>
+            {{/chars}}
         </div>
     </template>
     <template id="dialog-template">

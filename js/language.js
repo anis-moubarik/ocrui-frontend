@@ -49,7 +49,7 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
             this.render();
         },
         changeLanguage: function (ev) {
-            var l = $(ev.target).find(':selected').attr('data-value');
+            var l = $(ev.target).find(':selected').attr('value');
             ev.preventDefault();
             ev.stopPropagation();
             this.languages.set('selected',l);

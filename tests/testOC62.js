@@ -17,6 +17,7 @@ casper.then(function() {
         return require('editor').view.cMirror.getValue();
     });
     casper.clickLabel('Suomi'); 
+    casper.echo('clicked Suomi');
 
 });
 
@@ -35,6 +36,7 @@ casper.waitFor(function () {
         return buttons;
     });
 
+    console.log(buttons);
     for (var i in expectedButtons) {
         if (buttons[i] != expectedButtons[i]) return false;
     }
