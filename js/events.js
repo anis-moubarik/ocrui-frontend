@@ -6,7 +6,7 @@ define(function () {
     var queues = {};
 
     // debug:
-    onAny(function(ev,data) {console.log(ev,data);});
+    // onAny(function(ev,data) {console.log(ev,data);});
 
     // listen to all sent events, for testing and debugging
     function onAny (cb) {
@@ -29,7 +29,7 @@ define(function () {
             setTimeout(function(){
                 cb.apply(null,args);
             },0);
-            //cb(data);
+
     }
 
     function trigger (ev,data) {
