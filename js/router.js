@@ -1,5 +1,5 @@
-define(['spinner','events','alto','mets','image','backbone'],
-        function (spinner,events,alto,mets,image,Backbone) {
+define(['events','alto','mets','image','backbone'],
+        function (events,alto,mets,image,Backbone) {
     "use strict";
 
     var Router = Backbone.Router.extend({
@@ -31,7 +31,7 @@ define(['spinner','events','alto','mets','image','backbone'],
         var data = {docId:docId, pageNumber:pageNumber};
 
         events.trigger('changePage',pageNumber);
-        spinner.showSpinner();
+        events.trigger('nowProcessing',"page-change");
 
         var imageLoaded = image.get(data);
         var altoLoaded = alto.get(data);
@@ -51,11 +51,11 @@ define(['spinner','events','alto','mets','image','backbone'],
         $.when(imageLoaded,altoLoaded).then(
             function() {
                 events.trigger('changePageDone');
-                spinner.hideSpinner();
+                events.trigger('endProcessing',"page-change");
             },
             function(msg) {
                 events.trigger('changePageError',msg);
-                spinner.hideSpinner();
+                events.trigger('endProcessing',"page-change");
             });
 
     }

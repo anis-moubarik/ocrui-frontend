@@ -1,4 +1,4 @@
-define(['jquery','spin'],function ($,spin) {
+define(['jquery','spin','events'],function ($,spin,events) {
     "use strict";
 
 
@@ -14,31 +14,44 @@ define(['jquery','spin'],function ($,spin) {
     };
 
     var spinner = new spin.Spinner(options);
-    var spinnerCount = 0;
+    var nowSpinning = false;
 
-    function showSpinner(i) {
-        if (i===undefined) i = 1;
-        if (spinnerCount === 0) {
+    var stack = {};
+
+    events.on('nowProcessing',startProcess);
+
+    events.on('endProcessing',endProcess);
+
+    function startProcess(process) {
+        if (process in stack) {
+            throw "Trying to start a process already in taking place";
+        }
+        stack[process] = true;
+        if (!nowSpinning) {
             spinner.spin($('#spinner').get(0));
             $('#greyout').css('z-index','1000000');
             $('#spinner').css('z-index','1000001');
         }
-        spinnerCount += i;
+        nowSpinning = true;
     }
     
-    function hideSpinner(i) {
-        if (i===undefined) i = 1;
-        spinnerCount -= i;
-        if (spinnerCount <= 0) {
-            spinnerCount = 0;
+    function endProcess(process) {
+        if (!(process in stack)) {
+            throw "Trying to end a process not in stack";
+        }
+        delete stack[process];
+        var processes = false;
+        for (var i in stack) {
+            processes = true;
+            break;
+        }
+        if (!processes) {
             spinner.stop();
             $('#spinner,#greyout').css('z-index','-1');
         }
     }
     
     return {
-        showSpinner : showSpinner,
-        hideSpinner : hideSpinner
     };
 
 });

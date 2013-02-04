@@ -35,6 +35,8 @@ require.config({
 require(
     [
         "jquery",
+        "geometry",
+        'events',
         "bootstrap",
         "mustache",
         "underscore",
@@ -45,7 +47,6 @@ require(
         "facsimile",
         "editor",
         "router",
-        "geometry",
         "spin",
         "spinner",
         "pageselector",
@@ -55,33 +56,29 @@ require(
         'save',
         'container',
         'boxes',
-        'dialog',
-        'events'
-    ], function($, bootstrap,mustache, underscore, jqueryui, backbone, codemirror, toolbar, facsimile, editor, router, geometry, spin, spinner, pageselector, mousewheel,language,bibinfo,save,container,boxes,dialog,events) {
-        $(function() {
+        'dialog'
+    ], function($, geometry,events) {
+        try {
+            console.log;
+        } catch (err) {
+            console = {
+                log: function() {},
+                trace: function() {}
+            };
+        }
 
-            try {
-                console.log;
-            } catch (err) {
-                console = {
-                    log: function() {},
-                    trace: function() {}
-                };
-            }
+        $.get('templates.html',function(html) {
+            $templates = $(html);
+            $(document).ready(function() {
 
-            $.get('templates.html',function(html) {
-                $templates = $(html);
-                $(document).ready(function() {
+                Backbone.history.start();
 
-                    Backbone.history.start();
+                // keep element sizes ok, when window size changes
+                $(window).resize(geometry.resizeHandler);
 
-                    // keep element sizes ok, when window size changes
-                    $(window).resize(geometry.resizeHandler);
+                $(window).resize();
 
-                    $(window).resize();
-
-                    events.trigger('appReady');
-                });
+                events.trigger('appReady');
             });
         });
 });

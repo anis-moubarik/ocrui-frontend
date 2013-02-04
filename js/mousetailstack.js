@@ -40,6 +40,11 @@ define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,too
         // about it, this is good enough
         var i = 0;
 
+        if (ev.timeStamp === 0) {
+            // firefox timeStamps are bad, kludge over it.
+            this.stack = [];
+        }
+
         while ((i < this.stack.length) &&
                 (ev.timeStamp - this.stack[i].timeStamp > this.timeTolerance)) {
 
