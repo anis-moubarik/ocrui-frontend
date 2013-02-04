@@ -5,6 +5,9 @@ define(function () {
     var anyListeners = [];
     var queues = {};
 
+    // debug:
+    onAny(function(ev,data) {console.log(ev,data);});
+
     // listen to all sent events, for testing and debugging
     function onAny (cb) {
         anyListeners.push(cb);
@@ -20,6 +23,15 @@ define(function () {
 
     }
 
+    function triggerOne (cb, timeout) {
+
+            var args = Array().slice.call(arguments,2);
+            setTimeout(function(){
+                cb.apply(null,args);
+            },0);
+            //cb(data);
+    }
+
     function trigger (ev,data) {
 
         if (!(ev in listeners)) {
@@ -29,12 +41,10 @@ define(function () {
         queues[ev] = undefined; // remove any delayed triggerings
 
         for (var i in listeners[ev]) {
-            var cb = listeners[ev][i];
-            cb(data);
+            triggerOne(listeners[ev][i],0,data);
         }
         for (var i in anyListeners) {
-            var cb = anyListeners[i];
-            cb(ev,data);
+            triggerOne(anyListeners[i],0,ev,data);
         };
 
     }
