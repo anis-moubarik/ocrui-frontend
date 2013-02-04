@@ -2,7 +2,7 @@
 define(['jquery','events'], function($,events) {
     "use strict";
 
-    function resizeHandler (ev) {
+    function resizeHandler () {
         var topHeight = $('#toolbar').outerHeight();
         var bottomHeight = $('#bottom-geometry').outerHeight();
         var wHeight = $(window).innerHeight();
@@ -23,6 +23,12 @@ define(['jquery','events'], function($,events) {
 
         events.trigger('setGeometry',data);
     }
+
+    // keep element sizes ok, when window size changes
+    $(window).resize(resizeHandler);
+
+    events.on('changePageDone',resizeHandler);
+    events.on('changePageError',resizeHandler);
 
     return {
         resizeHandler: resizeHandler

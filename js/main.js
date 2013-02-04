@@ -73,11 +73,6 @@ require(
 
                 Backbone.history.start();
 
-                // keep element sizes ok, when window size changes
-                $(window).resize(geometry.resizeHandler);
-
-                $(window).resize();
-
                 events.trigger('appReady');
             });
         });
