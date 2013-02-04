@@ -1,6 +1,4 @@
-/*globals $templates:false*/
-
-define(['jquery','underscore','events','mustache','backbone'],function ($,_,events,mustache,Backbone) {
+define(['jquery','underscore','events','templates','mustache','backbone'],function ($,_,events,templates,mustache,Backbone) {
     "use strict";
 
     var Model = Backbone.Model.extend({
@@ -61,7 +59,7 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
             var that = this;
 
             var context = {
-                selected: this.languages.get('selected'),
+                xselected: this.languages.get('selected'),
                 selectedName: this.languages.get('selected'),
                 chars: []
             };
@@ -71,7 +69,7 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
                     var o = {
                         code: e.code,
                         name: e.name,
-                        selected: undefined
+                        selected: ' '
                         }
                     if (e.code==that.languages.get('selected')) {
                         context.selectedName = e.name;
@@ -83,7 +81,7 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
             context.languages.push({
                 code: '',
                 name: '',
-                selected: isAnySelected ? undefined : 'selected'
+                selected: isAnySelected ? ' ' : 'selected'
                 });
 
             for (var i in this.languages.get('languages')) {
@@ -93,7 +91,8 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
                 }
             }
 
-            var tpl = $templates.find('#language-selector-template').html();
+            var tpl = templates.get('language-selector');
+
             this.$el.html(mustache.render(tpl,context));
 
         }

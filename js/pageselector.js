@@ -1,6 +1,5 @@
-/*globals $templates:false */
-define(['jquery','events','toolbar','mustache','backbone'],
-        function ($,events,toolbar,mustache,Backbone) {
+define(['jquery','events','toolbar','mustache','backbone','templates'],
+        function ($,events,toolbar,mustache,Backbone,templates) {
     "use strict";
 
     var View = Backbone.View.extend({
@@ -91,7 +90,7 @@ define(['jquery','events','toolbar','mustache','backbone'],
                 pageNumber: this.options.pageNumber,
                 pages: this.options.maxPage
             };
-            var tpl = $templates.find('#page-selector-template').html();
+            var tpl = templates.get('page-selector');
             this.$el.html(mustache.render(tpl,context));
         }
     });

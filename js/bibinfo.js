@@ -1,6 +1,5 @@
-/*globals console:false $templates:false */
-define(['jquery','events','mustache','backbone','toolbar'],
-        function ($,events,mustache,Backbone,toolbar) {
+define(['jquery','events','mustache','backbone','toolbar','templates'],
+        function ($,events,mustache,Backbone,toolbar,templates) {
     "use strict";
 
     var View = Backbone.View.extend({
@@ -45,7 +44,7 @@ define(['jquery','events','mustache','backbone','toolbar'],
                 author: this.author,
                 title: this.title
             };
-            var tpl = $templates.find('#bib-info-template').html();
+            var tpl = templates.get('bib-info');
             this.$el.html(mustache.render(tpl,context));
         }
     });

@@ -1,5 +1,3 @@
-var $templates;
-
 require.config({
     'paths': {
         "bootstrap": "../lib/bootstrap/js/bootstrap",
@@ -58,6 +56,7 @@ require(
         'boxes',
         'dialog'
     ], function($, geometry,events) {
+
         try {
             console.log;
         } catch (err) {
@@ -67,13 +66,11 @@ require(
             };
         }
 
-        $.get('templates.html',function(html) {
-            $templates = $(html);
-            $(document).ready(function() {
+        $(document).ready(function() {
 
-                Backbone.history.start();
+            Backbone.history.start();
 
-                events.trigger('appReady');
-            });
+            events.trigger('appReady');
+
         });
 });

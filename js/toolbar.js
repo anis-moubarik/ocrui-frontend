@@ -1,5 +1,4 @@
-/*globals $templates:false */
-define(['jquery','underscore','events','mustache','backbone'],function ($,_,events,mustache,Backbone) {
+define(['jquery','underscore','events','mustache','backbone','templates'],function ($,_,events,mustache,Backbone,templates) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -102,7 +101,7 @@ define(['jquery','underscore','events','mustache','backbone'],function ($,_,even
                     };
                 })
             };
-            var tpl = $templates.find('#toolbar-template').html();
+            var tpl = templates.get('toolbar');
             this.$el.html(mustache.render(tpl,context));
 
             for (var i in widgets) {

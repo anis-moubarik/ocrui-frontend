@@ -1,5 +1,4 @@
-/*globals $templates:false*/
-define(['events','mustache','backbone'],function (events,mustache,Backbone) {
+define(['events','mustache','backbone','templates'],function (events,mustache,Backbone,templates) {
     "use strict";
 
     var View = Backbone.View.extend({
@@ -46,7 +45,7 @@ define(['events','mustache','backbone'],function (events,mustache,Backbone) {
                     }
                 ]
             };
-            var tpl = $templates.find('#dialog-template').html();
+            var tpl = templates.get('dialog');
             this.$el.html(mustache.render(tpl,context));
             this.isRendered = $("#messageDialog");
             this.isRendered.modal();
