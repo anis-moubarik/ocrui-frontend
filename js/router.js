@@ -16,11 +16,13 @@ define(['events','alto','mets','image','backbone'],
     router.on("route:default", function routeEmpty() {
 
         events.trigger('message','Default view');
+        $(window).resize();
     });
 
     router.on("route:document", function routeDoc(id) {
 
         events.trigger('message','Document view');
+        $(window).resize();
 
     });
 
@@ -52,10 +54,12 @@ define(['events','alto','mets','image','backbone'],
             function() {
                 events.trigger('changePageDone');
                 events.trigger('endProcessing',"page-change");
+                $(window).resize();
             },
             function(msg) {
                 events.trigger('changePageError',msg);
                 events.trigger('endProcessing',"page-change");
+                $(window).resize();
             });
 
     }
