@@ -1,9 +1,18 @@
 define(function () {
     "use strict";
 
+    /* Implementation of an unreliable event bus
+     * When event is triggered, the data passed may or may not ever
+     * be received by listeners. Subsequent triggerings of the same event
+     * overwrite the passed data.
+     *
+     * If reliable data passing is necessary, use triggerImmediately,
+     * but it's worse.
+     */
+
     var listeners = {};
     var anyListeners = [];
-    var queues = {};
+    var schedule = {};
 
     // debug:
     // onAny(function(ev,data) {console.log(ev,data);});
@@ -23,77 +32,65 @@ define(function () {
 
     }
 
-    function triggerOne (cb, timeout) {
 
-            var args = Array().slice.call(arguments,2);
-            setTimeout(function(){
-                cb.apply(null,args);
-            },0);
-
-    }
-
-    function trigger (ev,data) {
+    function triggerImmediately (ev, data) {
 
         if (!(ev in listeners)) {
             listeners[ev] = [];
         }
 
-        queues[ev] = undefined; // remove any delayed triggerings
-
         for (var i in listeners[ev]) {
-            triggerOne(listeners[ev][i],0,data);
+            var cb = listeners[ev][i];
+            cb(data);
         }
+
         for (var i in anyListeners) {
-            triggerOne(anyListeners[i],0,ev,data);
-        };
+            var cb = anyListeners[i];
+            cb(ev,data);
+        }
+
+    }
+
+    /* schedules an event to be triggered as soon as possible.
+     */
+    function trigger (ev,data) {
+
+        delay(ev,data,0);
 
     }
 
     /* Delayed triggering of an event. Waits a moment before triggering
      * and only triggers once if there is many triggering requests done
-     * in short time period. The data of the last trigger is used only.
+     * in short time period.
      */
     function delay (ev,data,timeout) {
 
-        var that = this;
         if (timeout === undefined) {
             timeout = 100;
         }
-        if (queues[ev] === undefined) {
-            queues[ev] = [];
-            setTimeout(function() {
-                processQueue(ev,timeout);
-            },timeout);
-        }
-        queues[ev].push(data);
+
+        clearScheduledCallbacks(ev);
+
+        schedule[ev] = setTimeout(function() {
+            triggerImmediately(ev,data);
+        }, timeout);
 
     }
 
-    function processQueue (ev,timeout) {
+    function clearScheduledCallbacks(ev) {
 
-        // This might happen if event was triggered without delay before
-        // the delay got processed
-        if (queues[ev] === undefined) { return; }
-
-        // If there is more than one request in queue, just take the
-        // last one and start a new timeout
-        // Otherwise, trigger event
-        if (queues[ev].length > 1) {
-            queues[ev] = [queues[ev][queues[ev].length -1]];
-            setTimeout(function() {
-                processQueue(ev,timeout);
-            },timeout);
-        } else {
-            var data = queues[ev][0];
-            queues[ev] = undefined;
-            trigger(ev,data);
+        if (schedule[ev] !== undefined) {
+            clearTimeout(schedule[ev]);
+            schedule[ev] = undefined;
         }
+
     }
 
     return {
         on:on,
         onAny:onAny,
         anyListeners:anyListeners,
+        triggerImmediately:triggerImmediately,
         trigger:trigger,
         delay:delay
     };
