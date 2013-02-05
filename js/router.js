@@ -1,5 +1,5 @@
-define(['events','alto','mets','image','backbone'],
-        function (events,alto,mets,image,Backbone) {
+define(['events','alto','mets','backbone'],
+        function (events,alto,mets,Backbone) {
     "use strict";
 
     var Router = Backbone.Router.extend({
@@ -23,32 +23,38 @@ define(['events','alto','mets','image','backbone'],
         events.trigger('message','Document view');
 
     });
-
+    
     router.on("route:page", routePage);
     function routePage(docId,pageId) {
 
+        /* TODO: clear earlier deferred callbacks before starting */
+
         var pageNumber = Math.floor(parseInt(pageId,10));
         var data = {docId:docId, pageNumber:pageNumber};
+        var imageRendered = new $.Deferred();
+        var altoLoaded = alto.get(data);
 
-        events.trigger('changePage',pageNumber);
+
+        events.trigger('changePage',data);
         events.trigger('nowProcessing',"page-change");
 
-        var imageLoaded = image.get(data);
-        var altoLoaded = alto.get(data);
+
+        events.on('facsimileRendered', function () {
+            imageRendered.resolve();
+        });
+        events.on('facsimileRenderError', function () {
+            imageRendered.reject();
+        });
 
         mets.get(data).then(
             function(doc) { events.trigger('changePageMets',doc); },
             function(msg) { events.trigger('changePageMetsError',msg); });
 
-        imageLoaded.then(
-            function(img) { events.trigger('changePageImage',img); },
-            function(msg) { events.trigger('changePageImageError',msg); });
-
         altoLoaded.then(
             function(myAlto) { events.trigger('changePageAlto',myAlto); },
             function(msg) { events.trigger('changePageAltoError',msg); });
 
-        $.when(imageLoaded,altoLoaded).then(
+        $.when(imageRendered,altoLoaded).then(
             function() {
                 events.trigger('changePageDone');
                 events.trigger('endProcessing',"page-change");

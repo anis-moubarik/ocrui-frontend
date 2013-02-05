@@ -24,7 +24,7 @@ define(['jquery','events','toolbar','mustache','backbone','templates'],
                 modes:['page'] });
 
             events.on('changePage',function(data) {
-                that.options.pageNumber = data;
+                that.options.pageNumber = data.pageNumber;
                 that.render();
             });
             events.on('changePageMets',function(doc) {

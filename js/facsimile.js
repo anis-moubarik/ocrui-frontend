@@ -1,6 +1,6 @@
 /*globals console:true setTimeout:false setInterval:false */
-define(['jquery','events','backbone','container'],
-        function ($,events,Backbone,container) {
+define(['jquery','events','backbone','image','container'],
+        function ($,events,Backbone,image,container) {
     "use strict";
 
     var View = Backbone.View.extend({
@@ -9,9 +9,10 @@ define(['jquery','events','backbone','container'],
 
             var that = this;
 
-            events.on('changePageImage',function(image) {
-                that.setImage(image);
+            events.on('changePage',function(data) {
+                that.changePage(data);
             });
+
 
             events.on('scheduledRender', function() {
                 that.render();
@@ -22,10 +23,22 @@ define(['jquery','events','backbone','container'],
         events: {
         },
 
-        setImage: function(image) {
-            this.image = image;
-            container.view.setImageSize(image.width,image.height);
-            this.render();
+        changePage: function(attributes) {
+
+            var that = this;
+            this.attributes = attributes;
+            image.get(attributes).done( function (image) {
+
+                /* if (that.attributes != attributes) return; */
+                that.image = image;
+                container.view.setImageSize(image.width,image.height);
+                that.render();
+                events.trigger('changePageImage',image); 
+
+            }).fail(function(msg) {
+                events.trigger('changePageImageError',msg);
+            });
+
         },
         render: function() {
 
@@ -55,7 +68,7 @@ define(['jquery','events','backbone','container'],
                 console.log(err);
 
             }
-            events.trigger('facsimileRendered');
+            events.trigger('facsimileRendered',this.attributes);
 
         }
     });

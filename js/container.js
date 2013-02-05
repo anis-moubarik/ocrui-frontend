@@ -52,10 +52,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
                 that.possiblyScrollToHighlight(data);
             });
 
-            events.on('changePageImage',function(image) {
-                that.scheduleRender();
-            });
-
             events.on('setGeometry', function(data) {
                 that.horizontalPixels = data.facsimileWidth;
                 that.verticalPixels = data.facsimileHeight;
