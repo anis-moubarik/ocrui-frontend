@@ -19,7 +19,8 @@ define(['jquery','events','toolbar','mustache','backbone','templates'],
             toolbar.registerWidget({
                 id:'page-selector',
                 view:this,
-                classes: "btn-group form-horizontal input-prepend input-append",
+                index: 1,
+                classes: "btn-group form-horizontal input-prepend input-append pull-right",
                 modes:['page'] });
 
             events.on('changePage',function(data) {

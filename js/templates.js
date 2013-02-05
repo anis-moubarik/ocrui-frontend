@@ -6,7 +6,8 @@ define([], function () {
 
         "page-selector": ' <button class="btn" id="page-previous" title="Previous page"> <i class="icon-arrow-left"> </i> </button> <input type="text" class="span1" id="page-number" title="Page number" value="{{pageNumber}}"/> <button class="btn disabled" title="Number of pages">/ {{pages}}</button> <button class="btn" id="page-next" title="Next page"> <i class="icon-arrow-right"> </i> </button> ',
 
-        "bib-info": ' <input class="span4" type="text" disabled value="{{author}}: {{title}}" /> ',
+        "bib-info": ' <div class="dropdown"> <a class="dropdown-toggle bib-info" data-toggle="dropdown" data-target="#">{{author}}: {{title}}</a> <div class="more-bib-info dropdown-menu" role="menu" aria-labelledby="dLabel"> <h2> marcxml</h2> <p> {{marcxml}} </p> </div> </div>',
+
 
         "language-selector": ' <div class="pull-right"> <form id="language-selector" class="navbar-form"> <select> {{#languages}} <option {{{selected}}} value="{{code}}" >{{name}}</option> {{/languages}} </select> </form> </div> <div id="keyboard" class="btn-group"> {{#chars}} <a href="#" class="btn" data-character="{{.}}">{{.}}</a> {{/chars}} </div> ',
 

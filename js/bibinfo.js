@@ -13,6 +13,7 @@ define(['jquery','events','mustache','backbone','toolbar','templates'],
             });
             toolbar.registerWidget({
                 id:'bib-info',
+                index:0,
                 view:this,
                 classes: "btn-group form-horizontal input-prepend input-append",
                 modes:['page'] });
@@ -20,7 +21,12 @@ define(['jquery','events','mustache','backbone','toolbar','templates'],
 
         el : '#bib-info',
         events: {
-            'click #more-bib-info': 'moreBibInfo'
+            //'click': 'moreBibInfo'
+        },
+        getMarcXML : function(mets) {
+            var $marc = $(mets.data).find('MARC\\:record, record');
+            var node = $marc.get();
+            return $marc.text(); // BUG: err, something...
         },
         getMarcField : function(mets,tag,code) {
             var df = 'datafield[tag='+tag+']';
@@ -35,14 +41,18 @@ define(['jquery','events','mustache','backbone','toolbar','templates'],
         setDocument : function (mets) {
             this.author = this.getMarcField(mets,'100','a');
             this.title = this.getMarcField(mets,'245','a');
+            this.marcxml = this.getMarcXML(mets);
         },
-        moreBibInfo : function (number) {
+        moreBibInfo : function (ev) {
                 console.log('x');
+                ev.preventDefault();
+                ev.stopPropagation();
         },
         render: function() {
             var context = {
                 author: this.author,
-                title: this.title
+                title: this.title,
+                marcxml: this.marcxml
             };
             var tpl = templates.get('bib-info');
             this.$el.html(mustache.render(tpl,context));

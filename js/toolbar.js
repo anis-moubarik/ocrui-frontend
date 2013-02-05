@@ -7,6 +7,16 @@ define(['jquery','underscore','events','mustache','backbone','templates'],functi
     var widgets = {};
     var buttons = {};
 
+    function itemSort(a,b) {
+        if ( ( a.index === undefined ) && (b.index === undefined) ) return 0;
+
+        if ( ( a.index !== undefined ) && (b.index === undefined) ) return -1;
+
+        if ( ( a.index === undefined ) && (b.index !== undefined) ) return 1;
+
+        return b.index - a.index;
+    }
+
     function registerKeyboardShortcut(which,callback) {
         if (which in keyboardShortcuts) {
             throw "Trying to reregister shortcut for " + which;
@@ -101,6 +111,8 @@ define(['jquery','underscore','events','mustache','backbone','templates'],functi
                     };
                 })
             };
+            context.widgets.sort(itemSort);
+            context.buttons.sort(itemSort);
             var tpl = templates.get('toolbar');
             this.$el.html(mustache.render(tpl,context));
 
