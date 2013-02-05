@@ -1,9 +1,5 @@
-define(['jquery','underscore','events','templates','mustache','backbone'],function ($,_,events,templates,mustache,Backbone) {
+define(['jquery','underscore','events','templates','mustache','backbone','languages'],function ($,_,events,templates,mustache,Backbone,languages) {
     "use strict";
-
-    var Model = Backbone.Model.extend({
-        url: function () { return '/ocrui/languages.json';}
-    });
 
     var View = Backbone.View.extend({
         initialize:function() {
@@ -27,10 +23,8 @@ define(['jquery','underscore','events','templates','mustache','backbone'],functi
         },
         load: function() {
             var that = this;
-            this.languages = new Model();
-            this.languages.fetch({
-                success: function() {that.render(); }
-            });
+            this.languages = languages;
+            this.render();
         },
         changeCoordinates: function (words) {
             if (words === undefined) return; // do something else
@@ -41,7 +35,7 @@ define(['jquery','underscore','events','templates','mustache','backbone'],functi
                 return l;
             }, null);
             if (this.languages) {
-                this.languages.set('selected', newLanguage);
+                this.languages.selected= newLanguage;
             }
 
             this.render();
@@ -50,28 +44,29 @@ define(['jquery','underscore','events','templates','mustache','backbone'],functi
             var l = $(ev.target).find(':selected').attr('value');
             ev.preventDefault();
             ev.stopPropagation();
-            this.languages.set('selected',l);
+            this.languages.selected=l;
             events.trigger('requestLanguageChange',l);
             this.render();
+
         },
         render: function() {
 
             var that = this;
 
             var context = {
-                xselected: this.languages.get('selected'),
-                selectedName: this.languages.get('selected'),
+                xselected: this.languages.selected,
+                selectedName: this.languages.selected,
                 chars: []
             };
             var isAnySelected = false;
-            context.languages = this.languages.get('languages').
+            context.languages = this.languages.languages.
                 map(function(e) {
                     var o = {
                         code: e.code,
                         name: e.name,
                         selected: ' '
                         }
-                    if (e.code==that.languages.get('selected')) {
+                    if (e.code==that.languages.selected) {
                         context.selectedName = e.name;
                         o.selected = "selected";
                         isAnySelected = true;
@@ -84,9 +79,9 @@ define(['jquery','underscore','events','templates','mustache','backbone'],functi
                 selected: isAnySelected ? ' ' : 'selected'
                 });
 
-            for (var i in this.languages.get('languages')) {
-                var l = this.languages.get('languages')[i];
-                if (l.code==this.languages.get('selected')) {
+            for (var i in this.languages.languages) {
+                var l = this.languages.languages[i];
+                if (l.code==this.languages.selected) {
                     context.chars = l.keyboard;
                 }
             }
@@ -94,6 +89,7 @@ define(['jquery','underscore','events','templates','mustache','backbone'],functi
             var tpl = templates.get('language-selector');
 
             this.$el.html(mustache.render(tpl,context));
+            events.trigger('keyboardLayoutChanged');
 
         }
 
