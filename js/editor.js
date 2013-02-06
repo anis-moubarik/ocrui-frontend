@@ -14,6 +14,10 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','backbone',
                 getAlto: function() {return that.getAlto();}
             });
 
+            // suppress default codemirror bindings
+            CodeMirror.commands.goPageUp = function () { }
+            CodeMirror.commands.goPageDown = function () { }
+
             // Add reference to codemirror object to dom tree
             // to help automatic testing
             this.$el.data('CodeMirror',this.cMirror);
