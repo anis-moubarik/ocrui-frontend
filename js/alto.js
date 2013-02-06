@@ -1,8 +1,8 @@
-define(['jquery','libalto','backbone','mybackbone','mets','utils','events'],
-        function ($,libalto,Backbone,mybackbone,mets,utils,events) {
+define(['jquery','libalto','mybackbone','mets','utils','events'],
+        function ($,libalto,mybackbone,mets,utils,events) {
     "use strict";
 
-    var AltoModel = Backbone.Model.extend({
+    var AltoModel = mybackbone.Model.extend({
         initialize: function (options) {
             this.url = options.doc.getAltoUrl(options.pageNumber);
             options.doc.registerAlto(options.pageNumber,this);
@@ -54,8 +54,6 @@ define(['jquery','libalto','backbone','mybackbone','mets','utils','events'],
             this.alto.setCurrentXML(response);
             return data;
         },
-
-        sync: mybackbone.sync
     });
 
     var altos = {};

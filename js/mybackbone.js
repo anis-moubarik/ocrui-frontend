@@ -1,7 +1,40 @@
 /* A custom sync method to override backbone default */
 
-define(['backbone','underscore'],function (Backbone,_) {
+define(['backbone','underscore','events'],function (Backbone,_,events) {
     "use strict";
+
+    var Model = Backbone.Model.extend({sync:sync});
+
+    // if an existing element is not provided...
+    var View = function(options) {
+        this.cid = _.uniqueId('view');
+        this._configure(options || {});
+        this._ensureElement();
+        this.initialize.apply(this, arguments);
+        this.delegateMyEvents();
+        this.delegateEvents();
+    };
+
+    _.extend(View.prototype, Backbone.View.prototype, {delegateMyEvents:delegateMyEvents});
+    View.extend = Backbone.View.extend;
+    window.v = View;
+
+    function delegateMyEvents(evs) {
+        var that = this;
+        function cbFactory(m) {
+            return function () {m.apply(that,arguments);};
+        }
+
+        if (!(evs || (evs = _.result(this, 'myEvents')))) return;
+        //this.undelegateMyEvents();
+        for (var key in evs) {
+            var method = evs[key];
+            if (!_.isFunction(method)) method = this[evs[key]];
+            if (!method) throw new Error('Method "' + evs[key] + '" does not exist');
+
+            events.on(key,cbFactory(method));
+        }
+    }
 
     var urlError = function() {
         throw new Error('A "url" property or function must be specified');
@@ -81,7 +114,8 @@ define(['backbone','underscore'],function (Backbone,_) {
     }
 
     return {
-        sync : sync
+        Model : Model,
+        View : View
     };
 });
 

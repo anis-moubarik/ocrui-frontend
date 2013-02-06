@@ -1,9 +1,9 @@
 /*globals setTimeout:false setInterval:false */
-define(['underscore','jquery','toolbar','events','backbone','mousetailstack','utils'],
-        function (_,$,toolbar,events,Backbone,mousetailstack,utils) {
+define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','utils'],
+        function (_,$,toolbar,events,mybackbone,mousetailstack,utils) {
     "use strict";
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
 
         initialize: function() {
 
@@ -48,29 +48,15 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
                 $('#pan-zoom').click();
             });
 
-            events.on('changeCoordinates',function(data) {
-                that.possiblyScrollToHighlight(data);
-            });
-
-            events.on('setGeometry', function(data) {
-                that.horizontalPixels = data.facsimileWidth;
-                that.verticalPixels = data.facsimileHeight;
-                that.scheduleRender ();
-            });
-
-            events.on('newViewportRequest', function(vp) {
-                that.setViewport(vp);
-            });
-
-            events.on('mousetail',function(data) {that.panTail(data);});
-
-            events.on('setPageGeometry',function(data) {
-                that.pageWidth = data.width;
-                that.pageHeight = data.height;
-            });
-
         },
         el: '#facsimile-canvas',
+        myEvents: {
+            'changeCoordinates':'possiblyScrollToHighlight',
+            'setGeometry': 'setGeometry',
+            'newViewportRequest' : 'setViewport',
+            'mousetail' : 'panTail',
+            'setPageGeometry':'setPageGeometry',
+        },
         events: {
             'click': 'propagateClick',
             'mousewheel': 'wheel',
@@ -78,6 +64,15 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
             'mousedown': 'beginPan',
             'mouseup': 'endPan',
             'mouseout': 'endPan',
+        },
+        setPageGeometry: function(data) {
+            this.pageWidth = data.width;
+            this.pageHeight = data.height;
+        },
+        setGeometry: function(data) {
+            this.horizontalPixels = data.facsimileWidth;
+            this.verticalPixels = data.facsimileHeight;
+            this.scheduleRender ();
         },
         setViewport: function(vp) {
             this.setOrigin(vp.originX,vp.originY);
@@ -337,7 +332,6 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
             var pageMarginRight = pageRight + margin;
             var pageMarginBottom = pageBottom + margin;
 
-            
             var canvasWidth = canvasRight - canvasLeft;
             var canvasHeight = canvasBottom - canvasTop;
             var pageMarginWidth = pageMarginRight - pageMarginLeft;

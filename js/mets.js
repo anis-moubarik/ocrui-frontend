@@ -1,7 +1,7 @@
-define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
+define(['jquery','mybackbone'],function ($,mybackbone) {
     "use strict";
 
-    var DocumentModel = Backbone.Model.extend({
+    var DocumentModel = mybackbone.Model.extend({
         initialize: function (options) {
             this.id = options.id;
             this.urlBase = 'items/'+this.id;
@@ -102,8 +102,6 @@ define(['jquery','backbone','mybackbone'],function ($,Backbone,mybackbone) {
             this.parsePageInfo(response);
             return {};
         },
-
-        sync: mybackbone.sync
 
     });
 

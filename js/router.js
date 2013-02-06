@@ -6,7 +6,9 @@ define(['events','backbone'],
         routes:{
             "": "default",
             ":id": "document",
+            ":id/": "document",
             ":id/:page": "page",
+            ":id/:page/": "page",
             ":id/:page/:viewport": "pageVP"
         }
     });
