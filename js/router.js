@@ -1,6 +1,17 @@
-define(['events','alto','mets','backbone'],
-        function (events,alto,mets,Backbone) {
+define(['events','mets','backbone'],
+        function (events,mets,Backbone) {
     "use strict";
+
+    var facsimileRendered = undefined;
+    var editorRendered = undefined;
+
+    events.on('facsimileRendered', function () { facsimileRendered.resolve(); });
+
+    events.on('facsimileRenderError', function () { facsimileRendered.reject(); });
+
+    events.on('editorRendered', function () { editorRendered.resolve(); });
+
+    events.on('editorRenderError', function () { editorRendered.reject(); });
 
     var Router = Backbone.Router.extend({
         routes:{
@@ -27,34 +38,33 @@ define(['events','alto','mets','backbone'],
     router.on("route:page", routePage);
     function routePage(docId,pageId) {
 
-        /* TODO: clear earlier deferred callbacks before starting */
+        var data = {
+            docId:docId,
+            pageNumber:Math.floor(parseInt(pageId,10))
+        };
 
-        var pageNumber = Math.floor(parseInt(pageId,10));
-        var data = {docId:docId, pageNumber:pageNumber};
-        var imageRendered = new $.Deferred();
-        var altoLoaded = alto.get(data);
+        /* clear earlier deferred callbacks before starting */
+        if (facsimileRendered !== undefined) {
+            facsimileRendered.reject();
+        }
+        if (editorRendered !== undefined) {
+            editorRendered.reject();
+        }
 
+        /* create new deferreds. they will be fired by event
+         * handlers when being notified of a rendre
+         */
+        facsimileRendered = new $.Deferred();
+        editorRendered = new $.Deferred();
 
         events.trigger('changePage',data);
         events.trigger('nowProcessing',"page-change");
-
-
-        events.on('facsimileRendered', function () {
-            imageRendered.resolve();
-        });
-        events.on('facsimileRenderError', function () {
-            imageRendered.reject();
-        });
 
         mets.get(data).then(
             function(doc) { events.trigger('changePageMets',doc); },
             function(msg) { events.trigger('changePageMetsError',msg); });
 
-        altoLoaded.then(
-            function(myAlto) { events.trigger('changePageAlto',myAlto); },
-            function(msg) { events.trigger('changePageAltoError',msg); });
-
-        $.when(imageRendered,altoLoaded).then(
+        $.when(facsimileRendered,editorRendered).then(
             function() {
                 events.trigger('changePageDone');
                 events.trigger('endProcessing',"page-change");

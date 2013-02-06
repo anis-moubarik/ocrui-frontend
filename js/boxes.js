@@ -1,6 +1,6 @@
 /*globals setTimeout:false setInterval:false */
-define(['jquery','toolbar','events','backbone','mousetailstack','container'],
-        function ($,toolbar,events,Backbone,mousetailstack,container) {
+define(['jquery','toolbar','events','backbone','container','alto',],
+        function ($,toolbar,events,Backbone,container,alto) {
     "use strict";
 
     var View = Backbone.View.extend({
@@ -41,8 +41,8 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
             events.on('scheduledRender', function() {
                 that.render();
             });
-            events.on('changePageAlto',function(alto) {
-                that.setLayoutBoxes(alto);
+            events.on('changePage',function(attributes) {
+                that.changePage(attributes);
             });
 
         },
@@ -56,9 +56,20 @@ define(['jquery','toolbar','events','backbone','mousetailstack','container'],
 */
         },
 
-        setLayoutBoxes : function(alto) {
-            this.layoutBoxes = alto.getLayoutBoxes();
-            this.render();
+        changePage: function(attributes) {
+            var that = this;
+            this.attributes = attributes;
+            alto.get(attributes).then(
+                function(myAlto) {
+                    /* if (this.attributes != attributes) return;*/
+                    that.layoutBoxes = myAlto.getLayoutBoxes();
+                    that.render();
+                },
+                function(msg) {
+                    that.layoutBoxes = [];
+                    that.render();
+                }
+            );
         },
         setHighlightBoxes : function(data) {
             this.highlight = data;

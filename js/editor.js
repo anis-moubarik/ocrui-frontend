@@ -1,5 +1,6 @@
 /*global setTimeout:false */
-define(['underscore','jquery','events','toolbar','codemirror','backbone','cmmode'],function (_,$,events,toolbar,CodeMirror,Backbone) {
+define(['underscore','jquery','events','toolbar','codemirror','alto','backbone','cmmode'],
+    function (_,$,events,toolbar,CodeMirror,alto,Backbone) {
     "use strict";
 
     var View = Backbone.View.extend({
@@ -63,8 +64,8 @@ define(['underscore','jquery','events','toolbar','codemirror','backbone','cmmode
             events.on('refocus',function(data) {
                 that.refocus();
             });
-            events.on('changePageAlto',function(alto) {
-                that.setAlto(alto);
+            events.on('changePage',function(alto) {
+                that.changePage(alto);
             });
             events.on('requestLanguageChange',function(selected) {
                 that.requestLanguageChange(selected);
@@ -180,8 +181,21 @@ define(['underscore','jquery','events','toolbar','codemirror','backbone','cmmode
 
             events.trigger('changeCoordinates',words);
         },
-        getAlto: function(alto) {
+        getAlto: function() {
             return this.alto;
+        },
+        changePage: function(attributes) {
+            var that = this;
+            this.attributes = attributes;
+            alto.get(attributes).then(
+                function(myAlto) {
+                    /* if (this.attributes != attributes) return;*/
+                    that.setAlto(myAlto);
+                },
+                function(msg) {
+                    events.trigger('editorRenderError',msg);
+                }
+            );
         },
         setAlto: function(alto) {
             this.alto = alto;
@@ -190,6 +204,7 @@ define(['underscore','jquery','events','toolbar','codemirror','backbone','cmmode
             this.cMirror.clearHistory();
             var word = this.alto.getNthWord(0);
             this.cMirror.focus();
+            events.trigger('editorRendered',this.attributes);
         },
         render: function() {
             return;     // Nothing to do, CodeMirror renders itself

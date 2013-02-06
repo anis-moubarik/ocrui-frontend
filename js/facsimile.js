@@ -23,20 +23,52 @@ define(['jquery','events','backbone','image','container'],
         events: {
         },
 
+        getAttributes: function(attributes, pageDelta) {
+            var a = {
+                docId : attributes.docId,
+                pageNumber : attributes.pageNumber + pageDelta
+            }
+            return a;
+        },
         changePage: function(attributes) {
 
             var that = this;
             this.attributes = attributes;
-            image.get(attributes).done( function (image) {
+            this.nextAttributes = this.getAttributes(attributes,1);
+            this.prevAttributes = this.getAttributes(attributes,-1);
+            image.get(attributes).done( function (img) {
 
                 /* if (that.attributes != attributes) return; */
-                that.image = image;
-                container.view.setImageSize(image.width,image.height);
+                that.image = img;
+                that.prevImage = undefined;
+                that.nextImage = undefined;
+                container.view.setImageSize(img.width,img.height);
                 that.render();
-                events.trigger('changePageImage',image); 
+                events.trigger('changePageImage',img); 
+
+                console.log('rendered',JSON.stringify(attributes));
+                console.log('caching',JSON.stringify(that.nextAttributes));
+                image.get(that.nextAttributes).done( function (img) {
+                    /* if (that.attributes != attributes) return; */
+                    that.nextImage = img;
+                    console.log('set next img ',JSON.stringify(that.nextAttributes));
+
+                    container.view.setNextImageSize(img.width,img.height);
+                    that.render();
+                });
+                console.log('caching',JSON.stringify(that.prevAttributes));
+                image.get(that.prevAttributes).done( function (img) {
+                    /* if (that.attributes != attributes) return; */
+                    that.prevImage = img;
+                    console.log('set prev img ',JSON.stringify(that.prevAttributes));
+                    container.view.setPrevImageSize(img.width,img.height);
+                    that.render();
+                });
 
             }).fail(function(msg) {
+
                 events.trigger('changePageImageError',msg);
+
             });
 
         },
@@ -59,15 +91,14 @@ define(['jquery','events','backbone','image','container'],
             ctx.shadowColor = 'black';
             ctx.shadowBlur = 20;
 
-            try {
-
-                ctx.drawImage(this.image.image,0,0);
-
-            } catch (err) {
-
-                console.log(err);
-
+            ctx.drawImage(this.image.image,0,0);
+            if (this.nextImage) {
+                ctx.drawImage(this.nextImage.image,0,this.image.height*1.1);
             }
+            if (this.prevImage) {
+                ctx.drawImage(this.prevImage.image,0,-this.prevImage.height*1.1);
+            }
+
             events.trigger('facsimileRendered',this.attributes);
 
         }

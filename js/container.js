@@ -368,9 +368,9 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
             var pageRight = this.imageWidth * this.pageScale;
             var pageBottom = this.imageHeight * this.pageScale;
             var pageMarginLeft = pageLeft - margin;
-            var pageMarginTop = pageTop - margin;
+            var pageMarginTop = pageTop - this.imageHeight*0.6;
             var pageMarginRight = pageRight + margin;
-            var pageMarginBottom = pageBottom + margin;
+            var pageMarginBottom = pageBottom + this.imageHeight*0.6;
 
             if (canvasLeft < pageMarginLeft) {
                 this.originX = - (pageLeft - margin);
@@ -379,9 +379,9 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
             }
 
             if (canvasTop < pageMarginTop) {
-                this.originY = - (pageTop - margin);
+                events.trigger('requestPrevPage');
             } else if (canvasBottom > pageMarginBottom) {
-                this.originY = - ( pageBottom - this.verticalPixels + margin);
+                events.trigger('requestNextPage');
             }
             this.triggerNewViewport();
 
@@ -396,6 +396,14 @@ define(['underscore','jquery','toolbar','events','backbone','mousetailstack','ut
         setImageSize: function(w,h) {
             this.imageWidth = w;
             this.imageHeight = h;
+        },
+        setNextImageSize: function(w,h) {
+            this.nextImageWidth = w;
+            this.nextImageHeight = h;
+        },
+        setPrevImageSize: function(w,h) {
+            this.prevImageWidth = w;
+            this.prevImageHeight = h;
         },
         scheduleRender: function () {
             var that = this;
