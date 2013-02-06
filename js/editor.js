@@ -18,10 +18,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','backbone',
             CodeMirror.commands.goPageUp = function () { }
             CodeMirror.commands.goPageDown = function () { }
 
-            // Add reference to codemirror object to dom tree
-            // to help automatic testing
-            this.$el.data('CodeMirror',this.cMirror);
-
             toolbar.registerButton({
                 id:'show-saved-changes',
                 toggle:true,

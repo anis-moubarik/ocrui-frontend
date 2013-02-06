@@ -54,6 +54,10 @@
     pointer-events: none;
 }
 
+.pass-pointer-events {
+    pointer-events: none;
+}
+
 .highlight-box, .layout-box {
     position: absolute;
 }

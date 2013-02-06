@@ -1,5 +1,5 @@
 /*globals setTimeout:false */
-define(['jquery','toolbar','events','backbone','mousetailstack'],function ($,toolbar,events,Backbone,mousetailstack) {
+define(['jquery','toolbar','events'],function ($,toolbar,events) {
     "use strict";
 
     // This is used to implement nice non-sticky panning

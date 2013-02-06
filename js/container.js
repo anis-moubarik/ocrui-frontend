@@ -58,7 +58,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'changePageImage':'setImageSize',
             'changePage':'changePage',
             'scrollOneStep':'scrollOneStep',
-            'scheduledRender':'scheduledRender',
+            'scheduledRender':'render',
         },
         events: {
             'click': 'propagateClick',
@@ -430,9 +430,6 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         scheduleRender: function () {
             events.delay('scheduledRender',undefined,20);
 
-        },
-        scheduledRender: function() {
-            this.render();
         },
         render: function() {
 

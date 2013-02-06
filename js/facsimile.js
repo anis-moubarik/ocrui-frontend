@@ -1,24 +1,20 @@
-define(['jquery','events','backbone','image','container'],
-        function ($,events,Backbone,image,container) {
+define(['jquery','events','mybackbone','image','container'],
+        function ($,events,mybackbone,image,container) {
     "use strict";
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
 
         initialize: function() {
 
             var that = this;
 
-            events.on('changePage',function(data) {
-                that.changePage(data);
-            });
-
-
-            events.on('scheduledRender', function() {
-                that.render();
-            });
-
         },
         el: '#facsimile-canvas',
+        myEvents: {
+            'changePage': 'changePage',
+            'scheduledRender': 'render',
+        },
+
         events: {
         },
 

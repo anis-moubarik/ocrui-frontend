@@ -1,15 +1,13 @@
-/*globals setTimeout:false setInterval:false */
-define(['jquery','toolbar','events','backbone','container','alto',],
-        function ($,toolbar,events,Backbone,container,alto) {
+define(['jquery','toolbar','events','mybackbone','container','alto',],
+        function ($,toolbar,events,mybackbone,container,alto) {
     "use strict";
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
 
         initialize: function() {
 
             var that = this;
             this.layoutBoxes = []
-            //events.on('mousetail',function(data) {that.panTail(data);});
 
             toolbar.registerButton({
                 id:'show-layout',
@@ -31,29 +29,24 @@ define(['jquery','toolbar','events','backbone','container','alto',],
                 modes:['page'],
                 toggleCB:function(newState) {
                     that.showHighlight = newState;
+                    if (newState) {
+                        that.$el.addClass('pass-pointer-events');
+                    } else {
+                        that.$el.removeClass('pass-pointer-events');
+                    }
                     that.render();
                 }});
 
-            events.on('changeCoordinates',function(data) {
-                that.setHighlightBoxes(data);
-            });
-
-            events.on('scheduledRender', function() {
-                that.render();
-            });
-            events.on('changePage',function(attributes) {
-                that.changePage(attributes);
-            });
-
         },
         el: '#boxes',
+        myEvents: {
+
+            'changeCoordinates': 'setHighlightBoxes',
+            'scheduledRender': 'render',
+            'changePage': 'changePage',
+
+        },
         events: {
-/*            'click': 'propagateClick',
-            'mousemove': 'pan',
-            'mousedown': 'beginPan',
-            'mouseup': 'endPan',
-            'mouseout': 'endPan',
-*/
         },
 
         changePage: function(attributes) {

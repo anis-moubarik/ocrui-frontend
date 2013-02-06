@@ -54,8 +54,6 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
         initialize: function() {
             this.options = {};
             var that = this;
-            this.pageChangeQueue = [];
-            this.pageChangeRequested = false;
 
             toolbar.registerKeyboardShortcut(33, function() {
                 that.pagePrevious();
@@ -112,26 +110,10 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
             if (isNaN(i)) return 1;
             return i;
         },
-        setPageNumber : function (number) {
-                // queues page changes
-
-                var that = this;
-                this.pageChangeQueue.push(number);
-                if (this.pageChangeRequested) return;
-                this.pageChangeRequested = true;
-                setTimeout(function() {that.processPageChange();},100);
-        },
-        processPageChange: function () {
-            // TODO: this don't work properly yet.
-            var number = this.pageChangeQueue[this.pageChangeQueue.length-1];
-            this.pageChangeRequested = false;
-            this.pageChangeQueue = [];
-            events.trigger('changePage',{pageNumber:number});
-        },
         boundedSetPage : function(number) {
             if (number < this.options.minPage) number = this.options.minPage;
             if (number > this.options.maxPage) number = this.options.maxPage;
-            this.setPageNumber(number);
+            events.delay('changePage',{pageNumber:number},100);
         },
         setPageNumberBounds : function (min,max) {
             this.options.minPage = min;
