@@ -1,16 +1,12 @@
-define(['jquery','events','mustache','backbone','toolbar','templates'],
-        function ($,events,mustache,Backbone,toolbar,templates) {
+define(['jquery','events','mustache','mybackbone','toolbar','templates'],
+        function ($,events,mustache,mybackbone,toolbar,templates) {
     "use strict";
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
         initialize: function() {
             this.options = {};
             var that = this;
 
-            events.on('changePageMets',function(mets) {
-                that.setDocument(mets);
-                that.render();
-            });
             toolbar.registerWidget({
                 id:'bib-info',
                 index:0,
@@ -22,6 +18,12 @@ define(['jquery','events','mustache','backbone','toolbar','templates'],
         el : '#bib-info',
         events: {
             //'click': 'moreBibInfo'
+        },
+        myEvents: {
+            'changePageMets':function(mets) {
+                    this.setDocument(mets);
+                    this.render();
+                },
         },
         getMarcXML : function(mets) {
             var $marc = $(mets.data).find('MARC\\:record, record');

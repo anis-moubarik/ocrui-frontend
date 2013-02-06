@@ -68,8 +68,6 @@ require(
 
         $(document).ready(function() {
 
-            Backbone.history.start();
-
             events.trigger('appReady');
 
         });

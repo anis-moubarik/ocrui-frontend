@@ -17,6 +17,8 @@ define(['events','backbone'],
     var currentDocId = undefined;
     var router = new Router();
 
+    events.on('appReady', function() { Backbone.history.start(); });
+
     router.on("route:default", function routeEmpty() {
 
         events.trigger('message','Default view');

@@ -1,8 +1,8 @@
 /*globals Image:false */
-define(['jquery','backbone','mets'],function ($,Backbone,mets) {
+define(['jquery','mybackbone','mets'],function ($,mybackbone,mets) {
     "use strict";
 
-    var ImageModel = Backbone.Model.extend({
+    var ImageModel = mybackbone.Model.extend({
         initialize: function (options) {
             this.url = options.url;
             this.loading = new $.Deferred();

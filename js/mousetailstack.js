@@ -1,4 +1,3 @@
-/*globals setTimeout:false */
 define(['jquery','toolbar','events'],function ($,toolbar,events) {
     "use strict";
 
@@ -15,6 +14,10 @@ define(['jquery','toolbar','events'],function ($,toolbar,events) {
         this.length = 0.6; // 0 <= length < 1
         this.callback = callback;
         this.timeTolerance = timeTolerance;
+        
+        var that = this;
+
+        events.on('mousetail', function() { that.triggerTail(); });
 
     }
 
@@ -58,15 +61,12 @@ define(['jquery','toolbar','events'],function ($,toolbar,events) {
 
     MouseTailStack.prototype.triggerTail = function () {
 
-        var that = this;
-
         this.dx = truncate(this.dx*this.length);
         this.dy = truncate(this.dy*this.length);
 
         if ((this.dx !== 0) && (this.dy !== 0)) {
 
-            setTimeout( function() { that.triggerTail(); }, 50);
-            events.trigger('mousetail',[this.dx,this.dy]);
+            events.delay('mousetail',[this.dx,this.dy],50);
 
         }
 

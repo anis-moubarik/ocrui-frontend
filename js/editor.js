@@ -1,9 +1,8 @@
-/*global setTimeout:false */
-define(['underscore','jquery','events','toolbar','codemirror','alto','backbone','cmmode'],
-    function (_,$,events,toolbar,CodeMirror,alto,Backbone) {
+define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone','cmmode'],
+    function (_,$,events,toolbar,CodeMirror,alto,mybackbone) {
     "use strict";
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
 
         initialize: function () {
             var that = this;
@@ -50,34 +49,29 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','backbone',
                     that.cMirror.setOption('showLanguage',newState);
                     that.cMirror.replaceSelection(that.cMirror.getSelection());
                 }});
-            events.on('virtualKeyboard',function(data) {
-                that.cMirror.replaceSelection(data);
-                that.cMirror.focus();
-                var cursor = that.cMirror.getCursor();
-                that.cMirror.setCursor(cursor);
-            });
-            events.on('cursorToCoordinate',function(data) {
-                
-                that.moveCursorToWord(data);    
-
-            });
-            events.on('refocus',function(data) {
-                that.refocus();
-            });
-            events.on('changePage',function(alto) {
-                that.changePage(alto);
-            });
-            events.on('requestLanguageChange',function(selected) {
-                that.requestLanguageChange(selected);
-            });
 
             this.cMirror.on('cursorActivity',function (instance) {
-                that.setupHighlightChange();
+                events.delay('setupHighlightChange',undefined,100);
             });
             this.cMirror.on('change',function (instance) {
                 that.changed(instance);
             });
 
+        },
+        el: '#editor',
+        myEvents: {
+            'virtualKeyboard':'virtualKeyboard',
+            'cursorToCoordinate': 'moveCursorToWord',
+            'refocus':'refocus',
+            'changePage':'changePage',
+            'requestLanguageChange':'requestLanguageChange',
+            'setupHighlightChange':'setupHighlightChange',
+        },
+        virtualKeyboard: function(data) {
+            that.cMirror.replaceSelection(data);
+            that.cMirror.focus();
+            var cursor = that.cMirror.getCursor();
+            that.cMirror.setCursor(cursor);
         },
         requestLanguageChange: function(selected) {
             var wordIndexes = this.getCurrentWordIndexes();
@@ -87,7 +81,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','backbone',
             this.cMirror.replaceSelection(this.cMirror.getSelection());
             this.cMirror.focus();
         },
-        el: '#editor',
         refocus: function(ev) {
             this.cMirror.focus();
         },
@@ -121,13 +114,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','backbone',
             var content = instance.getValue();
             this.alto.updateStringContent(content);
             this.setupHighlightChange();
-        },
-        setupHighlightChange: function () {
-            this.highlightChangePending = true;
-            var that = this;
-            setTimeout(function() {
-                    that.triggerHighlightChange();
-                }, 100);
         },
         getCurrentWordIndexes: function () {
             var wordIndexes = {};
@@ -167,10 +153,8 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','backbone',
             }
             return wordIndexes;
         },
-        triggerHighlightChange: function () {
+        setupHighlightChange: function () {
 
-            if (!this.highlightChangePending) return;
-            this.highlightChangePending = false;
             var wordIndexes = this.getCurrentWordIndexes();
             var that = this;
             var words = _.map(wordIndexes,function (v,k) {

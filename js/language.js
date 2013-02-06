@@ -1,19 +1,19 @@
-define(['jquery','underscore','events','templates','mustache','backbone','languages'],function ($,_,events,templates,mustache,Backbone,languages) {
+define(['jquery','events','templates','mustache','mybackbone','languages'],
+        function ($,events,templates,mustache,mybackbone,languages) {
     "use strict";
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
         initialize:function() {
-            var that = this;
-            events.on('appReady',function() { that.load(); });
-            events.on('changeCoordinates',function(data) {
-                that.changeCoordinates(data);
-            });
 
         },
         el: '#vkeyboard',
         events: {
             'change select': 'changeLanguage',
             'click a': 'vkeyboardClick'
+        },
+        myEvents: {
+            'appReady': 'load',
+            'changeCoordinates':'changeCoordinates'
         },
         vkeyboardClick: function(ev) {
             var ch = ev.currentTarget.getAttribute('data-character');
