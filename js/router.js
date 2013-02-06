@@ -22,6 +22,7 @@ define(['events','backbone'],
     router.on("route:default", function routeEmpty() {
 
         events.trigger('message','Default view');
+
     });
 
     router.on("route:document", function routeDoc(id) {

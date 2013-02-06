@@ -17,6 +17,11 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
                 modes:['page'],
                 toggleCB:function(newState) {
                     that.showLayout = newState;
+                    if (newState) {
+                        that.$el.removeClass('pass-pointer-events');
+                    } else {
+                        that.$el.addClass('pass-pointer-events');
+                    }
                     that.render();
                 }});
 
@@ -29,11 +34,6 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
                 modes:['page'],
                 toggleCB:function(newState) {
                     that.showHighlight = newState;
-                    if (newState) {
-                        that.$el.addClass('pass-pointer-events');
-                    } else {
-                        that.$el.removeClass('pass-pointer-events');
-                    }
                     that.render();
                 }});
 
@@ -47,6 +47,21 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
 
         },
         events: {
+            'click': 'handleClick',
+        },
+        handleClick: function(ev) {
+            // create new layoutBox.
+
+            console.log(ev);
+            var el = ev.toElement;
+
+            var box = {
+                hpos: container.view.getPageX(ev.offsetX),
+                vpos: container.view.getPageY(ev.offsetY),
+                width: 100,
+                height: 100 
+            }
+            this.renderBoxes ([box],"layout-box",true);
         },
 
         changePage: function(attributes) {
@@ -68,7 +83,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
             this.highlight = data;
             this.render();
         },
-        renderBoxes : function(boxes,cls) {
+        renderBoxes : function(boxes,cls,editable) {
             var box;
             var rect;
             var $div;
@@ -89,8 +104,14 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
                 $div.css('top',rect.vpos);
                 $div.css('width',rect.width);
                 $div.css('height',rect.height);
-                //$div.resizable();
                 this.$el.append($div);
+
+                if (editable) {
+                    $div.resizable({
+                        handles: "n, ne, e, se, s, sw, w, nw",
+                    });
+                    $div.draggable();
+                }
 
             }
 
@@ -107,7 +128,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
 
             if (this.showLayout) {
 
-                this.renderBoxes(this.layoutBoxes,"layout-box");
+                this.renderBoxes(this.layoutBoxes,"layout-box",true);
                 events.trigger('layoutBoxesRendered',this.layoutBoxes);
 
             }

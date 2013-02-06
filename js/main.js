@@ -5,7 +5,7 @@ require.config({
         "jquery": "../lib/jquery",
         "mustache": "../lib/mustache",
         "underscore": "../lib/underscore-min",
-        "jquery-ui": "../lib/jquery-ui.min",
+        "jquery-ui": "../lib/jquery-ui-1.10.0.custom/js/jquery-ui-1.10.0.custom.min",
         "backbone": "../lib/backbone",
         "jsdiff": "../lib/jsdiff",
         "spin": "../lib/spin",

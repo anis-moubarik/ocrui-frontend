@@ -151,17 +151,19 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         propagateClick: function(ev) {
             if (!this.propageteNextClick) return;
             if (ev.which != 1) return;
-            var offset = this.$el.offset();
-            var screenCoords = {
-                x:ev.pageX - offset.left,
-                y:ev.pageY - offset.top
+
+            var pageCoords = {
+                x: this.getPageX(ev.offsetX),
+                y: this.getPageY(ev.offsetY)
             };
 
-            var imageCoords = {
-                x: (screenCoords.x - this.originX) / this.hScale(),
-                y: (screenCoords.y - this.originY) / this.vScale()
-            };
-            events.trigger('cursorToCoordinate',imageCoords);
+            events.trigger('cursorToCoordinate',pageCoords);
+        },
+        getPageX: function (screenX) {
+            return (screenX - this.originX) / this.hScale();
+        },
+        getPageY: function (screenY) {
+            return (screenY - this.originY) / this.vScale();
         },
         hScale: function () {
             return this.imageWidth * this.pageScale / this.pageWidth;
