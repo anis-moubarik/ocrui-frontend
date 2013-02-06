@@ -1,4 +1,4 @@
-/*globals setTimeout:false setInterval:false */
+/*globals setTimeout:false */
 define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','utils'],
         function (_,$,toolbar,events,mybackbone,mousetailstack,utils) {
     "use strict";

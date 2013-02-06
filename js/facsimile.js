@@ -1,4 +1,3 @@
-/*globals console:true setTimeout:false setInterval:false */
 define(['jquery','events','backbone','image','container'],
         function ($,events,Backbone,image,container) {
     "use strict";
@@ -47,23 +46,18 @@ define(['jquery','events','backbone','image','container'],
                 events.trigger('changePageImage',img); 
                 that.render();
 
-                console.log('rendered',JSON.stringify(attributes));
-                console.log('caching',JSON.stringify(that.nextAttributes));
                 image.get(that.nextAttributes).done( function (img) {
                     /* if (that.attributes != attributes) return; */
                     that.nextImage = img;
-                    console.log('set next img ',JSON.stringify(that.nextAttributes));
 
                     /*
                     container.view.setNextImageSize(img.width,img.height);
                     that.render();
                     */
                 });
-                console.log('caching',JSON.stringify(that.prevAttributes));
                 image.get(that.prevAttributes).done( function (img) {
                     /* if (that.attributes != attributes) return; */
                     that.prevImage = img;
-                    console.log('set prev img ',JSON.stringify(that.prevAttributes));
                     /*
                     container.view.setPrevImageSize(img.width,img.height);
                     that.render();

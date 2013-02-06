@@ -45,7 +45,7 @@ define(['events','backbone'],
                 originY: parseInt(parts[1],10),
                 pageScale: parseFloat(parts[2])
             }
-            events.delay('newViewportRequest',vp);
+            events.trigger('newViewportRequest',vp);
         });
         routePage(docId,pageId);
     });
