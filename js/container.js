@@ -428,7 +428,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         },
         */
         scheduleRender: function () {
-            events.delay('scheduledRender',undefined,20);
+            events.delay('scheduledRender',undefined,1);
 
         },
         render: function() {
