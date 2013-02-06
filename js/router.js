@@ -1,17 +1,6 @@
-define(['events','mets','backbone'],
-        function (events,mets,Backbone) {
+define(['events','backbone'],
+        function (events,Backbone) {
     "use strict";
-
-    var facsimileRendered = undefined;
-    var editorRendered = undefined;
-
-    events.on('facsimileRendered', function () { facsimileRendered.resolve(); });
-
-    events.on('facsimileRenderError', function () { facsimileRendered.reject(); });
-
-    events.on('editorRendered', function () { editorRendered.resolve(); });
-
-    events.on('editorRenderError', function () { editorRendered.reject(); });
 
     var Router = Backbone.Router.extend({
         routes:{
@@ -38,43 +27,13 @@ define(['events','mets','backbone'],
     router.on("route:page", routePage);
     function routePage(docId,pageId) {
 
-        var data = {
+        events.trigger('changePage',{
             docId:docId,
             pageNumber:Math.floor(parseInt(pageId,10))
-        };
-
-        /* clear earlier deferred callbacks before starting */
-        if (facsimileRendered !== undefined) {
-            facsimileRendered.reject();
-        }
-        if (editorRendered !== undefined) {
-            editorRendered.reject();
-        }
-
-        /* create new deferreds. they will be fired by event
-         * handlers when being notified of a rendre
-         */
-        facsimileRendered = new $.Deferred();
-        editorRendered = new $.Deferred();
-
-        events.trigger('changePage',data);
-        events.trigger('nowProcessing',"page-change");
-
-        mets.get(data).then(
-            function(doc) { events.trigger('changePageMets',doc); },
-            function(msg) { events.trigger('changePageMetsError',msg); });
-
-        $.when(facsimileRendered,editorRendered).then(
-            function() {
-                events.trigger('changePageDone');
-                events.trigger('endProcessing',"page-change");
-            },
-            function(msg) {
-                events.trigger('changePageError',msg);
-                events.trigger('endProcessing',"page-change");
-            });
+        });
 
     }
+
     router.on("route:pageVP", function routePageVP(docId,pageId,viewport) {
         events.on('changePageDone',function() {
             var parts = viewport.split('x');

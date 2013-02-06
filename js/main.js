@@ -47,7 +47,7 @@ require(
         "router",
         "spin",
         "spinner",
-        "pageselector",
+        "page",
         "mousewheel",
         "language",
         "bibinfo",

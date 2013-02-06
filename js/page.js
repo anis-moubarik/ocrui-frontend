@@ -1,6 +1,56 @@
-define(['jquery','events','toolbar','mustache','backbone','templates'],
-        function ($,events,toolbar,mustache,Backbone,templates) {
+define(['jquery','events','mets','toolbar','mustache','backbone','templates'],
+        function ($,events,mets,toolbar,mustache,Backbone,templates) {
     "use strict";
+
+
+
+
+    var facsimileRendered = undefined;
+    var editorRendered = undefined;
+
+    events.on('facsimileRendered', function () { facsimileRendered.resolve(); });
+
+    events.on('facsimileRenderError', function () { facsimileRendered.reject(); });
+
+    events.on('editorRendered', function () { editorRendered.resolve(); });
+
+    events.on('editorRenderError', function () { editorRendered.reject(); });
+
+
+    events.on('changePage', function (data) {
+
+        /* create new deferreds. clear earlier ones before.
+         */
+        /* clear earlier deferred callbacks before starting */
+        if (facsimileRendered !== undefined) {
+            facsimileRendered.reject();
+        }
+        facsimileRendered = new $.Deferred();
+
+        if (editorRendered !== undefined) {
+            editorRendered.reject();
+        }
+        editorRendered = new $.Deferred();
+
+        events.trigger('nowProcessing',"page-change");
+
+        mets.get(data).then(
+            function(doc) { events.trigger('changePageMets',doc); },
+            function(msg) { events.trigger('changePageMetsError',msg); });
+
+        $.when(facsimileRendered,editorRendered).then(
+            function() {
+                events.trigger('changePageDone');
+                events.trigger('endProcessing',"page-change");
+            },
+            function(msg) {
+                events.trigger('changePageError',msg);
+                events.trigger('endProcessing',"page-change");
+            });
+    });
+
+
+
 
     var View = Backbone.View.extend({
         initialize: function() {
