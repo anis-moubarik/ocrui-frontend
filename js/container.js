@@ -56,6 +56,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'newViewportRequest' : 'setViewport',
             'mousetail' : 'panTail',
             'setPageGeometry':'setPageGeometry',
+            'changePageImage':'setImageSize',
         },
         events: {
             'click': 'propagateClick',
@@ -188,10 +189,10 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             return this.pageScale;
         },
         getOriginX: function() {
-            return this.originX;
+            return this.originX; // return origin x of viewport in global crds
         },
         getOriginY: function() {
-            return this.originY;
+            return this.originY; // return origin y of viewport in global crds
         },
         possiblyScrollToHighlight: function(highlight) {
             if (highlight === []) return;
@@ -362,21 +363,36 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             var pageRight = this.imageWidth * this.pageScale;
             var pageBottom = this.imageHeight * this.pageScale;
             var pageMarginLeft = pageLeft - margin;
-            var pageMarginTop = pageTop - this.imageHeight*0.6;
+            var pageMarginTop = pageTop - margin;
+            var pageMarginPrevTop = pageTop - margin - this.imageHeight*this.pageScale;
+            var pageTriggerPrev = pageTop - this.imageHeight*0.6*this.pageScale;
             var pageMarginRight = pageRight + margin;
-            var pageMarginBottom = pageBottom + this.imageHeight*0.6;
+            var pageMarginBottom = pageBottom + margin;
+            var pageMarginNextBottom = pageBottom + margin + this.imageHeight*this.pageScale;
+            var pageTriggerNext = pageBottom + this.imageHeight*0.6*this.pageScale;
 
             if (canvasLeft < pageMarginLeft) {
-                this.originX = - (pageLeft - margin);
+                this.originX = - pageMarginLeft;
             } else if (canvasRight > pageMarginRight) {
-                this.originX = - (pageRight - this.horizontalPixels + margin);
+                this.originX = - (pageMarginRight - this.horizontalPixels);
             }
 
             if (canvasTop < pageMarginTop) {
-                events.trigger('requestPrevPage');
+                this.originY = - pageMarginTop;
             } else if (canvasBottom > pageMarginBottom) {
-                events.trigger('requestNextPage');
+                this.originY = - ( pageMarginBottom - this.verticalPixels );
             }
+
+/*
+            if (canvasTop < pageTriggerPrev) {
+                events.trigger('requestPrevPage');
+                //this.setOrigin(this.originX,this.originY - (margin + this.imageHeight*this.pageScale));
+            } else if (canvasBottom > pageTriggerNext) {
+                events.trigger('requestNextPage');
+                //this.setOrigin(this.originX,this.originY + (margin + this.imageHeight*this.pageScale));
+            }
+*/
+
             this.triggerNewViewport();
 
         },
@@ -387,10 +403,11 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                 pageScale:this.pageScale,
             });
         },
-        setImageSize: function(w,h) {
-            this.imageWidth = w;
-            this.imageHeight = h;
+        setImageSize: function(image) {
+            this.imageWidth = image.width;
+            this.imageHeight = image.height;
         },
+        /*
         setNextImageSize: function(w,h) {
             this.nextImageWidth = w;
             this.nextImageHeight = h;
@@ -399,6 +416,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             this.prevImageWidth = w;
             this.prevImageHeight = h;
         },
+        */
         scheduleRender: function () {
             var that = this;
             if (this.renderingRequest == true) return;

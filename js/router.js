@@ -62,7 +62,8 @@ define(['events','backbone'],
     events.on('requestChangePage',function gotoPage(number) {
 
         var parts = Backbone.history.fragment.split('/');
-        var route = parts[0]+'/'+number;
+        var route = parts[0] + '/' + number;
+        if (parts[2] !== undefined) route += '/' + parts[2];
         router.navigate(route,{replace:false,trigger:true});
 
     });

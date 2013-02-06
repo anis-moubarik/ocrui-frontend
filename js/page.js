@@ -1,5 +1,5 @@
-define(['jquery','events','mets','toolbar','mustache','backbone','templates'],
-        function ($,events,mets,toolbar,mustache,Backbone,templates) {
+define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
+        function ($,events,mets,toolbar,mustache,mybackbone,templates) {
     "use strict";
 
 
@@ -52,7 +52,7 @@ define(['jquery','events','mets','toolbar','mustache','backbone','templates'],
 
 
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
         initialize: function() {
             this.options = {};
             var that = this;
@@ -73,21 +73,29 @@ define(['jquery','events','mets','toolbar','mustache','backbone','templates'],
                 classes: "btn-group form-horizontal input-prepend input-append pull-right",
                 modes:['page'] });
 
-            events.on('changePage',function(data) {
-                that.options.pageNumber = data.pageNumber;
-                that.render();
-            });
-            events.on('changePageMets',function(doc) {
-                var pages = doc.getNumberOfPages();
-                that.setPageNumberBounds(1,pages);
-                that.render();
-            });
         },
         el : '#page-selector',
+        myEvents: {
+            /*
+            'requestNextPage' : 'pageNext',
+            'requestPrevPage' : 'pagePrevious',
+            */
+            'changePage' : 'changePage',
+            'changePageMets' : 'changePageMets',
+        },
         events: {
             'click #page-next': 'pageNext',
             'click #page-previous': 'pagePrevious',
             'change #page-number': 'pageNumber'
+        },
+        changePage: function(data) {
+            this.options.pageNumber = data.pageNumber;
+            this.render();
+        },
+        changePageMets: function(doc) {
+            var pages = doc.getNumberOfPages();
+            this.setPageNumberBounds(1,pages);
+            this.render();
         },
         pageNext : function (ev) {
             $('#page-number').attr('value',this.getPageNumber() + 1);
