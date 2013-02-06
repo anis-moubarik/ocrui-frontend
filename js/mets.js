@@ -1,4 +1,4 @@
-define(['jquery','mybackbone'],function ($,mybackbone) {
+define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
     "use strict";
 
     var DocumentModel = mybackbone.Model.extend({
@@ -105,23 +105,26 @@ define(['jquery','mybackbone'],function ($,mybackbone) {
 
     });
 
+
+    var currentDocId = undefined;
+
     var documents = {};
 
-    function get(options) {
+    function get(docId) {
 
         var promise = new $.Deferred();
 
-        var doc = documents[options.docId];
+        var doc = documents[docId];
 
         if (doc === undefined) {
 
             try {
-                doc = new DocumentModel({id:options.docId});
+                doc = new DocumentModel({id:docId});
             } catch (err) {
                 promise.reject(err);
                 return;
             }
-            documents[options.docId] = doc;
+            documents[docId] = doc;
             doc.loading = doc.fetch();
 
         }
@@ -134,8 +137,21 @@ define(['jquery','mybackbone'],function ($,mybackbone) {
         return promise;
     }
 
+    events.on('changeDocument', function (data) {
+        currentDocId = data.docId;
+        get(data.docId).then(
+            function(doc) { events.trigger('changePageMets',doc); },
+            function(msg) { events.trigger('changePageMetsError',msg); }
+        );
+    });
+
+    
+    function getCurrent() {
+        return get(currentDocId);
+    }
+
     return {
-        get: get
+        getCurrent: getCurrent
     };
 
 });

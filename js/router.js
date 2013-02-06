@@ -13,6 +13,8 @@ define(['events','backbone'],
         }
     });
 
+    var currentPageNumber = undefined;
+    var currentDocId = undefined;
     var router = new Router();
 
     router.on("route:default", function routeEmpty() {
@@ -29,10 +31,21 @@ define(['events','backbone'],
     router.on("route:page", routePage);
     function routePage(docId,pageId) {
 
-        events.trigger('changePage',{
-            docId:docId,
-            pageNumber:Math.floor(parseInt(pageId,10))
-        });
+        var pageNumber = Math.floor(parseInt(pageId,10));
+
+        if (currentDocId != docId) {
+            events.trigger('changeDocument',{
+                docId:docId
+            });
+            currentDocId = docId;
+        }
+
+        if (currentPageNumber != pageNumber) {
+            events.trigger('changePage',{
+                pageNumber:pageNumber
+            });
+            currentPageNumber = pageNumber;
+        }
 
     }
 

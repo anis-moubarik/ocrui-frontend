@@ -28,7 +28,7 @@ define(['jquery','backbone','mets'],function ($,Backbone,mets) {
 
         var promise = new $.Deferred();
 
-        mets.get(options).then(
+        mets.getCurrent().then(
             function (doc) {
                 var imageOptions = {
                     docId: options.docId,

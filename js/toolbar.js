@@ -1,4 +1,5 @@
-define(['jquery','underscore','events','mustache','backbone','templates'],function ($,_,events,mustache,Backbone,templates) {
+define(['jquery','underscore','events','mustache','mybackbone','templates'],
+        function ($,_,events,mustache,mybackbone,templates) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -59,17 +60,20 @@ define(['jquery','underscore','events','mustache','backbone','templates'],functi
         }
     });
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
         initialize: function() {
             var that = this;
             this.mode = 'empty';
-            events.on('changePage',function() {
-                that.setMode('page');
-            });
         },
         el : '#toolbar',
+        myEvents: {
+            'changePage': 'setPageMode',
+        },
         events: {
             'click button': 'handleClick'
+        },
+        setPageMode: function () {
+            this.setMode('page');
         },
         setMode: function(mode) {
             if (this.mode == mode) { return; }

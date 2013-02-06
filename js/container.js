@@ -1,4 +1,3 @@
-/*globals setTimeout:false */
 define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','utils'],
         function (_,$,toolbar,events,mybackbone,mousetailstack,utils) {
     "use strict";
@@ -57,6 +56,9 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'mousetail' : 'panTail',
             'setPageGeometry':'setPageGeometry',
             'changePageImage':'setImageSize',
+            'changePage':'changePage',
+            'scrollOneStep':'scrollOneStep',
+            'scheduledRender':'scheduledRender',
         },
         events: {
             'click': 'propagateClick',
@@ -194,8 +196,16 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         getOriginY: function() {
             return this.originY; // return origin y of viewport in global crds
         },
+        changePage: function() {
+            this.initialHighlightSet = false;
+        },
         possiblyScrollToHighlight: function(highlight) {
             if (highlight === []) return;
+            if (!this.initialHighlightSet) {
+                /* don't scroll on initial highlight of a page */
+                this.initialHighlightSet = true;
+                return;
+            }
             var hl = utils.getCombinedBoundingBox(highlight);
 
             var hpos = Math.round(hl.hpos * this.hScale());
@@ -211,23 +221,19 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             var scrollToX = cX;
             var scrollToY = cY;
 
-            var xx = this.inVisibleX(cX,margin);
-            var yy = this.inVisibleY(cY,margin);
-
-            var speed = 0.25; // speed of scroll 0 < speed <= 1
-            var timeout = 40; // => about 25 frames per sec
-            var margin = 50;
+            var xx = this.inVisibleX(cX,this.scrollMargin);
+            var yy = this.inVisibleY(cY,this.scrollMargin);
 
             if ((xx === 0) && (yy === 0)) {
                 return; // no need to scroll
             }
 
             // fit whole box to screen if possible otherwise just scroll thereabouts */
-            if (width + 2*margin < this.horizontalPixels) {
+            if (width + 2*this.scrollMargin < this.horizontalPixels) {
                 if (xx < 0) { scrollToX = hpos; }
                 else if (xx > 0) { scrollToX = hpos + width; }
             }
-            if (height + 2*margin < this.vertivalPixels) {
+            if (height + 2*this.scrollMargin < this.vertivalPixels) {
                 if (yy < 0) { scrollToY = vpos; }
                 else if (yy > 0) { scrollToY = vpos + height; }
             }
@@ -237,21 +243,25 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             var that = this;
 
             if (this.scrollingTo === undefined) {
-                setTimeout(function() {that.scrollOneStep(speed,margin,timeout);},timeout);
+                events.delay('scrollOneStep',undefined,this.scrollTimeout);
             }
 
             this.scrollingTo = {x:scrollToX,y:scrollToY};
 
         },
-        scrollOneStep: function (speed,margin,timeout) {
+        scrollSpeed: 0.25, // speed of scroll 0 < speed <= 1
+        scrollTimeout: 40, // => about 25 frames per sec
+        scrollMargin: 50,
+        scrollOneStep: function () {
+
             if (this.scrollingTo == undefined) return;
             var that = this;
-            var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,margin) * speed);
-            var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,margin) * speed);
+            var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,this.scrollMargin) * this.scrollSpeed);
+            var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,this.scrollMargin) * this.scrollSpeed);
             this.setOrigin(this.originX - xDelta, this.originY - yDelta);
             this.scheduleRender();
             if ((xDelta !== 0) || (yDelta !== 0)) {
-                setTimeout(function() {that.scrollOneStep(speed,margin,timeout);},timeout);
+                events.delay('scrollOneStep',undefined,this.scrollTimeout);
             } else {
                 this.scrollingTo = undefined;
             }
@@ -418,17 +428,10 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         },
         */
         scheduleRender: function () {
-            var that = this;
-            if (this.renderingRequest == true) return;
-            this.renderingRequest = true;
-            setTimeout(function() {
-                that.processRenderingRequests();
-            },20);
+            events.delay('scheduledRender',undefined,20);
 
         },
-        processRenderingRequests: function() {
-            this.renderingRequest = false;
-            events.trigger('scheduledRender');
+        scheduledRender: function() {
             this.render();
         },
         render: function() {

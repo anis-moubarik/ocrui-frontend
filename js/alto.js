@@ -66,7 +66,7 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
 
         var promise = new $.Deferred();
 
-        mets.get(options).then(
+        mets.getCurrent().then(
             function (doc) {
                 var altoOptions = {
                     docId: options.docId,

@@ -16,7 +16,6 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
 
     events.on('editorRenderError', function () { editorRendered.reject(); });
 
-
     events.on('changePage', function (data) {
 
         /* create new deferreds. clear earlier ones before.
@@ -33,10 +32,6 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
         editorRendered = new $.Deferred();
 
         events.trigger('nowProcessing',"page-change");
-
-        mets.get(data).then(
-            function(doc) { events.trigger('changePageMets',doc); },
-            function(msg) { events.trigger('changePageMetsError',msg); });
 
         $.when(facsimileRendered,editorRendered).then(
             function() {
