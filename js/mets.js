@@ -141,8 +141,11 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
         currentDocId = data.docId;
         get(data.docId).then(
             function(doc) { events.trigger('changePageMets',doc); },
-            function(msg) { events.trigger('changePageMetsError',msg); }
-        );
+            function(msg) { events.trigger('changePageMetsError',{
+                error: 'changePageMetsError',
+                message: msg
+            })
+        });
     });
 
     

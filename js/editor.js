@@ -193,7 +193,10 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','backbone',
                     that.setAlto(myAlto);
                 },
                 function(msg) {
-                    events.trigger('editorRenderError',msg);
+                    events.trigger('editorRenderError',{
+                        error: 'editorRenderError',
+                        message: msg
+                    });
                 }
             );
         },

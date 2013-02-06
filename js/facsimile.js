@@ -47,18 +47,18 @@ define(['jquery','events','backbone','image','container'],
                 that.render();
 
                 image.get(that.nextAttributes).done( function (img) {
-                    /* if (that.attributes != attributes) return; */
+                    /*
+                    if (that.attributes != attributes) return;
                     that.nextImage = img;
 
-                    /*
                     container.view.setNextImageSize(img.width,img.height);
                     that.render();
                     */
                 });
                 image.get(that.prevAttributes).done( function (img) {
-                    /* if (that.attributes != attributes) return; */
-                    that.prevImage = img;
                     /*
+                    if (that.attributes != attributes) return;
+                    that.prevImage = img;
                     container.view.setPrevImageSize(img.width,img.height);
                     that.render();
                     */
@@ -66,7 +66,10 @@ define(['jquery','events','backbone','image','container'],
 
             }).fail(function(msg) {
 
-                events.trigger('changePageImageError',msg);
+                events.trigger('changePageImageError',{
+                    error: 'changePageImageError',
+                    message: msg
+                });
 
             });
 

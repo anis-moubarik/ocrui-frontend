@@ -1,27 +1,28 @@
-define(['events','mustache','backbone','templates'],function (events,mustache,Backbone,templates) {
+define(['events','mustache','mybackbone','templates'],function (events,mustache,mybackbone,templates) {
     "use strict";
 
-    var View = Backbone.View.extend({
+    var View = mybackbone.View.extend({
         initialize: function() {
             var that = this;
             this.errors = [];
 
-            var closure = function(data) { that.pushError(data); };
-            events.on('changePageMetsError', closure);
-            events.on('changePageImageError', closure);
-            events.on('changePageAltoError', closure);
-            events.on('changePageError', closure);
-            events.on('message', closure);
         },
         el : '#dialog',
+        myEvents: {
+            'changePageMetsError': 'pushEvent',
+            'changePageImageError': 'pushEvent',
+            'changePageAltoError': 'pushEvent',
+            'changePageError': 'pushEvent',
+            'message': 'pushEvent'
+        },
         events: {
             'click #dialog-ok': 'dropMessages',
         },
         dropMessages: function() {
             this.errors = [];
         },
-        pushError: function(error) {
-            this.errors.push(error);
+        pushEvent: function(error) {
+            this.errors.push(JSON.stringify(error));
             this.render();
         },
         render: function() {

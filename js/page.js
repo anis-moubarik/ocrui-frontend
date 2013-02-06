@@ -8,13 +8,13 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
     var facsimileRendered = undefined;
     var editorRendered = undefined;
 
-    events.on('facsimileRendered', function () { facsimileRendered.resolve(); });
+    events.on('facsimileRendered', function (d) { facsimileRendered.resolve(d); });
 
-    events.on('facsimileRenderError', function () { facsimileRendered.reject(); });
+    events.on('facsimileRenderError', function (d) { facsimileRendered.reject(d); });
 
-    events.on('editorRendered', function () { editorRendered.resolve(); });
+    events.on('editorRendered', function (d) { editorRendered.resolve(d); });
 
-    events.on('editorRenderError', function () { editorRendered.reject(); });
+    events.on('editorRenderError', function (d) { editorRendered.reject(d); });
 
     events.on('changePage', function (data) {
 
@@ -22,12 +22,12 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
          */
         /* clear earlier deferred callbacks before starting */
         if (facsimileRendered !== undefined) {
-            facsimileRendered.reject();
+            facsimileRendered.resolve();
         }
         facsimileRendered = new $.Deferred();
 
         if (editorRendered !== undefined) {
-            editorRendered.reject();
+            editorRendered.resolve();
         }
         editorRendered = new $.Deferred();
 
@@ -35,11 +35,14 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
 
         $.when(facsimileRendered,editorRendered).then(
             function() {
-                events.trigger('changePageDone');
+                events.trigger('changePageDone',data);
                 events.trigger('endProcessing',"page-change");
             },
-            function(msg) {
-                events.trigger('changePageError',msg);
+            function(data) {
+                events.trigger('changePageError',{
+                    error:'changePageError',
+                    message: data
+                });
                 events.trigger('endProcessing',"page-change");
             });
     });
@@ -123,7 +126,7 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
             var number = this.pageChangeQueue[this.pageChangeQueue.length-1];
             this.pageChangeRequested = false;
             this.pageChangeQueue = [];
-            events.trigger('requestChangePage',number);
+            events.trigger('changePage',{pageNumber:number});
         },
         boundedSetPage : function(number) {
             if (number < this.options.minPage) number = this.options.minPage;
