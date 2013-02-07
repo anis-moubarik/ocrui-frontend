@@ -61,6 +61,13 @@ define(['jquery','toolbar','events'],function ($,toolbar,events) {
 
     MouseTailStack.prototype.triggerTail = function () {
 
+
+        /* If there is lag, just don't bother with tail */
+        if (Date.now() > this.lagToleration) {
+            return;
+        }
+        this.lagToleration += 50;
+
         this.dx = truncate(this.dx*this.length);
         this.dy = truncate(this.dy*this.length);
 
@@ -91,6 +98,7 @@ define(['jquery','toolbar','events'],function ($,toolbar,events) {
 
         }
 
+        this.lagToleration = Date.now() + 300;
         this.triggerTail();
 
     };

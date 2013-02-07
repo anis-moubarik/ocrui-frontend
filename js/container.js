@@ -46,9 +46,11 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             toolbar.registerKeyboardShortcut(113, function(ev) {
                 $('#pan-zoom').click();
             });
+            this.setMouseSensitivity(true);
+
 
         },
-        el: '#facsimile-canvas',
+        el: '#facsimile-container',
         myEvents: {
             'changeCoordinates':'possiblyScrollToHighlight',
             'setGeometry': 'setGeometry',
@@ -77,6 +79,9 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             this.verticalPixels = data.facsimileHeight;
             this.scheduleRender ();
         },
+        setMouseSensitivity: function(b) {
+            this.mouseSensitivity = b ? true : false;
+        },
         setViewport: function(vp) {
             this.setOrigin(vp.originX,vp.originY);
             this.setZoom(vp.pageScale);
@@ -84,6 +89,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             this.scheduleRender();
         },
         wheel: function(ev,delta,deltaX,deltaY) {
+            if (!this.mouseSensitivity) return;
             var offset = this.$el.offset();
             var x = ev.pageX - offset.left;
             var y = ev.pageY - offset.top;
@@ -103,6 +109,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         },
 
         beginPan: function(ev) {
+            if (!this.mouseSensitivity) return;
             if (ev.which != 1) return;
             this.propageteNextClick = true;
             this.panning = true;
@@ -117,11 +124,12 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             ev.stopPropagation();
         },
         endPan: function(ev) {
+            if (!this.mouseSensitivity) return;
             this.mouseTailStack.end(ev);
             this.panning = false;
         },
         cancelPan: function(ev) {
-
+            if (!this.mouseSensitivity) return;
             if (!this.panning) return;
             this.setOrigin(this.savedOriginX, this.savedOriginY);
             this.scheduleRender();
@@ -129,6 +137,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
         },
         pan: function(ev) {
+            if (!this.mouseSensitivity) return;
             this.propageteNextClick = false;
             if (!this.panning) { return; }
             this.mouseTailStack.push(ev);
@@ -143,12 +152,14 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
         },
         panTail: function(data) {
+            if (!this.mouseSensitivity) return;
             this.setOrigin(
                 this.originX + data[0],
                 this.originY + data[1]);
             this.scheduleRender();
         },
         propagateClick: function(ev) {
+            if (!this.mouseSensitivity) return;
             if (!this.propageteNextClick) return;
             if (ev.which != 1) return;
 
@@ -430,7 +441,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         },
         */
         scheduleRender: function () {
-            events.delay('scheduledRender',undefined,1);
+            events.delayOrIgnore('scheduledRender',undefined,20);
 
         },
         render: function() {

@@ -18,8 +18,10 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
                 toggleCB:function(newState) {
                     that.showLayout = newState;
                     if (newState) {
+                        container.view.setMouseSensitivity(false);
                         that.$el.removeClass('pass-pointer-events');
                     } else {
+                        container.view.setMouseSensitivity(true);
                         that.$el.addClass('pass-pointer-events');
                     }
                     that.render();
@@ -47,12 +49,16 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
 
         },
         events: {
-            'click': 'clickOutsideBoxes',
-            'mouseup .layout-box': 'selectLayoutBox',
+            'dblclick': 'clickOutsideBoxes',
             'click .layout-box': 'clickLayoutBox',
             'dblclick .layout-box': 'clickLayoutBox',
             'stop .layout-box': 'stopDrag',
             'start .layout-box': 'startDrag'
+        },
+        passToContainer: function (ev) {
+            //$('#facsimile-container').trigger(ev);
+            //console.log('x');
+            ev.stopPropagation();
         },
         startDrag: function (ev,ui) {
             var x = container.view.getPageX(ui.offsetX);
@@ -64,17 +70,15 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
             var y = container.view.getPageY(ui.offsetY);
             console.log(x,y);
         },
-        selectLayoutBox: function(ev) {
-            $('.selected-layout-box').removeClass('selected-layout-box');
-            $(ev.toElement).addClass('selected-layout-box');
-        },
         clickLayoutBox: function(ev) {
             console.log(ev);
             if (ev.type == "dblclick") {
                 $(ev.toElement).remove();
                 //this.removeLayoutBox();
+            } else if (ev.type == "click") {
+                $('.selected-layout-box').removeClass('selected-layout-box');
+                $(ev.toElement).addClass('selected-layout-box');
             }
-            ev.stopPropagation();
         },
         clickOutsideBoxes: function(ev) {
             // create new layoutBox.
@@ -89,6 +93,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
                 height: 100 
             }
             this.renderBoxes ([box],"layout-box",true);
+            ev.stopPropagation();
         },
 
         changePage: function(attributes) {

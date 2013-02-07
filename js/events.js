@@ -49,6 +49,8 @@ define(function () {
             cb(ev,data);
         }
 
+        schedule[ev] = undefined; // clear timeout id
+
     }
 
     /* schedules an event to be triggered as soon as possible.
@@ -77,6 +79,38 @@ define(function () {
 
     }
 
+    /* Delayed triggering of an event. Waits a moment before triggering
+     * and only triggers once if there is many triggering requests done
+     * in short time period.
+     */
+    function delay (ev,data,timeout) {
+
+        if (timeout === undefined) {
+            timeout = 100;
+        }
+
+        clearScheduledCallbacks(ev);
+
+        schedule[ev] = setTimeout(function() {
+            triggerImmediately(ev,data);
+        }, timeout);
+
+    }
+
+    /* Delayed triggering of an event. Waits a moment before triggering
+     * and only triggers once if there is many triggering requests done
+     * in short time period. This version never overwrites existing
+     * timeouts.
+     */
+    function delayOrIgnore (ev,data,timeout) {
+
+        if (schedule[ev] !== undefined) {
+            return;
+        } else {
+            delay(ev,data,timeout);
+        }
+    }
+
     function clearScheduledCallbacks(ev) {
 
         if (schedule[ev] !== undefined) {
@@ -92,7 +126,8 @@ define(function () {
         anyListeners:anyListeners,
         triggerImmediately:triggerImmediately,
         trigger:trigger,
-        delay:delay
+        delay:delay,
+        delayOrIgnore:delayOrIgnore
     };
 
 });
