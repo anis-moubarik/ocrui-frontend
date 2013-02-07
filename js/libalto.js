@@ -337,42 +337,64 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
     }
 
-    Alto.prototype.isDirty = function() {
-        return this.dirty;
-    };
-
-    Alto.prototype.dom2Word = function(dom) {
-        // see also setNthWord
-        return {
-            content: dom.getAttribute('CONTENT'),
-            language: dom.getAttribute('LANGUAGE'),
-            hpos: parseInt(dom.getAttribute('HPOS'),10),
-            vpos: parseInt(dom.getAttribute('VPOS'),10),
-            width: parseInt(dom.getAttribute('WIDTH'),10),
-            height: parseInt(dom.getAttribute('HEIGHT'),10),
-        };
-    };
-
-    Alto.prototype.getLayoutBoxes = function () {
-
-        var that = this;
-        var tb = $(this.current).find('TextBlock').map(function () {
-            var $strings = $(this).find('String');
-            var words = $strings.map(function() {
-                return that.dom2Word(this);
-            }).get();
-            var combined = utils.getCombinedBoundingBox(words);
-            return combined;
-        });
-        return tb;
-    };
-
     Alto.prototype.setOriginalXML = function (xml) {
         this.original = xml;
     };
 
     Alto.prototype.setCurrentXML = function (xml) {
         this.current = xml;
+        this.parseLayoutBoxes(xml);
+    };
+
+    Alto.prototype.parseLayoutBoxes = function(xml) {
+        var that = this;
+        var wordIndex = 0;
+        var layoutBoxIndex = 0;
+        var $textblocks = $(xml).find('TextBlock');
+        this.words = [];
+        this.layoutBoxes = $textblocks.map(function (e,i) {
+            var fromIndex = wordIndex;
+            var $strings = $(this).find('String');
+            var words = $strings.map(function() {
+                var word = that.dom2Word(this,wordIndex);
+                that.words[wordIndex++] = word;
+                return word;
+            }).get();
+
+            var layoutBox = utils.getCombinedBoundingBox(words);
+            layoutBox.index=layoutBoxIndex ++;
+            layoutBox.fromIndex=fromIndex;
+            layoutBox.toIndex=wordIndex;
+
+            return layoutBox;
+        });
+    };
+
+    Alto.prototype.isDirty = function() {
+        return this.dirty;
+    };
+
+    Alto.prototype.dom2Word = function(dom,index) {
+        return {
+            index: index,
+            content: dom.getAttribute('CONTENT'),
+            language: dom.getAttribute('LANGUAGE'),
+            changed: dom.getAttribute('CHANGED') ?
+                true : false,
+            changedSinceSave: dom.getAttribute('CHANGED_SINCE_SAVE') ?
+                true : false,
+            hpos: parseInt(dom.getAttribute('HPOS'),10),
+            vpos: parseInt(dom.getAttribute('VPOS'),10),
+            width: parseInt(dom.getAttribute('WIDTH'),10),
+            height: parseInt(dom.getAttribute('HEIGHT'),10),
+
+        };
+    };
+
+    Alto.prototype.getLayoutBoxes = function () {
+
+        return this.layoutBoxes;
+
     };
 
     Alto.prototype.updateStringContent = function (content) {
@@ -388,36 +410,25 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         process.createAltoFromOriginalAndWords(this.original, words);
         process.updateLanguages(this.current,words);
 
-        this.current = process.getNewAlto();
+        this.setCurrentXML( process.getNewAlto() );
 
         this.dirty = true;
     };
 
-    Alto.prototype.getLanguageSequence = function (dom) {
-        if (dom === undefined) {dom = this.current;}
-        return $(dom).find('String').map(
-            function() {
-                return this.getAttribute('LANGUAGE') ? true : false;
-            }
-        ).get();
-    };
-
-    Alto.prototype.getWordIndexAt = function (x,y) {
+    Alto.prototype.getWordAt = function (x,y) {
         var selection;
 
         var minDistance;
-        var minDistanceIndex;
+        var minDistanceWord;
         var that=this;
         // find bounding box under or closest to the cursor.
-        $(this.current).find('String').each(function(i) {
-
-            var word = that.dom2Word(this);
+        this.words.map(function(word,i) {
 
             // look for an exact match
             if ((x >= word.hpos) && (x <= word.hpos + word.width) &&
                 (y >= word.vpos) && (y <= word.vpos + word.height)) {
 
-                selection = i;
+                selection = word;
                 return false;
 
             }
@@ -431,7 +442,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
                 if ((minDistance === undefined) || (distance < minDistance))
                 {
                     minDistance = distance;
-                    minDistanceIndex = i;
+                    minDistanceWord = word;
                 }
             }
             tryToSetClosestCorner(word.hpos,word.vpos);
@@ -441,48 +452,34 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         });
         if (selection === undefined) {
-            selection = minDistanceIndex;
+            selection = minDistanceWord;
         }
         return selection;
     };
 
     Alto.prototype.setNthWordLanguage = function(index,language) {
-        var $dom =  $(this.current).find('String').eq(index);
-        $dom.attr('LANGUAGE',language);
-        return this.dom2Word($dom.get(0));
+        this.words[index].language = language;
+        return this.words[index];
     };
 
     Alto.prototype.getNthWord = function(index) {
-        var dom =  $(this.current).find('String').get(index);
-        if (dom === undefined) {return undefined;}
-        return this.dom2Word(dom);
+        return this.words[index];
     };
 
-    Alto.prototype.getStringSequence = function(dom) {
-        if (dom === undefined) {dom = this.current;}
-        return $(dom).find('String').map(
-            function() { return this.getAttribute('CONTENT'); }
-        ).get();
+    Alto.prototype.getStringSequence = function() {
+        return this.words.map(function(e,i) {return e.content;});
     };
 
-    Alto.prototype.getChangedSequence = function(dom) {
-        if (dom === undefined) {dom = this.current;}
-        return $(dom).find('String').map(
-            function() {
-                return this.getAttribute('CHANGED') ? true : false;
-            }
-        ).get();
+    Alto.prototype.getLanguageSequence = function () {
+        return this.words.map(function(e,i) {return e.language;});
     };
 
-    Alto.prototype.getChangedSinceSaveSequence = function(dom) {
-        if (dom === undefined) {dom = this.current;}
-        return $(dom).find('String').map(
-            function() {
-                return this.getAttribute('CHANGED_SINCE_SAVE') ?
-                    true :
-                    false;
-            }
-        ).get();
+    Alto.prototype.getChangedSequence = function() {
+        return this.words.map(function(e,i) {return e.changed;});
+    };
+
+    Alto.prototype.getChangedSinceSaveSequence = function() {
+        return this.words.map(function(e,i) {return e.changedSinceSave;});
     };
 
     return {

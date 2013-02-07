@@ -14,8 +14,8 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
         isDirty: function() {
             return this.alto.isDirty();
         },
-        getWordIndexAt: function(x,y) {
-            return this.alto.getWordIndexAt(x,y);
+        getWordAt: function(x,y) {
+            return this.alto.getWordAt(x,y);
         },
         updateStringContent: function (content) {
             return this.alto.updateStringContent(content);

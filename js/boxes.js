@@ -136,6 +136,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
                 $div.css('top',rect.vpos);
                 $div.css('width',rect.width);
                 $div.css('height',rect.height);
+                $div.data(box);
                 this.$el.append($div);
 
                 if (editable) {

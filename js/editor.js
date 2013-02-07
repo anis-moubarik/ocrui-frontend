@@ -90,8 +90,9 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             var ch = 0;
             var inMiddleOfWord = false;
             if (!this.alto) { return; }
-            var wordIndex = this.alto.getWordIndexAt(coords.x,coords.y);
-            if (wordIndex === undefined) {return;}
+            var word = this.alto.getWordAt(coords.x,coords.y);
+            if (word === undefined) {return;}
+            var wordIndex = word.index;
             for (var i in content) {
                 var c = content[i];
                 if (c == '\n') {
