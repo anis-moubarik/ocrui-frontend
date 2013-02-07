@@ -462,7 +462,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     };
 
     Alto.prototype.getLanguageSequence = function () {
-        console.log( this.words.map(function(e,i) {return e.language;}));
         return this.words.map(function(e,i) {return e.language;});
     };
 

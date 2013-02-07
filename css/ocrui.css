@@ -53,10 +53,6 @@
     z-index:990;
 }
 
-.pass-pointer-events {
-    pointer-events: none;
-}
-
 .highlight-box, .layout-box {
     position: absolute;
 }
@@ -78,7 +74,8 @@
 }
 
 #facsimile-canvas {
-    background-image: url(../img/canvas-bg.png);
+    /*background-image: url(../img/canvas-bg.png);*/
+    background-color: rgb(220,220,220);
 }
 
 #spinner,#greyout {

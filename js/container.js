@@ -170,6 +170,12 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
             events.trigger('cursorToCoordinate',pageCoords);
         },
+        getPageWidth: function (screenWidth) {
+            return screenWidth / this.hScale();
+        },
+        getPageHeight: function (screenHeight) {
+            return screenHeight / this.vScale();
+        },
         getPageX: function (screenX) {
             return (screenX - this.originX) / this.hScale();
         },

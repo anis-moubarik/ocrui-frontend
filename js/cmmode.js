@@ -1,4 +1,4 @@
-define(['jquery','codemirror'],function ($,CodeMirror) {
+define(['codemirror'],function (CodeMirror) {
     "use strict";
 
     // CodeMirror mode for Ocrui
@@ -13,7 +13,6 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
                 return state;
             },
             token: function(stream,state) {
-                //console.log(state.wordIndex);
                 stream.eatSpace();
                 var word = '';
                 while (!stream.eol()) {
