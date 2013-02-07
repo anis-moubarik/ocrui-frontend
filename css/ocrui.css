@@ -42,6 +42,10 @@
     outline: 1px solid #aaaaaa;
 }
 
+#editor.dirty {
+    outline: 1px solid #ff5555;
+}
+
 #boxes {
     background: none;
     position: absolute;

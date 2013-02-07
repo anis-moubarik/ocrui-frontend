@@ -51,7 +51,6 @@ require(
         "mousewheel",
         "language",
         "bibinfo",
-        'save',
         'container',
         'boxes',
         'dialog'

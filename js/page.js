@@ -2,9 +2,6 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
         function ($,events,mets,toolbar,mustache,mybackbone,templates) {
     "use strict";
 
-
-
-
     var facsimileRendered = undefined;
     var editorRendered = undefined;
 
@@ -62,6 +59,19 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
                 that.pageNext();
             });
 
+            toolbar.registerButton({
+                id:"save",
+                toggle:false,
+                text:"Save",
+                title:"Save",
+                modes:["page"],
+                click: function () {
+                    var dirtyPages = doc.dirtyPages();
+                    console.log('dirty pages:' + (dirtyPages.join(' ')));
+                    console.log('should now PUT');
+                }
+            });
+
             toolbar.registerWidget({
                 id:'page-selector',
                 view:this,
@@ -78,11 +88,23 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
             */
             'changePage' : 'changePage',
             'changePageMets' : 'changePageMets',
+            'changeDirtyState' : 'changeDirtyState',
         },
         events: {
             'click #page-next': 'pageNext',
             'click #page-previous': 'pagePrevious',
             'change #page-number': 'pageNumber'
+        },
+        changeDirtyState: function() {
+            mets.getCurrent().done(function(mets) {
+                if (mets.isDirty()) {
+                console.log('joo');
+                    $('#save').addClass('btn-warning');
+                } else {
+                console.log('ei');
+                    $('#save').removeClass('btn-warning');
+                }
+            });
         },
         changePage: function(data) {
             this.options.pageNumber = data.pageNumber;

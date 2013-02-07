@@ -96,14 +96,29 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         }
     }
 
-    function ContentUpdateProcess() {
+    function ContentUpdateProcess(
+            original,
+            newWords,
+            currentStringSequence,
+            currentLanguageSequence
+            ) {
+
         this.$nextPosition = undefined; // next $position to come
         this.resetLine();
+        this.$target = $(original).find('alto').clone();
+        this.createAltoFromOriginalAndWords(original, newWords);
+        this.updateLanguages(
+            newWords,
+            currentStringSequence,
+            currentLanguageSequence
+        );
+
     }
 
-    ContentUpdateProcess.prototype.createTarget = function ( original ) {
-         this.$target = $(original).find('alto').clone();
-    }
+    ContentUpdateProcess.prototype.isDirty = function () {
+        return false;
+    };
+
     ContentUpdateProcess.prototype.createAltoFromOriginalAndWords = function (
             original, words) {
 
@@ -117,6 +132,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         var wi = 0;
         var si = 0;
 
+        console.log(seq);
         this.$textline = this.$target.find('TextLine').first();
         for (var i = 0; i < seq.length; i++) {
             // Iterating simultaneously three sequences
@@ -391,19 +407,21 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         if (this.original === undefined) {return;}
         var newWords = content.split(/\s+/);
 
-        var process = new ContentUpdateProcess();
-
-        process.createTarget(this.original);
-        process.createAltoFromOriginalAndWords(this.original, newWords);
-        process.updateLanguages(
+        if (newWords[0] == "") newWords.splice(0,1);
+        var lastI = newWords.length-1;
+        if (newWords[lastI] == "") newWords.splice(lastI,1);
+        console.log(newWords);
+        var process = new ContentUpdateProcess(
+            this.original,
             newWords,
             this.getStringSequence(),
-            this.getLanguageSequence()
-        );
+            this.getLanguageSequence
+            );
+
 
         this.setCurrentXML( process.getNewAlto() );
 
-        this.dirty = true;
+        this.dirty = process.isDirty();
     };
 
     Alto.prototype.getWordAt = function (x,y) {
