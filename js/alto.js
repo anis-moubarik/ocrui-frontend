@@ -15,7 +15,9 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
             return this.alto.getWordAt(x,y);
         },
         updateStringContent: function (content) {
-            return this.alto.updateStringContent(content);
+            var rv = this.alto.updateStringContent(content);
+            events.trigger('pageDirtyStateChanged');
+            return rv;
         },
         setNthWordLanguage: function(index,language) {
             return this.alto.setNthWordLanguage(index,language);

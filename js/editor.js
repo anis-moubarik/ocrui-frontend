@@ -69,6 +69,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             'changePage':'changePage',
             'requestLanguageChange':'requestLanguageChange',
             'setupHighlightChange':'setupHighlightChange',
+            'pageDirtyStateChanged':'pageDirtyStateChanged',
         },
         virtualKeyboard: function(data) {
             that.cMirror.replaceSelection(data);
@@ -124,7 +125,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             var content = instance.getValue();
             this.alto.updateStringContent(content);
             this.configureCMMode();
-            this.setDirtyIndicator();
             this.setupHighlightChange();
         },
         getCurrentWordIndexes: function () {
@@ -193,8 +193,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }
             );
         },
-        setDirtyIndicator: function() {
-            events.trigger('changeDirtyState');
+        pageDirtyStateChanged: function() {
             if(this.alto.isDirty()) {
                 this.$el.addClass('dirty');
             } else {
@@ -208,7 +207,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             this.cMirror.clearHistory();
             var word = this.alto.getNthWord(0);
             this.cMirror.focus();
-            this.setDirtyIndicator();
             events.trigger('editorRendered',this.attributes);
         },
         render: function() {

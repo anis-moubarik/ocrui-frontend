@@ -116,7 +116,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     }
 
     ContentUpdateProcess.prototype.isDirty = function () {
-        return false;
+        return this.dirty;
     };
 
     ContentUpdateProcess.prototype.createAltoFromOriginalAndWords = function (
@@ -128,11 +128,13 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             }).get();
         var diff = jsdiff.diff(originalWords,words);
         var seq = getEditSequence(diff);
+        this.dirty = seq.reduce(function(prev,cur){
+            return prev || cur != 'match';
+        },false);
         var $strings = this.$target.find('String');
         var wi = 0;
         var si = 0;
 
-        console.log(seq);
         this.$textline = this.$target.find('TextLine').first();
         for (var i = 0; i < seq.length; i++) {
             // Iterating simultaneously three sequences
@@ -298,6 +300,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         words = words.map(_.identity); // jsdiff.diff edits second argument!!
         var diff = jsdiff.diff(currentWords,words);
         var seq = getEditSequence(diff);
+        
         var $strings = this.$target.find('String');
         var wi = 0;
         var si = 0;
@@ -404,13 +407,10 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         // Create new current structure from string content and
         // original alto structure
 
-        if (this.original === undefined) {return;}
         var newWords = content.split(/\s+/);
-
         if (newWords[0] == "") newWords.splice(0,1);
         var lastI = newWords.length-1;
         if (newWords[lastI] == "") newWords.splice(lastI,1);
-        console.log(newWords);
         var process = new ContentUpdateProcess(
             this.original,
             newWords,

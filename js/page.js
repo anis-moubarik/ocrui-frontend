@@ -88,23 +88,19 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
             */
             'changePage' : 'changePage',
             'changePageMets' : 'changePageMets',
-            'changeDirtyState' : 'changeDirtyState',
+            'documentDirtyStateChanged' : 'documentDirtyStateChanged'
         },
         events: {
             'click #page-next': 'pageNext',
             'click #page-previous': 'pagePrevious',
             'change #page-number': 'pageNumber'
         },
-        changeDirtyState: function() {
-            mets.getCurrent().done(function(mets) {
-                if (mets.isDirty()) {
-                console.log('joo');
-                    $('#save').addClass('btn-warning');
-                } else {
-                console.log('ei');
-                    $('#save').removeClass('btn-warning');
-                }
-            });
+        documentDirtyStateChanged: function(dirty) {
+            if (dirty) {
+                $('#save').addClass('btn-warning');
+            } else {
+                $('#save').removeClass('btn-warning');
+            }
         },
         changePage: function(data) {
             this.options.pageNumber = data.pageNumber;

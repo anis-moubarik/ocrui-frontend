@@ -137,6 +137,11 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
         return promise;
     }
 
+    events.on('pageDirtyStateChanged', function (data) {
+        getCurrent().done(function (mets) {
+            events.trigger('documentDirtyStateChanged',mets.isDirty());
+        })
+    });
     events.on('changeDocument', function (data) {
         currentDocId = data.docId;
         get(data.docId).then(
