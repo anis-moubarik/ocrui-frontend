@@ -59,6 +59,13 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         };
     }
 
+    function markChanges($$elements) {
+        for (var i in $$elements) {
+            var $element = $$elements[i];
+            $element.attr('CHANGED', 'true');
+        }
+    }
+
     function splitBoundingBoxes($$elements,bbs) {
         var stringLengths = _.map($$elements,function(element) {
             return element.attr('CONTENT').length;
@@ -256,26 +263,23 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         for (var i = 0; i < this.$$elementStack.length; i++) {
             this.$$elementStack[i].attr('CONTENT',this.wordStack[i] || '');
         }
+
         if (boundingBoxes.length > 0) {
             splitBoundingBoxes (this.$$elementStack, boundingBoxes);
-        } else {
-            // BUG: should write something to mark changes made
         }
 
+        markChanges (this.$$elementStack);
+
         this.resetLine();
+
         return elementsAdded;
 
     };
 
-    ContentUpdateProcess.prototype.updateLanguages = function(current,words) {
+    ContentUpdateProcess.prototype.updateLanguages =
+                function(words,currentWords,currentLangs) {
 
         words = words.map(_.identity); // jsdiff.diff edits second argument!!
-        var currentWords = $(current).find('String').map(
-            function() { return this.getAttribute('CONTENT') || ''; }
-        ).get();
-        var currentLangs = $(current).find('String').map(
-            function() { return this.getAttribute('LANGUAGE') || ''; }
-        ).get();
         var diff = jsdiff.diff(currentWords,words);
         var seq = getEditSequence(diff);
         var $strings = this.$target.find('String');
@@ -314,23 +318,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         return this.$target.get(0);
     };
 
-    function createAlto (original, current, words) {
-
-        // Returns a new Alto DOM from three input objects:
-        // original - the Original alto dom (bounding boxes come from here)
-        // current - the alto just before the last change (word language and
-        //   layout box information come from here)
-        // words - sequence of words from editor.
-
-        var process = new ContentUpdateProcess();
-
-        process.createTarget(original);
-        process.createAltoFromOriginalAndWords(original, words);
-        process.updateLanguages(current,words);
-
-        return process.getNewAlto();
-    }
-
     function Alto () {
 
         this.dirty = false;
@@ -367,7 +354,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             layoutBox.toIndex=wordIndex;
 
             return layoutBox;
-        });
+        }).get();
     };
 
     Alto.prototype.isDirty = function() {
@@ -402,13 +389,17 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         // original alto structure
 
         if (this.original === undefined) {return;}
-        var words = content.split(/\s+/);
+        var newWords = content.split(/\s+/);
 
         var process = new ContentUpdateProcess();
 
         process.createTarget(this.original);
-        process.createAltoFromOriginalAndWords(this.original, words);
-        process.updateLanguages(this.current,words);
+        process.createAltoFromOriginalAndWords(this.original, newWords);
+        process.updateLanguages(
+            newWords,
+            this.getStringSequence(),
+            this.getLanguageSequence()
+        );
 
         this.setCurrentXML( process.getNewAlto() );
 
@@ -471,6 +462,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     };
 
     Alto.prototype.getLanguageSequence = function () {
+        console.log( this.words.map(function(e,i) {return e.language;}));
         return this.words.map(function(e,i) {return e.language;});
     };
 
@@ -484,7 +476,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
     return {
         Alto : Alto,
-        createAlto : createAlto,
     };
 });
 

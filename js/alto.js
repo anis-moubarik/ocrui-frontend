@@ -8,9 +8,6 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
             options.doc.registerAlto(options.pageNumber,this);
             this.alto = new libalto.Alto()
         },
-        dom2Word: function(dom) {
-            return this.alto.dom2Word(dom);
-        },
         isDirty: function() {
             return this.alto.isDirty();
         },
@@ -26,23 +23,33 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
         getNthWord: function(index) {
             return this.alto.getNthWord(index);
         },
-        getStringSequence: function(dom) {
-            return this.alto.getStringSequence(dom);
+        getStringSequence: function() {
+            return this.alto.getStringSequence();
         },
-        getChangedSequence: function(dom) {
-            return this.alto.getChangedSequence(dom);
+        getChangedSequence: function() {
+            return this.alto.getChangedSequence();
         },
-        getChangedSinceSaveSequence: function(dom) {
-            return this.alto.getChangedSinceSaveSequence(dom);
+        getChangedSinceSaveSequence: function() {
+            return this.alto.getChangedSinceSaveSequence();
         },
-        getLanguageSequence: function(dom) {
-            return this.alto.getLanguageSequence(dom);
+        getLanguageSequence: function() {
+            return this.alto.getLanguageSequence();
         },
         getLayoutBoxes: function() {
             return this.alto.getLayoutBoxes();
         },
-        getString: function(dom) {
-            return this.getStringSequence(dom).join(' ');
+        getString: function() {
+            var s = ""
+            var layoutBoxes = this.getLayoutBoxes();
+            var strings = this.getStringSequence();
+            layoutBoxes.map(function (l,i) {
+                for (var i = l.fromIndex; i < l.toIndex; i++) {
+                    if (i > l.fromIndex) s += " ";
+                    s += strings[i];
+                }
+                s += "\n";
+            });
+            return s;
         },
         parse: function (response) {
             var data = {};

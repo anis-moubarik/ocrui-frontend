@@ -6,23 +6,14 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
     function cmMode (config, parserConfig) {
         return {
             startState: function() {
-                var alto = config.getAlto();
                 var state = {
                     language:'fi',
                     wordIndex:0,
-                    changedSequence:[],
-                    changedSinceSaveSequence:[],
-                    languageSequence:[],
                 };
-                if (alto) {
-                    state.changedSinceSaveSequence =
-                            alto.getChangedSinceSaveSequence();
-                    state.changedSequence = alto.getChangedSequence();
-                    state.languageSequence = alto.getLanguageSequence();
-                }
                 return state;
             },
             token: function(stream,state) {
+                //console.log(state.wordIndex);
                 stream.eatSpace();
                 var word = '';
                 while (!stream.eol()) {
@@ -33,19 +24,19 @@ define(['jquery','codemirror'],function ($,CodeMirror) {
                 stream.eatSpace();
                 var features = [];
                 if (config.showUnsavedChanges &&
-                    state.changedSequence[state.wordIndex]) {
+                    config.changedSequence[state.wordIndex]) {
 
                     features.push('changed-unsaved');
 
                 }
                 if (config.showOriginalChanges &&
-                    state.changedSequence[state.wordIndex]) {
+                    config.changedSequence[state.wordIndex]) {
 
                     features.push('changed');
 
                 }
                 if (config.showLanguage &&
-                    state.languageSequence[state.wordIndex]) {
+                    config.languageSequence[state.wordIndex]) {
 
                     features.push('language');
 

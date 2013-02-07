@@ -6,12 +6,15 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
 
         initialize: function () {
             var that = this;
-            this.cMirror = new CodeMirror(this.$el.get(0), {
+            this.cmConfig = {
                 value: "",
                 lineWrapping: true,
                 mode: 'ocrui',
-                getAlto: function() {return that.getAlto();}
-            });
+                changedSequence: [],
+                changedSinceSaveSequence: [],
+                languageSequence: []
+            }
+            this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 
             // suppress default codemirror bindings
             CodeMirror.commands.goPageUp = function () { }
@@ -111,9 +114,16 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             this.cMirror.setCursor(line,ch);
             this.cMirror.focus();
         },
+        configureCMMode: function () {
+            this.cmConfigchangedSinceSaveSequence =
+                this.alto.getChangedSinceSaveSequence();
+            this.cmConfig.changedSequence = this.alto.getChangedSequence();
+            this.cmConfig.languageSequence = this.alto.getLanguageSequence();
+        },
         changed: function (instance) {
             var content = instance.getValue();
             this.alto.updateStringContent(content);
+            this.configureCMMode();
             this.setupHighlightChange();
         },
         getCurrentWordIndexes: function () {
@@ -165,9 +175,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             });
 
             events.trigger('changeCoordinates',words);
-        },
-        getAlto: function() {
-            return this.alto;
         },
         changePage: function(attributes) {
             var that = this;

@@ -14,7 +14,7 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                 var pageNumber = i + 1;
                 var pageInfo = this.pageInfo[i];
                 if (pageInfo === undefined) { continue; }
-                var alto = [2];
+                var alto = pageInfo[2];
                 if (alto === undefined) { continue; }
                 if (alto.isDirty()) { dirtyPages.push(alto); }
             }
