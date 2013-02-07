@@ -66,6 +66,12 @@
     background: rgba(255,0,0,0.2);
 }
 
+.layout-box.selected-layout-box {
+
+    background: rgba(255,0,0,0.4);
+    
+}
+
 .highlight-box {
     outline: 1px solid rgb(255,255,0);
     background: rgba(255,255,0,0.2);

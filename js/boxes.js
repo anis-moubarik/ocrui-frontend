@@ -47,9 +47,36 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
 
         },
         events: {
-            'click': 'handleClick',
+            'click': 'clickOutsideBoxes',
+            'mouseup .layout-box': 'selectLayoutBox',
+            'click .layout-box': 'clickLayoutBox',
+            'dblclick .layout-box': 'clickLayoutBox',
+            'stop .layout-box': 'stopDrag',
+            'start .layout-box': 'startDrag'
         },
-        handleClick: function(ev) {
+        startDrag: function (ev,ui) {
+            var x = container.view.getPageX(ui.offsetX);
+            var y = container.view.getPageY(ui.offsetY);
+            console.log(x,y);
+        },
+        stopDrag: function (ev,ui) {
+            var x = container.view.getPageX(ui.offsetX);
+            var y = container.view.getPageY(ui.offsetY);
+            console.log(x,y);
+        },
+        selectLayoutBox: function(ev) {
+            $('.selected-layout-box').removeClass('selected-layout-box');
+            $(ev.toElement).addClass('selected-layout-box');
+        },
+        clickLayoutBox: function(ev) {
+            console.log(ev);
+            if (ev.type == "dblclick") {
+                $(ev.toElement).remove();
+                //this.removeLayoutBox();
+            }
+            ev.stopPropagation();
+        },
+        clickOutsideBoxes: function(ev) {
             // create new layoutBox.
 
             console.log(ev);
