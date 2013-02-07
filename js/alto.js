@@ -4,6 +4,7 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
 
     var AltoModel = mybackbone.Model.extend({
         initialize: function (options) {
+            this.set('pageNumber',options.pageNumber);
             this.url = options.doc.getAltoUrl(options.pageNumber);
             options.doc.registerAlto(options.pageNumber,this);
             this.alto = new libalto.Alto()

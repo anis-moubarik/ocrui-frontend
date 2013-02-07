@@ -142,13 +142,17 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
             events.trigger('documentDirtyStateChanged',mets.isDirty());
         })
     });
-    events.on('changeDocument', function (data) {
+    events.on('changeDocumentAndPage', function (data) {
         currentDocId = data.docId;
         get(data.docId).then(
-            function(doc) { events.trigger('changePageMets',doc); },
-            function(msg) { events.trigger('changePageMetsError',{
-                error: 'changePageMetsError',
-                message: msg
+            function(doc) {
+                events.trigger('changePageMets',doc);
+                events.trigger('changePage',data);
+            },
+            function(msg) {
+                events.trigger('changePageMetsError',{
+                    error: 'changePageMetsError',
+                    message: msg
             })
         });
     });

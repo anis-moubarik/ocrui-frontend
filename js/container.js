@@ -426,6 +426,8 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
         },
         triggerNewViewport: function() {
+            console.log('trigger: newViewport', this.originX, this.originY, this.pageScale);
+            console.trace();
             events.delay('newViewport',{
                 originX:this.originX,
                 originY:this.originY,

@@ -13,8 +13,8 @@ define(['events','backbone'],
         }
     });
 
-    var currentPageNumber = undefined;
-    var currentDocId = undefined;
+    var currentPageNumber;
+    var currentDocId;
     var router = new Router();
 
     events.on('appReady', function() { Backbone.history.start(); });
@@ -32,40 +32,26 @@ define(['events','backbone'],
     });
     
     router.on("route:page", routePage);
-    function routePage(docId,pageId) {
+    function routePage(docId,pageId,viewport) {
 
         var pageNumber = Math.floor(parseInt(pageId,10));
 
         if (currentDocId != docId) {
-            events.trigger('changeDocument',{
-                docId:docId
+            events.trigger('changeDocumentAndPage',{
+                docId:docId,
+                pageNumber:pageNumber
             });
-            currentDocId = docId;
-        }
-
-        if (currentPageNumber != pageNumber) {
+        } else if (currentPageNumber != pageNumber) {
             events.trigger('changePage',{
                 pageNumber:pageNumber
             });
-            currentPageNumber = pageNumber;
         }
+        currentDocId = docId;
+        currentPageNumber = pageNumber;
 
     }
 
-    router.on("route:pageVP", function routePageVP(docId,pageId,viewport) {
-        events.on('changePageDone',function() {
-            var parts = viewport.split('x');
-            if (parts.length != 3) return;
-            var vp = {
-                originX: parseInt(parts[0],10),
-                originY: parseInt(parts[1],10),
-                pageScale: parseFloat(parts[2])
-            }
-            events.trigger('newViewportRequest',vp);
-        });
-        routePage(docId,pageId);
-    });
-
+    router.on("route:pageVP", routePage);
 
     events.on('newViewport',function newViewport(vp) {
         var route = '';
@@ -79,10 +65,24 @@ define(['events','backbone'],
 
         var parts = Backbone.history.fragment.split('/');
         var route = parts[0] + '/' + data.pageNumber;
-        if (parts[2] !== undefined) route += '/' + parts[2];
-        router.navigate(route,{replace:true,trigger:false});
+        var viewport = parts[2];
+        if (viewport !== undefined) {
+            var vParts = viewport.split('x');
+            route += '/' + viewport;
+            if (vParts.length == 3) {
+                var vp = {
+                    originX: parseInt(vParts[0],10),
+                    originY: parseInt(vParts[1],10),
+                    pageScale: parseFloat(vParts[2])
+                }
+                events.trigger('newViewportRequest',vp);
+            }
+        }
 
+        router.navigate(route,{replace:true,trigger:false});
     });
+
+
 
     return {
         // expose these for testing

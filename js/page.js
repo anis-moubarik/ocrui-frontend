@@ -1,5 +1,5 @@
-define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
-        function ($,events,mets,toolbar,mustache,mybackbone,templates) {
+define(['jquery','events','toolbar','mustache','mybackbone','templates'],
+        function ($,events,toolbar,mustache,mybackbone,templates) {
     "use strict";
 
     var facsimileRendered = undefined;
@@ -66,8 +66,12 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
                 title:"Save",
                 modes:["page"],
                 click: function () {
-                    var dirtyPages = doc.dirtyPages();
-                    console.log('dirty pages:' + (dirtyPages.join(' ')));
+                    var dirtyPages = that.mets.dirtyPages();
+                    var pNums = dirtyPages.map(function (p) {
+                        return p.get('pageNumber');
+                    });
+                    var dString = pNums.join(' ');
+                    console.log('dirty pages:', dString);
                     console.log('should now PUT');
                 }
             });
@@ -106,8 +110,9 @@ define(['jquery','events','mets','toolbar','mustache','mybackbone','templates'],
             this.options.pageNumber = data.pageNumber;
             this.render();
         },
-        changePageMets: function(doc) {
-            var pages = doc.getNumberOfPages();
+        changePageMets: function(mets) {
+            var pages = mets.getNumberOfPages();
+            this.mets = mets;
             this.setPageNumberBounds(1,pages);
             this.render();
         },
