@@ -78,6 +78,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         setGeometry: function(data) {
             this.horizontalPixels = data.facsimileWidth;
             this.verticalPixels = data.facsimileHeight;
+            this.setZoom(this.pageScale);
             this.scheduleRender ();
         },
         setMouseSensitivity: function(b) {
