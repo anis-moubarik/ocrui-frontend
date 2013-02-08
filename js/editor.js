@@ -79,8 +79,9 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
         },
         requestLanguageChange: function(selected) {
             var wordIndexes = this.getCurrentWordIndexes();
-            for (var wordIndex in wordIndexes) {
-                this.alto.setNthWordLanguage(wordIndex,selected);
+            for (var wordIndexIndex in wordIndexes) {
+                var i = wordIndexes[wordIndexIndex];
+                this.alto.setNthWordLanguage(i,selected);
             }
             this.cMirror.replaceSelection(this.cMirror.getSelection());
             this.cMirror.focus();
@@ -138,12 +139,9 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             var e_line = end.line;
             var e_ch = end.ch;
             var inMiddleOfWord = false;
+            var slice = "";
             for (var i in content) {
                 var c = content[i];
-                if (c == '\n') {
-                    s_line --;
-                    e_line --;
-                }
                 if (c.match(/\S/)) {
                     if (inMiddleOfWord) wordIndex ++;
                     inMiddleOfWord = false;
@@ -155,15 +153,34 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                     if (s_ch <= 0) {
 
                         wordIndexes[wordIndex] = true;
+                        slice += c;
                     }
                     s_ch --;
+                    if (e_line <=0) {
+                        if (e_ch <= 0) {
+                            var isEmpty = true;
+                            for (var i in wordIndexes) {
+                                isEmpty = false;
+                                break;
+                            }
+                            if (isEmpty) {
+                                slice += c;
+                                wordIndexes[wordIndex] = true;
+                            }
+                            break;
+                        }
+                        e_ch --;
+                    }
                 }
-                if (e_line <=0) {
-                    if (e_ch === 0) break;
-                    e_ch --;
+                if (c == '\n') {
+                    s_line --;
+                    e_line --;
                 }
             }
-            return wordIndexes;
+            var wordIndexArray = _.map(wordIndexes,function (v,k) {
+                return parseInt(k);
+            });
+            return wordIndexArray;
         },
         setupHighlightChange: function () {
 
@@ -171,7 +188,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             var that = this;
             var words = _.map(wordIndexes,function (v,k) {
 
-                return that.alto.getNthWord(k);
+                return that.alto.getNthWord(v);
 
             });
 
