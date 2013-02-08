@@ -159,7 +159,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                     if (e_line <=0) {
                         if (e_ch <= 0) {
                             var isEmpty = true;
-                            for (var i in wordIndexes) {
+                            for (var j in wordIndexes) {
                                 isEmpty = false;
                                 break;
                             }
@@ -178,7 +178,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }
             }
             var wordIndexArray = _.map(wordIndexes,function (v,k) {
-                return parseInt(k);
+                return parseInt(k,10);
             });
             return wordIndexArray;
         },

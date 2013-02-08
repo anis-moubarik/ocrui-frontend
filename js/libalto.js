@@ -122,13 +122,13 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     ContentUpdateProcess.prototype.createAltoFromOriginalAndWords = function (
             original, words) {
 
-        words = words.map(_.identity); // jsdiff.diff edits second argument!!
+        words = _.map(words,_.identity); // jsdiff.diff edits second argument!!
         var originalWords = $(original).find('String').map( function() {
                 return this.getAttribute('CONTENT') || '';
             }).get();
         var diff = jsdiff.diff(originalWords,words);
         var seq = getEditSequence(diff);
-        this.dirty = seq.reduce(function(prev,cur){
+        this.dirty = _.reduce(seq,function(prev,cur){
             return prev || cur != 'match';
         },false);
         var $strings = this.$target.find('String');
@@ -297,7 +297,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     ContentUpdateProcess.prototype.updateLanguages =
                 function(words,currentWords,currentLangs) {
 
-        words = words.map(_.identity); // jsdiff.diff edits second argument!!
+        words = _.map(words,_.identity); // jsdiff.diff edits second argument!!
         var diff = jsdiff.diff(currentWords,words);
         var seq = getEditSequence(diff);
         
@@ -431,7 +431,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         var minDistanceWord;
         var that=this;
         // find bounding box under or closest to the cursor.
-        this.words.map(function(word,i) {
+        _.map(this.words,function(word,i) {
 
             // look for an exact match
             if ((x >= word.hpos) && (x <= word.hpos + word.width) &&
@@ -476,19 +476,19 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     };
 
     Alto.prototype.getStringSequence = function() {
-        return this.words.map(function(e,i) {return e.content;});
+        return _.map(this.words,function(e,i) {return e.content;});
     };
 
     Alto.prototype.getLanguageSequence = function () {
-        return this.words.map(function(e,i) {return e.language;});
+        return _.map(this.words,function(e,i) {return e.language;});
     };
 
     Alto.prototype.getChangedSequence = function() {
-        return this.words.map(function(e,i) {return e.changed;});
+        return _.map(this.words,function(e,i) {return e.changed;});
     };
 
     Alto.prototype.getChangedSinceSaveSequence = function() {
-        return this.words.map(function(e,i) {return e.changedSinceSave;});
+        return _.map(this.words,function(e,i) {return e.changedSinceSave;});
     };
 
     return {

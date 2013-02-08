@@ -1,5 +1,5 @@
-define(['jquery','events','templates','mustache','mybackbone','languages'],
-        function ($,events,templates,mustache,mybackbone,languages) {
+define(['underscore','jquery','events','templates','mustache','mybackbone','languages'],
+        function (_,$,events,templates,mustache,mybackbone,languages) {
     "use strict";
 
     var View = mybackbone.View.extend({
@@ -28,7 +28,7 @@ define(['jquery','events','templates','mustache','mybackbone','languages'],
         },
         changeCoordinates: function (words) {
             if (words === undefined) return; // do something else
-            var newLanguage = words.reduce( function (prev,cur) {
+            var newLanguage = _.reduce(words, function (prev,cur) {
                 var l = cur.language;
                 if (prev === null) return l;
                 if (prev != l) return undefined;
@@ -59,8 +59,7 @@ define(['jquery','events','templates','mustache','mybackbone','languages'],
                 chars: []
             };
             var isAnySelected = false;
-            context.languages = this.languages.languages.
-                map(function(e) {
+            context.languages = _.map(this.languages.languages, function(e) {
                     var o = {
                         code: e.code,
                         name: e.name,

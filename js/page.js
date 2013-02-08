@@ -1,6 +1,6 @@
 /*global console:false */
-define(['jquery','events','toolbar','mustache','mybackbone','templates'],
-        function ($,events,toolbar,mustache,mybackbone,templates) {
+define(['underscore','jquery','events','toolbar','mustache','mybackbone','templates'],
+        function (_,$,events,toolbar,mustache,mybackbone,templates) {
     "use strict";
 
     var facsimileRendered;
@@ -68,7 +68,7 @@ define(['jquery','events','toolbar','mustache','mybackbone','templates'],
                 modes:["page"],
                 click: function () {
                     var dirtyPages = that.mets.dirtyPages();
-                    var pNums = dirtyPages.map(function (p) {
+                    var pNums = _.map(dirtyPages,function (p) {
                         return p.get('pageNumber');
                     });
                     var dString = pNums.join(' ');

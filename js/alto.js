@@ -1,5 +1,5 @@
-define(['jquery','libalto','mybackbone','mets','utils','events'],
-        function ($,libalto,mybackbone,mets,utils,events) {
+define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
+        function (_,$,libalto,mybackbone,mets,utils,events) {
     "use strict";
 
     var AltoModel = mybackbone.Model.extend({
@@ -45,7 +45,7 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
             var s = "";
             var layoutBoxes = this.getLayoutBoxes();
             var strings = this.getStringSequence();
-            layoutBoxes.map(function (l) {
+            _.map(layoutBoxes,function (l) {
                 for (var i = l.fromIndex; i < l.toIndex; i++) {
                     if (i > l.fromIndex) s += " ";
                     s += strings[i];
@@ -65,12 +65,6 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
             return data;
         }
     });
-
-    var altos = {};
-
-    function getAltoId(options) {
-        return options.docId+'/'+options.pageNumber;
-    }
 
     function get(options) {
 
@@ -106,7 +100,13 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
         return promise;
     }
 
+    var altos = {};
+
+    function getAltoId(options) {
+        return options.docId+'/'+options.pageNumber;
+    }
+
     return {
-        get: get
+        get : get
     };
 });
