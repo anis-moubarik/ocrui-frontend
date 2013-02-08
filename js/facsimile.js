@@ -32,33 +32,8 @@ define(['jquery','events','mybackbone','image','container'],
             this.nextAttributes = this.getAttributes(attributes,1);
             this.prevAttributes = this.getAttributes(attributes,-1);
             image.get(attributes).done( function (img) {
+                that.gotNewImage(img);
 
-                /* if (that.attributes != attributes) return; */
-                that.image = img;
-                /*
-                that.prevImage = undefined;
-                that.nextImage = undefined;
-                */
-                events.trigger('changePageImage',img); 
-                that.render();
-
-                image.get(that.nextAttributes).done( function (img) {
-                    /*
-                    if (that.attributes != attributes) return;
-                    that.nextImage = img;
-
-                    container.view.setNextImageSize(img.width,img.height);
-                    that.render();
-                    */
-                });
-                image.get(that.prevAttributes).done( function (img) {
-                    /*
-                    if (that.attributes != attributes) return;
-                    that.prevImage = img;
-                    container.view.setPrevImageSize(img.width,img.height);
-                    that.render();
-                    */
-                });
 
             }).fail(function(msg) {
 
@@ -70,34 +45,67 @@ define(['jquery','events','mybackbone','image','container'],
             });
 
         },
+        gotNewImage: function(img) {
+            if (this.$container != undefined) {
+                this.$container.remove();
+            }
+            this.$container = $('<div></div>');
+            this.$container.attr('class','page-image-container');
+            /* if (that.attributes != attributes) return; */
+            this.image = img;
+            /*
+            this.prevImage = undefined;
+            this.nextImage = undefined;
+            */
+            this.$img = $(this.image.image);
+            this.$img.attr('class','page-image');
+            this.$img.attr('width','100%');
+            this.$img.attr('height','100%');
+            this.$container.append(this.$img);
+            this.$el.append(this.$container);
+            this.lastRenderedCSS = {};
+            this.render();
+
+            events.trigger('changePageImage',img); 
+
+            image.get(this.nextAttributes).done( function (img) {
+                /*
+                if (this.attributes != attributes) return;
+                this.nextImage = img;
+
+                container.view.setNextImageSize(img.width,img.height);
+                this.render();
+                */
+            });
+            image.get(this.prevAttributes).done( function (img) {
+                /*
+                if (this.attributes != attributes) return;
+                this.prevImage = img;
+                container.view.setPrevImageSize(img.width,img.height);
+                this.render();
+                */
+            });
+        },
         render: function() {
 
-            var ctx = this.$el.get(0).getContext("2d");
-            var w = container.view.getWidth();
-            var h = container.view.getHeight();
+            if (!this.$img) { return; }
+
             var zoom = container.view.getZoom();
-            var originX = container.view.getOriginX();
-            var originY = container.view.getOriginY();
 
-            if (!this.image) { return; }
-
-            ctx.setTransform(1,0,0,1,0,0);
-            ctx.clearRect( 0, 0, w, h);
-    
-            ctx.setTransform( zoom, 0, 0, zoom, originX, originY );
-
-            ctx.shadowColor = 'black';
-            ctx.shadowBlur = 20;
-
-            ctx.drawImage(this.image.image,0,0);
-            /*
-            if (this.nextImage) {
-                ctx.drawImage(this.nextImage.image,0,this.image.height*1.1);
+            var newCSS = {
+                left : container.view.getOriginX(),
+                top : container.view.getOriginY(),
+                width : zoom * this.image.get('width'),
+                height : zoom * this.image.get('height')
             }
-            if (this.prevImage) {
-                ctx.drawImage(this.prevImage.image,0,-this.prevImage.height*1.1);
+
+            for (var prop in newCSS) {
+                if (newCSS[prop] != this.lastRenderedCSS[prop]) {
+                    this.$container.css(prop,newCSS[prop]);
+                    this.lastRenderedCSS[prop] = newCSS[prop];
+                }
             }
-            */
+
             events.trigger('facsimileRendered',this.attributes);
 
         }

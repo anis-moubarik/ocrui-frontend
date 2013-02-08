@@ -25,8 +25,6 @@ define(['jquery','events'], function($,events) {
             $('.CodeMirror').height(availableH);
             $('#facsimile-container').height(availableH);
             $('#spinner').height(availableH);
-            $('#facsimile-canvas').attr('height',facsimileHeight);
-            $('#facsimile-canvas').attr('width',facsimileWidth);
             currentGeometry = data;
             events.trigger('setGeometry',data);
         }

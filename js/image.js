@@ -12,8 +12,8 @@ define(['jquery','mybackbone','mets'],function ($,mybackbone,mets) {
             this.image.src = this.url;
             var that = this;
             this.image.onload = function() { 
-                that.width = this.width;
-                that.height = this.height;
+                that.set('width', this.width);
+                that.set('height', this.height);
                 that.loading.resolve(that);
             };
             this.image.onerror = function() { 

@@ -47,12 +47,14 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
 
         },
         events: {
+            /*
             'click': 'click',
             'dblclick #boxes': 'clickOutsideBoxes',
             'click .layout-box': 'clickLayoutBox',
             'dblclick .layout-box': 'clickLayoutBox',
             'resize .layout-box': 'resizeLayoutBox',
             'drag .layout-box': 'dragLayoutBox',
+            */
         },
         click: function (ev) {
             console.log('c',ev);

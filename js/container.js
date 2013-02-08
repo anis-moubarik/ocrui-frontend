@@ -426,8 +426,6 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
         },
         triggerNewViewport: function() {
-            console.log('trigger: newViewport', this.originX, this.originY, this.pageScale);
-            console.trace();
             events.delay('newViewport',{
                 originX:this.originX,
                 originY:this.originY,
@@ -435,8 +433,8 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             });
         },
         setImageSize: function(image) {
-            this.imageWidth = image.width;
-            this.imageHeight = image.height;
+            this.imageWidth = image.get('width');
+            this.imageHeight = image.get('height');
         },
         /*
         setNextImageSize: function(w,h) {
