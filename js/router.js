@@ -15,6 +15,7 @@ define(['events','backbone'],
 
     var currentPageNumber;
     var currentDocId;
+    var changePageInProgress;
     var router = new Router();
 
     events.on('appReady', function() { Backbone.history.start(); });
@@ -48,37 +49,51 @@ define(['events','backbone'],
         }
         currentDocId = docId;
         currentPageNumber = pageNumber;
+        changePageInProgress = {
+            docId: docId,
+            pageNumber: pageNumber,
+            viewport: viewport
+        }
 
     }
 
     router.on("route:pageVP", routePage);
 
     events.on('newViewport',function newViewport(vp) {
+
+        if (changePageInProgress) return;
+
         var parts = Backbone.history.fragment.split('/');
-        var viewRoute = vp.originX + 'x' + vp.originY + 'x' + vp.pageScale;
+        var viewRoute = vp.originX + 'x' + vp.originY + 'x' + vp.pageScale +
+            'x' + (vp.vertical ? 'V' : 'H');
         var route = parts[0] + '/' + parts[1] + '/' + viewRoute;
         router.navigate(route,{replace:true,trigger:false});
+
     });
 
     events.on('changePageDone',function (data) {
 
+        // once everything is done, navigate to savedFragment
         var parts = Backbone.history.fragment.split('/');
         var route = parts[0] + '/' + data.pageNumber;
         var viewport = parts[2];
         if (viewport !== undefined) {
             var vParts = viewport.split('x');
             route += '/' + viewport;
-            if (vParts.length == 3) {
+            if (vParts.length == 4) {
                 var vp = {
                     originX: parseInt(vParts[0],10),
                     originY: parseInt(vParts[1],10),
-                    pageScale: parseFloat(vParts[2])
+                    pageScale: parseFloat(vParts[2]),
+                    vertical: vParts[3] == 'V' ? true : false
                 };
                 events.trigger('newViewportRequest',vp);
             }
         }
 
+        changePageInProgress = undefined;
         router.navigate(route,{replace:true,trigger:false});
+
     });
 
 

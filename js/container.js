@@ -55,7 +55,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         myEvents: {
             'changeCoordinates':'possiblyScrollToHighlight',
             'setGeometry': 'setGeometry',
-            'newViewportRequest' : 'setViewport',
+            'newViewportRequest' : 'newViewportRequest',
             'mousetail' : 'panTail',
             'setPageGeometry':'setPageGeometry',
             'changePageImage':'setImageSize',
@@ -75,7 +75,14 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             this.pageWidth = data.width;
             this.pageHeight = data.height;
         },
+        setLayoutVertical: function(vertical) {
+            this.vertical = vertical ? true : false;
+        },
+        isLayoutVertical: function () {
+            return this.vertical;
+        },
         setGeometry: function(data) {
+            this.setLayoutVertical(data.vertical);
             this.horizontalPixels = data.facsimileWidth;
             this.verticalPixels = data.facsimileHeight;
             this.setZoom(this.pageScale);
@@ -84,7 +91,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         setMouseSensitivity: function(b) {
             this.mouseSensitivity = b ? true : false;
         },
-        setViewport: function(vp) {
+        newViewportRequest: function(vp) {
             this.setOrigin(vp.originX,vp.originY);
             this.setZoom(vp.pageScale);
             this.scrollingTo = undefined;
@@ -430,7 +437,8 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             events.delay('newViewport',{
                 originX:this.originX,
                 originY:this.originY,
-                pageScale:this.pageScale
+                pageScale:this.pageScale,
+                vertical:this.isLayoutVertical()
             });
         },
         setImageSize: function(image) {

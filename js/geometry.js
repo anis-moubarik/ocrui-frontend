@@ -20,6 +20,10 @@ define(['jquery','events', 'toolbar'], function($,events,toolbar) {
         resizeHandler ();
     }
 
+    function newViewportRequest(data) {
+        changeLayout(data.vertical);
+    }
+
     function resizeHandler () {
         var topHeight = $('#toolbar').outerHeight();
         var bottomHeight = $('#bottom-geometry').outerHeight();
@@ -37,10 +41,12 @@ define(['jquery','events', 'toolbar'], function($,events,toolbar) {
         var facsimileHeight = availableH;
         var data = {
             facsimileWidth: facsimileWidth,
-            facsimileHeight: facsimileHeight
+            facsimileHeight: facsimileHeight,
+            vertical: vertical
         };
 
         if (
+            (data.vertical != currentGeometry.vertical) ||
             (data.facsimileWidth != currentGeometry.facsimileWidth) ||
             (data.facsimileHeight != currentGeometry.facsimileHeight)
             ) {
@@ -59,6 +65,7 @@ define(['jquery','events', 'toolbar'], function($,events,toolbar) {
     events.on('changePageDone',resizeHandler);
     events.on('changePageError',resizeHandler);
     events.on('keyboardLayoutChanged',resizeHandler);
+    events.on('newViewportRequest',newViewportRequest);
 
     toolbar.registerButton({
         id:'layout-selector',
