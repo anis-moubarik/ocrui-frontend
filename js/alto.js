@@ -50,7 +50,7 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
                     if (i > l.fromIndex) s += " ";
                     s += strings[i];
                 }
-                s += "\n";
+                s += "\n\n";
             });
             return s;
         },
