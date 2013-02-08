@@ -50,6 +50,7 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
 
             this.metsType = $(data).find('mets\\:mets, mets').attr('TYPE');
 
+
             if (this.metsType == 'METAe_Monograph') {
 
                 // loop through image files
@@ -73,6 +74,28 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                     that.pageInfo[seq][1] = altoFilename;
                 });
 
+            } else if (this.metsType == 'Newspaper') {
+                $(data).find('fileGrp[ID="IMGGRP"] file').each(function() {
+                    var seq = parseInt(this.getAttribute('SEQ'),10);
+                    var element = $(this).find('FLocat').get(0);
+                    var imageFilename = element.getAttribute('xlink:href');
+                    imageFilename = imageFilename.replace(/^file:\/\/\.\/preservation_img\/pr/,'access_img\/ac');
+                    imageFilename = imageFilename.replace(/jp2$/,'jpg');
+                    that.pageInfo[seq] = [imageFilename,undefined,undefined];
+                });
+
+                // loop through alto files
+                var i = 1;
+                $(data).find('fileGrp[ID="ALTOGRP"] file').each(function() {
+                    var seq = i++;
+                    var element = $(this).find('FLocat').get(0);
+                    var altoFilename = element.getAttribute('xlink:href');
+                    altoFilename = altoFilename.replace(/^file:\/\//,'').replace(/.\//,'');
+                    if (that.pageInfo[seq] === undefined) {
+                        that.pageInfo[seq] = [undefined,undefined,undefined];
+                    }
+                    that.pageInfo[seq][1] = altoFilename;
+                });
             } else {
 
                 // loop through mets somehow

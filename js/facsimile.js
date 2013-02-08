@@ -69,23 +69,23 @@ define(['jquery','events','mybackbone','image','container'],
 
             events.trigger('changePageImage',img); 
 
+            /*
+
             image.get(this.nextAttributes).done( function (img) {
-                /*
                 if (this.attributes != attributes) return;
                 this.nextImage = img;
 
                 container.view.setNextImageSize(img.width,img.height);
                 this.render();
-                */
             });
             image.get(this.prevAttributes).done( function (img) {
-                /*
                 if (this.attributes != attributes) return;
                 this.prevImage = img;
                 container.view.setPrevImageSize(img.width,img.height);
                 this.render();
-                */
             });
+
+            */
         },
         render: function() {
 

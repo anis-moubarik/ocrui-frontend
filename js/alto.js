@@ -92,7 +92,7 @@ define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
                 }
                 alto.loading.then(
                     function () {promise.resolve(alto);},
-                    function () {promise.reject("Cannot load alto file");}
+                    function (err) {promise.reject(err);}
                 );
             },
             function (arg) { promise.reject(arg); }
