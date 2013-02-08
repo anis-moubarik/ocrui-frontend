@@ -164,10 +164,9 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             if (ev.which != 1) return;
 
             var pageCoords = {
-                x: this.getPageX(ev.offsetX),
-                y: this.getPageY(ev.offsetY)
+                x: this.getPageX(ev.pageX-this.$el.offset().left),
+                y: this.getPageY(ev.pageY-this.$el.offset().top)
             };
-
             events.trigger('cursorToCoordinate',pageCoords);
         },
         getPageWidth: function (screenWidth) {
