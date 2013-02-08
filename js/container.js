@@ -43,6 +43,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                     that.wheelPan = newState;
             }});
 
+
             toolbar.registerKeyboardShortcut(113, function(ev) {
                 $('#pan-zoom').click();
             });

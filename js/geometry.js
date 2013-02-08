@@ -1,15 +1,38 @@
 /*globals window:false */
-define(['jquery','events'], function($,events) {
+define(['jquery','events', 'toolbar'], function($,events,toolbar) {
     "use strict";
 
+    var vertical = false;
     var currentGeometry = {};
+
+    function changeLayout(vert) {
+        if (vert) {
+            vertical = true;
+            $('#facsimile-container').attr('class','horizontal span12');
+            $('#editor').attr('class','horizontal span12');
+
+
+        } else {
+            vertical = false;
+            $('#facsimile-container').attr('class','vertical span6');
+            $('#editor').attr('class','vertical span6');
+        }
+        resizeHandler ();
+    }
 
     function resizeHandler () {
         var topHeight = $('#toolbar').outerHeight();
         var bottomHeight = $('#bottom-geometry').outerHeight();
         var wHeight = $(window).innerHeight();
         var availableH = wHeight - topHeight - bottomHeight;
+        if (vertical) {
+            availableH /= 2;
+        } else {
+
+        }
+
         availableH -= 30; // TODO: what is 30!
+
         var facsimileWidth = $('#facsimile-container').innerWidth();
         var facsimileHeight = availableH;
         var data = {
@@ -36,6 +59,16 @@ define(['jquery','events'], function($,events) {
     events.on('changePageDone',resizeHandler);
     events.on('changePageError',resizeHandler);
     events.on('keyboardLayoutChanged',resizeHandler);
+
+    toolbar.registerButton({
+        id:'layout-selector',
+        toggle:true,
+        active: false,
+        icon:'icon-repeat',
+        title:'Horizontal / vertical layout',
+        modes:['page'],
+        toggleCB:changeLayout
+    });
 
     return {
         resizeHandler: resizeHandler
