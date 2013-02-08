@@ -53,6 +53,7 @@ require(
         "bibinfo",
         'container',
         'boxes',
+        'compatibility',
         'dialog'
     ], function($, geometry,events) {
 
