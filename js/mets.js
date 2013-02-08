@@ -101,12 +101,12 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
             this.data = response;
             this.parsePageInfo(response);
             return {};
-        },
+        }
 
     });
 
 
-    var currentDocId = undefined;
+    var currentDocId;
 
     var documents = {};
 
@@ -140,7 +140,7 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
     events.on('pageDirtyStateChanged', function (data) {
         getCurrent().done(function (mets) {
             events.trigger('documentDirtyStateChanged',mets.isDirty());
-        })
+        });
     });
     events.on('changeDocumentAndPage', function (data) {
         currentDocId = data.docId;
@@ -153,7 +153,7 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                 events.trigger('changePageMetsError',{
                     error: 'changePageMetsError',
                     message: msg
-            })
+            });
         });
     });
 

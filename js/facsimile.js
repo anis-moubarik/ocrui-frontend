@@ -13,6 +13,7 @@ define(['jquery','events','mybackbone','image','container'],
         myEvents: {
             'changePage': 'changePage',
             'scheduledRender': 'render',
+            'facsimileGotNewImage': 'facsimileGotNewImage'
         },
 
         events: {
@@ -22,7 +23,7 @@ define(['jquery','events','mybackbone','image','container'],
             var a = {
                 docId : attributes.docId,
                 pageNumber : attributes.pageNumber + pageDelta
-            }
+            };
             return a;
         },
         changePage: function(attributes) {
@@ -32,8 +33,8 @@ define(['jquery','events','mybackbone','image','container'],
             this.nextAttributes = this.getAttributes(attributes,1);
             this.prevAttributes = this.getAttributes(attributes,-1);
             image.get(attributes).done( function (img) {
-                that.gotNewImage(img);
 
+                events.delay('facsimileGotNewImage',img, 100);
 
             }).fail(function(msg) {
 
@@ -45,8 +46,8 @@ define(['jquery','events','mybackbone','image','container'],
             });
 
         },
-        gotNewImage: function(img) {
-            if (this.$container != undefined) {
+        facsimileGotNewImage: function(img) {
+            if (this.$container !== undefined) {
                 this.$container.remove();
             }
             this.$container = $('<div></div>');
@@ -97,7 +98,7 @@ define(['jquery','events','mybackbone','image','container'],
                 top : container.view.getOriginY(),
                 width : zoom * this.image.get('width'),
                 height : zoom * this.image.get('height')
-            }
+            };
 
             for (var prop in newCSS) {
                 if (newCSS[prop] != this.lastRenderedCSS[prop]) {
@@ -112,7 +113,7 @@ define(['jquery','events','mybackbone','image','container'],
     });
 
     return {
-        view: new View(),
+        view: new View()
     };
 
 });

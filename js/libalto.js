@@ -392,7 +392,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             hpos: parseInt(dom.getAttribute('HPOS'),10),
             vpos: parseInt(dom.getAttribute('VPOS'),10),
             width: parseInt(dom.getAttribute('WIDTH'),10),
-            height: parseInt(dom.getAttribute('HEIGHT'),10),
+            height: parseInt(dom.getAttribute('HEIGHT'),10)
 
         };
     };
@@ -408,14 +408,14 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         // original alto structure
 
         var newWords = content.split(/\s+/);
-        if (newWords[0] == "") newWords.splice(0,1);
+        if (newWords[0] === "") newWords.splice(0,1);
         var lastI = newWords.length-1;
-        if (newWords[lastI] == "") newWords.splice(lastI,1);
+        if (newWords[lastI] === "") newWords.splice(lastI,1);
         var process = new ContentUpdateProcess(
             this.original,
             newWords,
             this.getStringSequence(),
-            this.getLanguageSequence
+            this.getLanguageSequence()
             );
 
 
@@ -492,7 +492,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     };
 
     return {
-        Alto : Alto,
+        Alto : Alto
     };
 });
 

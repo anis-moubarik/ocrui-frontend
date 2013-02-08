@@ -7,7 +7,7 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
             this.set('pageNumber',options.pageNumber);
             this.url = options.doc.getAltoUrl(options.pageNumber);
             options.doc.registerAlto(options.pageNumber,this);
-            this.alto = new libalto.Alto()
+            this.alto = new libalto.Alto();
         },
         isDirty: function() {
             return this.alto.isDirty();
@@ -42,10 +42,10 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
             return this.alto.getLayoutBoxes();
         },
         getString: function() {
-            var s = ""
+            var s = "";
             var layoutBoxes = this.getLayoutBoxes();
             var strings = this.getStringSequence();
-            layoutBoxes.map(function (l,i) {
+            layoutBoxes.map(function (l) {
                 for (var i = l.fromIndex; i < l.toIndex; i++) {
                     if (i > l.fromIndex) s += " ";
                     s += strings[i];
@@ -63,7 +63,7 @@ define(['jquery','libalto','mybackbone','mets','utils','events'],
             this.alto.setOriginalXML(response);
             this.alto.setCurrentXML(response);
             return data;
-        },
+        }
     });
 
     var altos = {};

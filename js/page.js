@@ -1,9 +1,10 @@
+/*global console:false */
 define(['jquery','events','toolbar','mustache','mybackbone','templates'],
         function ($,events,toolbar,mustache,mybackbone,templates) {
     "use strict";
 
-    var facsimileRendered = undefined;
-    var editorRendered = undefined;
+    var facsimileRendered;
+    var editorRendered;
 
     events.on('facsimileRendered', function (d) { facsimileRendered.resolve(d); });
 

@@ -13,12 +13,12 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 changedSequence: [],
                 changedSinceSaveSequence: [],
                 languageSequence: []
-            }
+            };
             this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 
             // suppress default codemirror bindings
-            CodeMirror.commands.goPageUp = function () { }
-            CodeMirror.commands.goPageDown = function () { }
+            CodeMirror.commands.goPageUp = function () { };
+            CodeMirror.commands.goPageDown = function () { };
 
             toolbar.registerButton({
                 id:'show-saved-changes',
@@ -69,13 +69,13 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             'changePage':'changePage',
             'requestLanguageChange':'requestLanguageChange',
             'setupHighlightChange':'setupHighlightChange',
-            'pageDirtyStateChanged':'pageDirtyStateChanged',
+            'pageDirtyStateChanged':'pageDirtyStateChanged'
         },
         virtualKeyboard: function(data) {
-            that.cMirror.replaceSelection(data);
-            that.cMirror.focus();
-            var cursor = that.cMirror.getCursor();
-            that.cMirror.setCursor(cursor);
+            this.cMirror.replaceSelection(data);
+            this.cMirror.focus();
+            var cursor = this.cMirror.getCursor();
+            this.cMirror.setCursor(cursor);
         },
         requestLanguageChange: function(selected) {
             var wordIndexes = this.getCurrentWordIndexes();
@@ -215,7 +215,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
     });
 
     return {
-        view: new View(),
+        view: new View()
     };
 
 });

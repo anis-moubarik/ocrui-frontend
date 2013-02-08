@@ -15,11 +15,7 @@ define(['backbone','underscore','events'],function (Backbone,_,events) {
         this.delegateEvents();
     };
 
-    _.extend(View.prototype, Backbone.View.prototype, {delegateMyEvents:delegateMyEvents});
-    View.extend = Backbone.View.extend;
-    window.v = View;
-
-    function delegateMyEvents(evs) {
+    View.prototype.delegateMyEvents = function (evs) {
         var that = this;
         function cbFactory(m) {
             return function () {m.apply(that,arguments);};
@@ -34,7 +30,10 @@ define(['backbone','underscore','events'],function (Backbone,_,events) {
 
             events.on(key,cbFactory(method));
         }
-    }
+    };
+
+    _.extend(View.prototype, Backbone.View.prototype);
+    View.extend = Backbone.View.extend;
 
     var urlError = function() {
         throw new Error('A "url" property or function must be specified');

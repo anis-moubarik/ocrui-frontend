@@ -54,7 +54,6 @@ define(['events','backbone'],
     router.on("route:pageVP", routePage);
 
     events.on('newViewport',function newViewport(vp) {
-        var route = '';
         var parts = Backbone.history.fragment.split('/');
         var viewRoute = vp.originX + 'x' + vp.originY + 'x' + vp.pageScale;
         var route = parts[0] + '/' + parts[1] + '/' + viewRoute;
@@ -74,7 +73,7 @@ define(['events','backbone'],
                     originX: parseInt(vParts[0],10),
                     originY: parseInt(vParts[1],10),
                     pageScale: parseFloat(vParts[2])
-                }
+                };
                 events.trigger('newViewportRequest',vp);
             }
         }

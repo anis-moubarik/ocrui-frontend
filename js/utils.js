@@ -24,7 +24,7 @@ define(['underscore'],function (_) {
 
     return {
         getCombinedBoundingBox: getCombinedBoundingBox
-    }
+    };
 });
 
 

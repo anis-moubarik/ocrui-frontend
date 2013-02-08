@@ -67,7 +67,7 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
         },
         el : '#toolbar',
         myEvents: {
-            'changePage': 'setPageMode',
+            'changePage': 'setPageMode'
         },
         events: {
             'click button': 'handleClick'

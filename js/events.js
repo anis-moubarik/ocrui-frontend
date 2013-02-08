@@ -1,3 +1,4 @@
+/*global setTimeout:false clearTimeout:false */
 define(function () {
     "use strict";
 
@@ -15,7 +16,7 @@ define(function () {
     var schedule = {};
 
     // debug:
-    //onAny(function(ev,data) {console.log(ev,data);});
+    onAny(function(ev,data) {console.log(ev,data);});
 
     // listen to all sent events, for testing and debugging
     function onAny (cb) {
@@ -35,17 +36,20 @@ define(function () {
 
     function triggerImmediately (ev, data) {
 
+        var i;
+        var cb;
+
         if (!(ev in listeners)) {
             listeners[ev] = [];
         }
 
-        for (var i in listeners[ev]) {
-            var cb = listeners[ev][i];
+        for (i in listeners[ev]) {
+            cb = listeners[ev][i];
             cb(data);
         }
 
-        for (var i in anyListeners) {
-            var cb = anyListeners[i];
+        for (i in anyListeners) {
+            cb = anyListeners[i];
             cb(ev,data);
         }
 
@@ -58,24 +62,6 @@ define(function () {
     function trigger (ev,data) {
 
         delay(ev,data,0);
-
-    }
-
-    /* Delayed triggering of an event. Waits a moment before triggering
-     * and only triggers once if there is many triggering requests done
-     * in short time period.
-     */
-    function delay (ev,data,timeout) {
-
-        if (timeout === undefined) {
-            timeout = 100;
-        }
-
-        clearScheduledCallbacks(ev);
-
-        schedule[ev] = setTimeout(function() {
-            triggerImmediately(ev,data);
-        }, timeout);
 
     }
 

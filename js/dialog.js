@@ -1,4 +1,4 @@
-define(['events','mustache','mybackbone','templates'],function (events,mustache,mybackbone,templates) {
+define(['jquery','events','mustache','mybackbone','templates'],function ($,events,mustache,mybackbone,templates) {
     "use strict";
 
     var View = mybackbone.View.extend({
@@ -16,7 +16,7 @@ define(['events','mustache','mybackbone','templates'],function (events,mustache,
             'message': 'pushEvent'
         },
         events: {
-            'click #dialog-ok': 'dropMessages',
+            'click #dialog-ok': 'dropMessages'
         },
         dropMessages: function() {
             this.errors = [];

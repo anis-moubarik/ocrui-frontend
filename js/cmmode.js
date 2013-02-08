@@ -8,7 +8,7 @@ define(['codemirror'],function (CodeMirror) {
             startState: function() {
                 var state = {
                     language:'fi',
-                    wordIndex:0,
+                    wordIndex:0
                 };
                 return state;
             },
@@ -41,7 +41,7 @@ define(['codemirror'],function (CodeMirror) {
 
                 }
                 state.wordIndex++;
-                return features.join(' ');;
+                return features.join(' ');
             }
         };
     }

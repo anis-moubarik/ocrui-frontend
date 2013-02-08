@@ -1,4 +1,4 @@
-define(['jquery','toolbar','events','mybackbone','container','alto',],
+define(['jquery','toolbar','events','mybackbone','container','alto'],
         function ($,toolbar,events,mybackbone,container,alto) {
     "use strict";
 
@@ -7,7 +7,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
         initialize: function() {
 
             var that = this;
-            this.layoutBoxes = []
+            this.layoutBoxes = [];
 
             toolbar.registerButton({
                 id:'show-layout',
@@ -43,7 +43,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
 
             'changeCoordinates': 'setHighlightBoxes',
             'scheduledRender': 'render',
-            'changePage': 'changePage',
+            'changePage': 'changePage'
 
         },
         events: {
@@ -57,12 +57,12 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
             */
         },
         click: function (ev) {
-            console.log('c',ev);
+            //console.log('c',ev);
         },
         dragLayoutBox: function (ev,ui) {
             var x = container.view.getPageX(ui.offset.left);
             var y = container.view.getPageY(ui.offset.top);
-            console.log(x,y);
+            //console.log(x,y);
         },
         resizeLayoutBox: function (ev,ui) {
             var offsetX = ui.position.left - this.$el.offset().left;
@@ -71,7 +71,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
             var y = container.view.getPageY(offsetY);
             var w = container.view.getPageWidth(ui.size.width);
             var h = container.view.getPageHeight(ui.size.height);
-            console.log(x,y,w,h);
+            //console.log(x,y,w,h);
         },
         clickLayoutBox: function(ev) {
             if (ev.type == "dblclick") {
@@ -93,7 +93,8 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
                     vpos: container.view.getPageY(ev.offsetY),
                     width: 100,
                     height: 100 
-                }
+                };
+
                 this.renderBoxes ([box],"layout-box",true);
                 ev.stopPropagation();
             }
@@ -131,7 +132,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
                     vpos : container.view.getScreenY(box.vpos)-3,
                     width : container.view.getScreenWidth(box.width)+6,
                     height : container.view.getScreenHeight(box.height)+6
-                }
+                };
 
                 $div = $('<div> </div>');
                 $div.attr('class',cls);
@@ -144,9 +145,9 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
 
 
                 if (editable) {
-                    $div.resizable({
-                        handles: "n, ne, e, se, s, sw, w, nw",
-                    });
+                    $div.resizable( {
+                        handles: "n, ne, e, se, s, sw, w, nw"
+                    } );
                     $div.draggable({ });
                 }
 
@@ -174,7 +175,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto',],
     });
 
     return {
-        view: new View(),
+        view: new View()
     };
 
 });

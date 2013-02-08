@@ -60,7 +60,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'changePageImage':'setImageSize',
             'changePage':'changePage',
             'scrollOneStep':'scrollOneStep',
-            'scheduledRender':'render',
+            'scheduledRender':'render'
         },
         events: {
             'click': 'propagateClick',
@@ -68,7 +68,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'mousemove': 'pan',
             'mousedown': 'beginPan',
             'mouseup': 'endPan',
-            'mouseout': 'endPan',
+            'mouseout': 'endPan'
         },
         setPageGeometry: function(data) {
             this.pageWidth = data.width;
@@ -273,7 +273,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         scrollMargin: 50,
         scrollOneStep: function () {
 
-            if (this.scrollingTo == undefined) return;
+            if (this.scrollingTo === undefined) return;
             var that = this;
             var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,this.scrollMargin) * this.scrollSpeed);
             var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,this.scrollMargin) * this.scrollSpeed);
@@ -429,7 +429,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             events.delay('newViewport',{
                 originX:this.originX,
                 originY:this.originY,
-                pageScale:this.pageScale,
+                pageScale:this.pageScale
             });
         },
         setImageSize: function(image) {
@@ -459,7 +459,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
     });
 
     return {
-        view: new View(),
+        view: new View()
     };
 
 });

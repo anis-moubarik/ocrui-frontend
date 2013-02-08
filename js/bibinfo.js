@@ -23,7 +23,7 @@ define(['jquery','events','mustache','mybackbone','toolbar','templates'],
             'changePageMets':function(mets) {
                     this.setDocument(mets);
                     this.render();
-                },
+                }
         },
         getMarcXML : function(mets) {
             var $marc = $(mets.data).find('MARC\\:record, record');
@@ -46,7 +46,7 @@ define(['jquery','events','mustache','mybackbone','toolbar','templates'],
             this.marcxml = this.getMarcXML(mets);
         },
         moreBibInfo : function (ev) {
-                console.log('x');
+                //console.log('x');
                 ev.preventDefault();
                 ev.stopPropagation();
         },

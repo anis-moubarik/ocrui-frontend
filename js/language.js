@@ -30,7 +30,7 @@ define(['jquery','events','templates','mustache','mybackbone','languages'],
             if (words === undefined) return; // do something else
             var newLanguage = words.reduce( function (prev,cur) {
                 var l = cur.language;
-                if (prev == null) return l;
+                if (prev === null) return l;
                 if (prev != l) return undefined;
                 return l;
             }, null);
@@ -65,7 +65,7 @@ define(['jquery','events','templates','mustache','mybackbone','languages'],
                         code: e.code,
                         name: e.name,
                         selected: ' '
-                        }
+                    };
                     if (e.code==that.languages.selected) {
                         context.selectedName = e.name;
                         o.selected = "selected";

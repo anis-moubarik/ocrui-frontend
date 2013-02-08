@@ -18,7 +18,7 @@ define(['jquery','mybackbone','mets'],function ($,mybackbone,mets) {
             };
             this.image.onerror = function() { 
                 that.loading.reject(that);
-            }
+            };
         }
     });
 
