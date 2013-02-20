@@ -44,6 +44,12 @@ define(['codemirror'],function (CodeMirror) {
                     features.push('language');
 
                 }
+                if (config.showHighlight &&
+                    config.highlight[state.wordIndex]) {
+
+                    features.push('highlight');
+
+                }
 
                 // next word
                 state.wordIndex++;

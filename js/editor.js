@@ -13,6 +13,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 changedSequence: [],
                 changedSinceSaveSequence: [],
                 languageSequence: [],
+                highlight: {},
             };
             this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 
@@ -20,6 +21,17 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             CodeMirror.commands.goPageUp = function () { };
             CodeMirror.commands.goPageDown = function () { };
 
+            toolbar.registerButton({
+                id:'highlight-editor-word',
+                toggle:true,
+                active:true,
+                icon:'icon-star',
+                title:'Highlight word in editor',
+                modes:['page'],
+                toggleCB:function(newState) {
+                    that.cMirror.setOption('showHighlight',newState);
+                    that.cMirror.replaceSelection(that.cMirror.getSelection());
+                }});
             toolbar.registerButton({
                 id:'show-saved-changes',
                 toggle:true,
@@ -57,6 +69,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 events.delayOrIgnore('setupHighlightChange',undefined,100);
             });
             this.cMirror.on('change',function (instance) {
+                if (that.suppressChanged) return ;
                 that.changed(instance);
             });
 
@@ -177,6 +190,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                     e_line --;
                 }
             }
+            this.words = wordIndexes;
             var wordIndexArray = _.map(wordIndexes,function (v,k) {
                 return parseInt(k,10);
             });
@@ -192,34 +206,12 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
 
             });
 
+            that.cMirror.setOption('highlight',this.words);
+            this.suppressChanged = true;
+            this.cMirror.view.frontier = 0;
+            this.cMirror.replaceSelection(this.cMirror.getSelection());
+            this.suppressChanged = false;
 
-            if (this.oldHighlight) {
-                this.oldHighlight.clear();
-                this.oldHighlight = undefined;
-            }
-
-            var start = this.cMirror.getCursor('start');
-            var start_token = this.cMirror.getTokenAt(start);
-            var end = this.cMirror.getCursor('end');
-            var end_token = this.cMirror.getTokenAt(end);
-            console.log(start_token,end_token)
-            console.log(start,end)
-            
-
-            var marker = this.cMirror.markText(
-                {
-                    line: start.line,
-                    ch: start_token.start
-                },
-                {
-                    line: end.line,
-                    ch: end_token.end
-                },
-                {
-                    className:'cm-highlight'
-                }
-            );
-            this.oldHighlight = marker;
             events.trigger('changeCoordinates',words);
 
         },
