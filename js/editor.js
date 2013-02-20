@@ -24,9 +24,9 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             toolbar.registerButton({
                 id:'highlight-editor-word',
                 toggle:true,
-                active:true,
+                active:false,
                 icon:'icon-star',
-                title:'Highlight word in editor',
+                title:'Highlight word under cursor in editor',
                 modes:['page'],
                 toggleCB:function(newState) {
                     that.cMirror.setOption('showHighlight',newState);
