@@ -21,6 +21,10 @@
     font-weight: bold;
 }
 
+.cm-highlight {
+    background: rgba(255,255,0,0.2);
+}
+
 .row-fluid .vertical {
     margin-top: 0;
     margin-bottom: 0;

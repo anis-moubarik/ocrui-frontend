@@ -12,7 +12,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 mode: 'ocrui',
                 changedSequence: [],
                 changedSinceSaveSequence: [],
-                languageSequence: []
+                languageSequence: [],
             };
             this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 
@@ -192,7 +192,36 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
 
             });
 
+
+            if (this.oldHighlight) {
+                this.oldHighlight.clear();
+                this.oldHighlight = undefined;
+            }
+
+            var start = this.cMirror.getCursor('start');
+            var start_token = this.cMirror.getTokenAt(start);
+            var end = this.cMirror.getCursor('end');
+            var end_token = this.cMirror.getTokenAt(end);
+            console.log(start_token,end_token)
+            console.log(start,end)
+            
+
+            var marker = this.cMirror.markText(
+                {
+                    line: start.line,
+                    ch: start_token.start
+                },
+                {
+                    line: end.line,
+                    ch: end_token.end
+                },
+                {
+                    className:'cm-highlight'
+                }
+            );
+            this.oldHighlight = marker;
             events.trigger('changeCoordinates',words);
+
         },
         changePage: function(attributes) {
             var that = this;
