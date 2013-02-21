@@ -65,7 +65,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                     that.cMirror.replaceSelection(that.cMirror.getSelection());
                 }});
 
-            this.cMirror.on('cursorActivity',function (instance) {
+            this.cMirror.on('cursorActivity',function () {
                 events.delayOrIgnore('setupHighlightChange',undefined,100);
             });
             this.cMirror.on('change',function (instance) {
