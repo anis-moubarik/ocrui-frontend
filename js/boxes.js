@@ -9,6 +9,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
             var that = this;
             this.layoutBoxes = [];
 
+/*
             toolbar.registerButton({
                 id:'show-layout',
                 toggle:true,
@@ -24,7 +25,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
                     }
                     that.render();
                 }});
-
+*/
             toolbar.registerButton({
                 id:'show-highlight',
                 toggle:true,
