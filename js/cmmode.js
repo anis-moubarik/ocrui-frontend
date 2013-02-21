@@ -6,21 +6,25 @@ define(['codemirror'],function (CodeMirror) {
     function cmMode (config, parserConfig) {
         return {
             startState: function() {
-                var state = {
+                return {
                     language:'fi',
                     wordIndex:0
                 };
-                return state;
             },
             token: function(stream,state) {
+
+                // return whitespace as separate empty token
                 stream.eatSpace();
+                //if (stream.current().length > 0) return null;
+
+                // get next word
                 var word = '';
                 while (!stream.eol()) {
-                    var next = stream.next();
-                    if (/\s/.test(next)) { break; }
-                    word += next;
+                    if (/\s/.test(stream.peek())) { break; }
+                    word += stream.next();
                 }
-                stream.eatSpace();
+
+                // set features of the word
                 var features = [];
                 if (config.showUnsavedChanges &&
                     config.changedSequence[state.wordIndex]) {
@@ -40,7 +44,16 @@ define(['codemirror'],function (CodeMirror) {
                     features.push('language');
 
                 }
+                if (config.showHighlight &&
+                    config.highlight[state.wordIndex]) {
+
+                    features.push('highlight');
+
+                }
+
+                // next word
                 state.wordIndex++;
+
                 return features.join(' ');
             }
         };

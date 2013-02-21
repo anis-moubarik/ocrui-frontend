@@ -12,7 +12,8 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 mode: 'ocrui',
                 changedSequence: [],
                 changedSinceSaveSequence: [],
-                languageSequence: []
+                languageSequence: [],
+                highlight: {},
             };
             this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 
@@ -20,6 +21,17 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             CodeMirror.commands.goPageUp = function () { };
             CodeMirror.commands.goPageDown = function () { };
 
+            toolbar.registerButton({
+                id:'highlight-editor-word',
+                toggle:true,
+                active:false,
+                icon:'icon-star',
+                title:'Highlight word under cursor in editor',
+                modes:['page'],
+                toggleCB:function(newState) {
+                    that.cMirror.setOption('showHighlight',newState);
+                    that.cMirror.replaceSelection(that.cMirror.getSelection());
+                }});
             toolbar.registerButton({
                 id:'show-saved-changes',
                 toggle:true,
@@ -57,6 +69,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 events.delayOrIgnore('setupHighlightChange',undefined,100);
             });
             this.cMirror.on('change',function (instance) {
+                if (that.suppressChanged) return ;
                 that.changed(instance);
             });
 
@@ -177,6 +190,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                     e_line --;
                 }
             }
+            this.words = wordIndexes;
             var wordIndexArray = _.map(wordIndexes,function (v,k) {
                 return parseInt(k,10);
             });
@@ -192,7 +206,14 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
 
             });
 
+            that.cMirror.setOption('highlight',this.words);
+            this.suppressChanged = true;
+            this.cMirror.view.frontier = 0;
+            this.cMirror.replaceSelection(this.cMirror.getSelection());
+            this.suppressChanged = false;
+
             events.trigger('changeCoordinates',words);
+
         },
         changePage: function(attributes) {
             var that = this;
