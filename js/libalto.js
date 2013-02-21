@@ -59,25 +59,19 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         };
     }
 
-    function markChanges($$elements) {
-        for (var i in $$elements) {
-            var $element = $$elements[i];
-            $element.attr('CHANGED', 'true');
-        }
-    }
-
-    function splitBoundingBoxes($$elements,bbs) {
-        var stringLengths = _.map($$elements,function(element) {
-            return element.attr('CONTENT').length;
+    function splitBoundingBoxes(words,bbs) {
+        if (bbs.length == 0) { return; }
+        var stringLengths = _.map(words,function(word) {
+            return word.content.length;
         });
         var totalLength = _.reduce(stringLengths,function(subTotal,length) {
             return subTotal + length;
         }, 0);
         var combinedBB = utils.getCombinedBoundingBox(bbs);
-        var elements = $$elements.length;
+        var elements = words.length;
         var precedingProportion = 0;
-        for (var i in $$elements) {
-            var $element = $$elements[i];
+        for (var i in words) {
+            var word = words[i];
             var proportion = stringLengths[i] / totalLength;
             var bb = {
                 hpos : combinedBB.hpos + 
@@ -88,313 +82,381 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             };
             precedingProportion += proportion;
 
-            $element.attr('HPOS', bb.hpos);
-            $element.attr('VPOS', bb.vpos);
-            $element.attr('WIDTH', bb.width);
-            $element.attr('HEIGHT', bb.height);
-            $element.attr('CHANGED', 'true');
+            // TODO: what about hyphenations
+            word.hpos = bb.hpos;
+            word.vpos = bb.vpos;
+            word.width = bb.width;
+            word.height = bb.height;
+            word.changed = true;
         }
     }
 
-    function ContentUpdateProcess(
-            original,
-            newWords,
-            currentStringSequence,
-            currentLanguageSequence
-            ) {
+    function ContentUpdateProcess( alto, newString ) {
 
-        this.$nextPosition = undefined; // next $position to come
-        this.resetLine();
-        this.$target = $(original).find('alto').clone();
-        this.createAltoFromOriginalAndWords(original, newWords);
-        this.updateLanguages(
-            newWords,
-            currentStringSequence,
-            currentLanguageSequence
-        );
+        var newStrings = newString.split(/\s+/);
+        if (newStrings[0] === "") newStrings.splice(0,1);
+        var lastI = newStrings.length-1;
+        if (newStrings[lastI] === "") newStrings.splice(lastI,1);
 
-    }
+        var originalStrings = alto.getOriginalStringSequence();
 
-    ContentUpdateProcess.prototype.isDirty = function () {
-        return this.dirty;
-    };
-
-    ContentUpdateProcess.prototype.createAltoFromOriginalAndWords = function (
-            original, words) {
-
-        words = _.map(words,_.identity); // jsdiff.diff edits second argument!!
-        var originalWords = $(original).find('String').map( function() {
-                return this.getAttribute('CONTENT') || '';
-            }).get();
-        var diff = jsdiff.diff(originalWords,words);
+        var diff = jsdiff.diff(originalStrings,_.map(newStrings,_.identity));
         var seq = getEditSequence(diff);
         this.dirty = _.reduce(seq,function(prev,cur){
             return prev || cur != 'match';
         },false);
-        var $strings = this.$target.find('String');
-        var wi = 0;
+
+        this.targetWords = []; // New words array to be created
+        this.stringStack = []; // stack of pending words to add
+        this.wordStack = []; // stack of pending element indexes to replace
+
         var si = 0;
+        var wi = 0;
 
-        this.$textline = this.$target.find('TextLine').first();
+        this.inLineIndex = 0;
+
         for (var i = 0; i < seq.length; i++) {
-            // Iterating simultaneously three sequences
-            //  i indexes edit edit sequence
-            // wi indexes editor words sequence
-            // si indexes alto string elements
 
-            var $currentString = $strings.eq(si);
-            var currentWord = words[wi];
-            var oldSi = si;
-            this.prepareString($currentString);
+            var currentWord = alto.originalWords[wi];
+            var currentString = newStrings[si];
+            var currentEdit = seq[i];
 
-            if (seq[i] == 'match') {
+            var oldWi = wi;
 
-                wi ++;
-                si ++;
-                this.processPending();
-                $currentString.removeAttr('CHANGED');
-
-            } else if (seq[i] == 'replace') {
+            if (currentEdit == 'match') {
 
                 si ++;
                 wi ++;
-                this.pushEdit( currentWord, $currentString);
+                if (this.processPending(currentWord) !== null) {
 
-            } else if (seq[i] == 'delete') {
+                    // add the matching word if pending edits didn't
+                    // use its bounding box and it didin't get added
+                    // in this.processPending()
+                    this.targetWords.push(
+                        this.dupWordWithSideEffects(currentWord,false)
+                    );
+                    this.inLineIndex ++;
+                    if (this.textLineIndex != currentWord.textLine) {
+                        this.inLineIndex = 0;
+                    }
 
-                si ++;
-                this.pushEdit( undefined, $currentString);
+                }
 
-            } else if (seq[i] == 'add') {
+            } else if (currentEdit == 'replace') {
 
                 wi ++;
-                this.pushEdit( currentWord, undefined);
+                si ++;
+                this.queueEdit( currentString, currentWord);
 
-            }
+            } else if (currentEdit == 'delete') {
 
-            if (si != oldSi) {
-                this.stringDone();
+                wi ++;
+                this.queueEdit( undefined, currentWord);
+
+            } else if (currentEdit == 'add') {
+
+                si ++;
+                this.queueEdit( currentString, undefined);
+
             }
 
         }
 
         this.processPending();
-    };
 
-    ContentUpdateProcess.prototype.resetLine = function () {
-        this.wordStack = []; // stack of pending words to add
-        this.$$elementStack = []; // stack of pending elements to replace
-        this.$textline = undefined; // textline of pending changes
-        this.$position = undefined; // element just before pending changes
-    };
-
-    ContentUpdateProcess.prototype.pushEdit = function(word, $string) {
-        // push edit and process earlier stack if this is a new line
-
-        var $nextTextline = this.$textline;
-        var elementsAdded = 0;
-
-        if ($string !== undefined) $nextTextline = $string.parent();
-
-        if ( ( this.$textline ) &&
-             ($nextTextline) &&
-             (this.$textline.get(0) != $nextTextline.get(0)) ) {
-            elementsAdded = this.processPending();
-        }
-
-        if (word !== undefined) {
-            this.wordStack.push(word);
-        }
-
-        if ($string !== undefined) {
-            this.$$elementStack.push($string);
-        }
-
-        return elementsAdded;
-
-    };
-
-    ContentUpdateProcess.prototype.prepareString = function($string) {
-        this.$nextPosition = $string;
-
-    };
-
-    ContentUpdateProcess.prototype.stringDone = function() {
-        this.$position = this.$nextPosition;
-        this.$textline = this.$position.parent();
-
-
-    };
-
-    ContentUpdateProcess.prototype.processPending = function() {
-
-        var elementsAdded = 0;
-        var needToAddNextElement = false;
-        if (    (this.wordStack.length === 0) &&
-                (this.$$elementStack.length === 0) ) {
-            return 0; // no pending elements
-        }
-
-        // If there are no elements to replace try to add preceding and
-        // subsequent elements and words.
-        if (this.$$elementStack.length === 0) {
-            // BUG: only add when these are at the same line
-            if ((this.$position) && (this.$position.parent().get(0) == this.$textline.get(0))) {
-                this.wordStack.splice(0,0,this.$position.attr('CONTENT'));
-                this.$$elementStack.splice(0,0,this.$position);
-            }
-            needToAddNextElement = true;
-        }
-
-        var $insertPosition = this.$position;
-        // add elements if they are too few
-        while (this.$$elementStack.length < this.wordStack.length) {
-            var $string = $($.parseXML('<String />')).find('String');
-            if ($insertPosition !== undefined) {
-                $insertPosition.after($string);
-                $insertPosition = $insertPosition.next();
-            } else if (this.$textline !== undefined) {
-                // this happens, when edits occur in the beginning
-                // of a line.
-                this.$textline.prepend($string);
-            } else {
-                throw "no textline! cannot edit.";
-            }
-            this.$$elementStack.push($string);
-            elementsAdded++;
-        }
-        if ((needToAddNextElement) && (this.$nextPosition) && (this.$nextPosition.parent().get(0) == this.$textline.get(0))) {
-            this.wordStack.push(this.$nextPosition.attr('CONTENT'));
-            this.$$elementStack.push(this.$nextPosition);
-        }
-
-        var unfilteredBBs = _.map(this.$$elementStack,getBoundingBoxOf);
-        var boundingBoxes = _.filter(unfilteredBBs,isNonNullBB);
-
-        // remove elements if they are too many
-        while (this.$$elementStack.length > this.wordStack.length) {
-            var $element = this.$$elementStack.pop();
-            $element.remove();
-            elementsAdded--;
-        }
-
-        for (var i = 0; i < this.$$elementStack.length; i++) {
-            this.$$elementStack[i].attr('CONTENT',this.wordStack[i] || '');
-        }
-
-        if (boundingBoxes.length > 0) {
-            splitBoundingBoxes (this.$$elementStack, boundingBoxes);
-        }
-
-        markChanges (this.$$elementStack);
-
-        this.resetLine();
-
-        return elementsAdded;
-
-    };
-
-    ContentUpdateProcess.prototype.updateLanguages =
-                function(words,currentWords,currentLangs) {
-
-        words = _.map(words,_.identity); // jsdiff.diff edits second argument!!
-        var diff = jsdiff.diff(currentWords,words);
+        var previousStrings = alto.getStringSequence();
+        var currentLangs = alto.getLanguageSequence();
+        var diff = jsdiff.diff(previousStrings,_.map(newStrings,_.identity));
         var seq = getEditSequence(diff);
         
-        var $strings = this.$target.find('String');
         var wi = 0;
-        var si = 0;
+        var li = 0;
 
         for (var i = 0; i < seq.length; i++) {
-            // Iterating simultaneously three sequences
             //  i indexes edit edit sequence
-            // wi indexes editor words sequence
-            // si indexes alto string elements
+            // wi indexes just created alto word objects
+            // li indexes previous languages
 
             if ((seq[i] == 'match') || (seq[i] == 'replace')) {
 
-                $strings.eq(si).attr('LANGUAGE',currentLangs[wi]);
+                this.targetWords[wi].language = currentLangs[li];
                 wi ++;
-                si ++;
+                li ++;
 
             } else if (seq[i] == 'delete') {
 
-                wi ++;
+                li ++;
 
             } else if (seq[i] == 'add') {
 
-                if (wi > 0) {
-                    $strings.eq(si).attr('LANGUAGE',currentLangs[wi - 1]);
+                if (li > 0) {
+                    this.targetWords[wi].language = currentLangs[li - 1];
                 }
-                si ++;
+                wi ++;
 
             }
 
         }
+
+    }
+
+    ContentUpdateProcess.prototype.queueEdit = function(string, word) {
+
+        // push edit and process earlier stack if this is a new line
+
+        if ( (word !== undefined) && (this.textLineIndex != word.textLine) ) {
+            this.processPending(word);
+        }
+
+        if (string !== undefined) {
+            this.stringStack.push(string);
+        }
+
+        if (word !== undefined) {
+            this.wordStack.push(this.dupWordWithSideEffects(word,true));
+        } 
+
     };
 
-    ContentUpdateProcess.prototype.getNewAlto = function() {
-        return this.$target.get(0);
+    ContentUpdateProcess.prototype.processPending = function(nextWord) {
+
+        var nextWordUsed = false;
+
+        if (    (this.stringStack.length === 0) &&
+                (this.wordStack.length === 0) ) {
+
+            return nextWord; // nothing to do
+
+        }
+
+            console.log(this.textLineIndex,nextWord && nextWord.textLine);
+            console.log(this.stringStack);
+            console.trace();
+
+        // If there are no elements to replace try to use preceding and
+        // subsequent words to get bounding box from.
+
+        if (this.wordStack.length === 0) {
+
+            if (this.targetWords.length > 0) {
+                var precedingWord = this.targetWords.pop();
+                this.stringStack.splice(0,0,precedingWord.content);
+                this.wordStack.splice(0,0,precedingWord);
+            }
+
+            if ((nextWord) && (nextWord.textLine == this.textLineIndex)) {
+                this.stringStack.push(nextWord.content);
+                this.wordStack.push(nextWord);
+                nextWordUsed = true;
+            }
+        }
+
+        var boundingBoxes = _.filter(this.wordStack,isNonNullBB);
+
+        // add words if they are too few
+        while (this.wordStack.length < this.stringStack.length) {
+            this.wordStack.splice(0,0,this.dummyWord());
+            this.inLineIndex ++;
+        }
+
+        // remove words if they are too many
+        while (this.wordStack.length > this.stringStack.length) {
+            this.wordStack.splice(0,1);
+            this.inLineIndex --;
+        }
+
+        // Set new content strings
+        for (var i = 0; i < this.wordStack.length; i++) {
+            this.wordStack[i].content = this.stringStack[i];
+        }
+
+        splitBoundingBoxes (this.wordStack, boundingBoxes);
+
+        // Finally copy new words to target.
+        Array.prototype.push.apply(this.targetWords,this.wordStack);
+
+        this.stringStack = [];
+        this.wordStack = [];
+
+        if (nextWordUsed) {
+            return null;
+        } else {
+            return nextWord;
+        }
+
     };
+
+    ContentUpdateProcess.prototype.wordIndex = function () {
+        return this.targetWords.length;
+    };
+
+    ContentUpdateProcess.prototype.textBlockIndex = function () {
+        if (this.targetWords.length==0) return 0;
+        this.targetWords[this.targetWords.length - 1].textBlock;
+    };
+
+    ContentUpdateProcess.prototype.textLineIndex = function () {
+        if (this.targetWords.length==0) return 0;
+        this.targetWords[this.targetWords.length - 1].textLine;
+    };
+
+    ContentUpdateProcess.prototype.dummyWord = function (changed) {
+        return {
+            content: '',
+            index: this.wordIndex(),
+            textBlock: this.textBlockIndex(),
+            textLine: this.textLineIndex(),
+            inLineIndex: this.inLineIndex,
+            language: null,
+            changed: true,
+            changedSinceSave: null,
+            hpos: null,
+            vpos: null,
+            width: null,
+            height: null
+
+        };
+    };
+
+    ContentUpdateProcess.prototype.dupWordWithSideEffects = function(original,changed) {
+
+        var dup = {}
+        for (var key in original) {
+            dup[key] = original[key];
+        }
+        if (changed) {
+            dup.changed = true;
+            this.inLineIndex ++;
+        } else {
+            dup.changed = false;
+        }
+        dup.textLine = this.textLineIndex();
+        dup.index = this.wordIndex();
+        dup.textBlock = this.textBlockIndex();
+        dup.inLineIndex = this.inLineIndex;
+
+        return dup;
+
+    };
+
+    ContentUpdateProcess.prototype.getNewWords = function() {
+        return this.targetWords;
+    };
+
+    ContentUpdateProcess.prototype.isDirty = function () {
+        return this.dirty;
+    };
+
+
 
     function Alto () {
 
         this.dirty = false;
+        this.words = [];
 
     }
 
     Alto.prototype.setOriginalXML = function (xml) {
-        this.original = xml;
+        //this.original = xml;
+        this.originalWords = this.constructWords(xml);
     };
 
     Alto.prototype.setCurrentXML = function (xml) {
-        this.current = xml;
-        this.parseLayoutBoxes(xml);
+        //this.current = xml;
+        this.words = this.constructWords(xml);
+        this.layoutBoxes = this.constructLayoutBoxes(this.words);
     };
 
-    Alto.prototype.parseLayoutBoxes = function(xml) {
-        var that = this;
+    Alto.prototype.constructWords = function(xml) {
+        var words = [];
         var wordIndex = 0;
-        var layoutBoxIndex = 0;
-        var $textblocks = $(xml).find('TextBlock');
-        this.words = [];
-        this.layoutBoxes = $textblocks.map(function (e,i) {
-            var fromIndex = wordIndex;
-            var $strings = $(this).find('String');
-            var words = $strings.map(function() {
-                var word = that.dom2Word(this,wordIndex);
-                that.words[wordIndex++] = word;
-                return word;
-            }).get();
+        var globaltlIndex = 0;
 
-            var layoutBox = utils.getCombinedBoundingBox(words);
-            layoutBox.index=layoutBoxIndex ++;
-            layoutBox.fromIndex=fromIndex;
-            layoutBox.toIndex=wordIndex;
+        $(xml).find('TextBlock').map(function (tbIndex,tb) {
 
-            return layoutBox;
-        }).get();
+            $(tb).find('TextLine').map(function(tlIndex,tl) {
+
+                $(tl).find('String').map(function(sIndex,s) {
+
+                    var word = {
+                        index: wordIndex,
+                        textBlock: tbIndex,
+                        textLine: globaltlIndex,
+                        inLineIndex: sIndex,
+                        content: s.getAttribute('CONTENT'),
+                        language: s.getAttribute('LANGUAGE'),
+                        changed: s.getAttribute('CHANGED') ?
+                            true : false,
+                        changedSinceSave: s.getAttribute('CHANGED_SINCE_SAVE') ?
+                            true : false,
+                        hpos: parseInt(s.getAttribute('HPOS'),10),
+                        vpos: parseInt(s.getAttribute('VPOS'),10),
+                        width: parseInt(s.getAttribute('WIDTH'),10),
+                        height: parseInt(s.getAttribute('HEIGHT'),10)
+
+                    };
+
+                    var subsType = s.getAttribute('SUBS_TYPE');
+                    var subsContent = s.getAttribute('SUBS_CONTENT');
+
+                    if (subsType == 'HypPart2') {
+
+                        words[wordIndex].hyp2 = word.content;
+                        words[wordIndex].content = subsContent;
+                        words[wordIndex].hpos2 = word.hpos;
+                        words[wordIndex].vpos2 = word.vpos;
+                        words[wordIndex].width2 = word.width;
+                        words[wordIndex].height2 = word.height;
+
+                    } else {
+                        words.push(word);
+                    }
+                    if (subsType == 'HypPart1') {
+                        words[wordIndex].hyphenated = true;
+                        words[wordIndex].hyp1 = word.content;
+                    } else {
+                        wordIndex++;
+                    }
+                    
+                    return word;
+
+                });
+                globaltlIndex++;
+
+            });
+
+        });
+
+        return words;
     };
+
+    Alto.prototype.constructLayoutBoxes = function(words) {
+        var layoutBoxes = Math.max.apply(null,
+            _.map(words, function (w) { return w.textBlock; })
+        );
+
+        var boxes = [];
+        for (var i = 0; i <= layoutBoxes; i++ ) {
+            var myWords = _.filter(words,
+                function (w) {return w.textBlock == i;}
+            );
+
+            var layoutBox = utils.getCombinedBoundingBox(myWords);
+            layoutBox.index = i;
+            layoutBox.fromIndex = Math.min.apply(null,
+                _.map(myWords, function(w) { return w.index; })
+            );
+            layoutBox.toIndex = Math.max.apply(null,
+                _.map(myWords, function(w) { return w.index; })
+            );
+            boxes.push(layoutBox);
+        }
+        return boxes;
+    };
+
 
     Alto.prototype.isDirty = function() {
         return this.dirty;
-    };
-
-    Alto.prototype.dom2Word = function(dom,index) {
-        return {
-            index: index,
-            content: dom.getAttribute('CONTENT'),
-            language: dom.getAttribute('LANGUAGE'),
-            changed: dom.getAttribute('CHANGED') ?
-                true : false,
-            changedSinceSave: dom.getAttribute('CHANGED_SINCE_SAVE') ?
-                true : false,
-            hpos: parseInt(dom.getAttribute('HPOS'),10),
-            vpos: parseInt(dom.getAttribute('VPOS'),10),
-            width: parseInt(dom.getAttribute('WIDTH'),10),
-            height: parseInt(dom.getAttribute('HEIGHT'),10)
-
-        };
     };
 
     Alto.prototype.getLayoutBoxes = function () {
@@ -407,19 +469,9 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         // Create new current structure from string content and
         // original alto structure
 
-        var newWords = content.split(/\s+/);
-        if (newWords[0] === "") newWords.splice(0,1);
-        var lastI = newWords.length-1;
-        if (newWords[lastI] === "") newWords.splice(lastI,1);
-        var process = new ContentUpdateProcess(
-            this.original,
-            newWords,
-            this.getStringSequence(),
-            this.getLanguageSequence()
-            );
+        var process = new ContentUpdateProcess( this, content );
 
-
-        this.setCurrentXML( process.getNewAlto() );
+        this.words = process.getNewWords();
 
         this.dirty = process.isDirty();
     };
@@ -433,16 +485,18 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         // find bounding box under or closest to the cursor.
         _.map(this.words,function(word,i) {
 
-            // look for an exact match
-            if ((x >= word.hpos) && (x <= word.hpos + word.width) &&
-                (y >= word.vpos) && (y <= word.vpos + word.height)) {
-
-                selection = word;
-                return false;
-
+            var ok = false;
+            if (word.hyphenated) {
+                ok = search ({
+                    hpos: word.hpos2,
+                    vpos: word.vpos2,
+                    width: word.width2,
+                    height: word.height2
+                })
             }
 
-            // look for a bounding box nearby
+            return ok || search(word);
+
             function tryToSetClosestCorner(cornerX,cornerY) {
                 var distance = Math.sqrt(
                     Math.pow((cornerX - x), 2) +
@@ -454,10 +508,22 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
                     minDistanceWord = word;
                 }
             }
-            tryToSetClosestCorner(word.hpos,word.vpos);
-            tryToSetClosestCorner(word.hpos+word.width,word.vpos);
-            tryToSetClosestCorner(word.hpos,word.vpos+word.height);
-            tryToSetClosestCorner(word.hpos+word.width,word.vpos+word.height);
+
+            function search (box) {
+                // look for an exact match
+                if ((x >= box.hpos) && (x <= box.hpos + box.width) &&
+                    (y >= box.vpos) && (y <= box.vpos + box.height)) {
+
+                    selection = word;
+                    return false;
+
+                }
+
+                tryToSetClosestCorner(box.hpos,box.vpos);
+                tryToSetClosestCorner(box.hpos+box.width,box.vpos);
+                tryToSetClosestCorner(box.hpos,box.vpos+box.height);
+                tryToSetClosestCorner(box.hpos+box.width,box.vpos+box.height);
+            }
 
         });
         if (selection === undefined) {
@@ -476,7 +542,10 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     };
 
     Alto.prototype.getStringSequence = function() {
-        return _.map(this.words,function(e,i) {return e.content;});
+        return _.map(this.words,function(w) {return w.content;});
+    };
+    Alto.prototype.getOriginalStringSequence = function() {
+        return _.map(this.originalWords,function(w) {return w.content;});
     };
 
     Alto.prototype.getLanguageSequence = function () {

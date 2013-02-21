@@ -46,7 +46,7 @@ define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
             var layoutBoxes = this.getLayoutBoxes();
             var strings = this.getStringSequence();
             _.map(layoutBoxes,function (l) {
-                for (var i = l.fromIndex; i < l.toIndex; i++) {
+                for (var i = l.fromIndex; i <= l.toIndex; i++) {
                     if (i > l.fromIndex) s += " ";
                     s += strings[i];
                 }
