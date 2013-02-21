@@ -1,4 +1,5 @@
 require.config({
+    'urlArgs': "bust=v2", // fix caching troubles
     'paths': {
         "bootstrap": "../lib/bootstrap/js/bootstrap",
         "codemirror": "../lib/codemirror-3.0/lib/codemirror",
