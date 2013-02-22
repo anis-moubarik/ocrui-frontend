@@ -72,15 +72,12 @@ define(['jquery','events','mybackbone','image','container'],
             */
             this.lastRenderedCSS = {};
             if (img.loading.state()=="resolved") {
-                console.log('x');
                 this.$img = $(this.image.image);
                 this.$img.attr('class','page-image');
                 this.$img.attr('width','100%');
                 this.$img.attr('height','100%');
                 this.$container.append(this.$img);
             } else if (img.tnLoading.state()=="resolved") {
-                console.log('y');
-                console.log(this.image.tnImage.src);
                 this.$img = $(this.image.tnImage);
                 this.$img.attr('class','page-image');
                 this.$img.attr('width','100%');
