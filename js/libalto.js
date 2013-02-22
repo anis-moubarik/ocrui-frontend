@@ -399,14 +399,23 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
                     var subsType = s.getAttribute('SUBS_TYPE');
                     var subsContent = s.getAttribute('SUBS_CONTENT');
 
-                    if (subsType == 'HypPart2') {
+                    if (subsType == 'HypPart2')  {
 
-                        words[wordIndex].hyp2 = word.content;
-                        words[wordIndex].content = subsContent;
-                        words[wordIndex].hpos2 = word.hpos;
-                        words[wordIndex].vpos2 = word.vpos;
-                        words[wordIndex].width2 = word.width;
-                        words[wordIndex].height2 = word.height;
+                        if (words[wordIndex] === undefined) {
+                            
+                            console.log('hyp2 without hyp1');
+                            words.push(word);
+
+                        } else {
+
+                            words[wordIndex].hyp2 = word.content;
+                            words[wordIndex].content = subsContent;
+                            words[wordIndex].hpos2 = word.hpos;
+                            words[wordIndex].vpos2 = word.vpos;
+                            words[wordIndex].width2 = word.width;
+                            words[wordIndex].height2 = word.height;
+
+                        }
 
                     } else {
                         words.push(word);

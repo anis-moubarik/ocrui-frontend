@@ -34,6 +34,11 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
         getNumberOfPages : function () {
             return this.pageInfo.length;
         },
+        getImageThumbnailUrl : function (pageNumber) {
+            var page = this.pageInfo[pageNumber - 1]; //pageNumber is 1-based
+            if (page === undefined) return undefined;
+            return this.urlBase + '/' + page[3];
+        },
         getImageUrl : function (pageNumber) {
             var page = this.pageInfo[pageNumber - 1]; //pageNumber is 1-based
             if (page === undefined) return undefined;
@@ -59,7 +64,8 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                     var element = $(this).find('FLocat').get(0);
                     var imageFilename = element.getAttribute('xlink:href');
                     imageFilename = imageFilename.replace(/^file:\/\//,'').replace(/.\//,'');
-                    that.pageInfo[seq] = [imageFilename,undefined,undefined];
+                    var tnFilename = 'small-' + imageFilename;
+                    that.pageInfo[seq] = [imageFilename,undefined,undefined,tnFilename];
                 });
 
                 // loop through alto files
@@ -69,7 +75,7 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                     var altoFilename = element.getAttribute('xlink:href');
                     altoFilename = altoFilename.replace(/^file:\/\//,'').replace(/.\//,'');
                     if (that.pageInfo[seq] === undefined) {
-                        that.pageInfo[seq] = [undefined,undefined,undefined];
+                        that.pageInfo[seq] = [undefined,undefined,undefined,undefined];
                     }
                     that.pageInfo[seq][1] = altoFilename;
                 });
@@ -81,7 +87,7 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                     var imageFilename = element.getAttribute('xlink:href');
                     imageFilename = imageFilename.replace(/^file:\/\/\.\/preservation_img\/pr/,'access_img\/ac');
                     imageFilename = imageFilename.replace(/jp2$/,'jpg');
-                    that.pageInfo[seq] = [imageFilename,undefined,undefined];
+                    that.pageInfo[seq] = [imageFilename,undefined,undefined,undefined];
                 });
 
                 // loop through alto files
@@ -92,7 +98,7 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                     var altoFilename = element.getAttribute('xlink:href');
                     altoFilename = altoFilename.replace(/^file:\/\//,'').replace(/.\//,'');
                     if (that.pageInfo[seq] === undefined) {
-                        that.pageInfo[seq] = [undefined,undefined,undefined];
+                        that.pageInfo[seq] = [undefined,undefined,undefined,undefined];
                     }
                     that.pageInfo[seq][1] = altoFilename;
                 });
@@ -105,8 +111,9 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                     var seqString = fileId.substring(3,7);
                     var seq = parseInt(seqString,10);
                     var imageFilename = 'access_img/img'+seqString+'-access.jpg';
+                    var tnFilename = 'thumb_img/img'+seqString+'-thumb.jpg';
                     var altoFilename = 'alto/img'+seqString+'-alto.xml';
-                    that.pageInfo[seq] = [imageFilename,altoFilename];
+                    that.pageInfo[seq] = [imageFilename,altoFilename,undefined,tnFilename];
                 });
 
             }
@@ -185,8 +192,14 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
         return get(currentDocId);
     }
 
+    function getCurrentDocId() {
+        return currentDocId;
+    }
+
     return {
-        getCurrent: getCurrent
+        get: get,
+        getCurrent: getCurrent,
+        getCurrentDocId: getCurrentDocId
     };
 
 });

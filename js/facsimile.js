@@ -32,18 +32,30 @@ define(['jquery','events','mybackbone','image','container'],
             this.attributes = attributes;
             this.nextAttributes = this.getAttributes(attributes,1);
             this.prevAttributes = this.getAttributes(attributes,-1);
-            image.get(attributes).done( function (img) {
+            var img = image.get(attributes);
+            img.fetch();
+            img.tnFetch();
+            img.tnLoading.done( function (img) {
 
                 events.delay('facsimileGotNewImage',img, 100);
 
-            }).fail(function(msg) {
-
-                events.trigger('changePageImageError',{
-                    error: 'changePageImageError',
-                    message: msg
-                });
-
             });
+            img.loading.then(
+                function (img) {
+
+                    events.delay('facsimileGotNewImage',img, 100);
+
+                },
+                function fail (msg) {
+
+                    events.trigger('changePageImageError',{
+                        error: 'changePageImageError',
+                        message: msg
+                    });
+
+                }
+
+            );
 
         },
         facsimileGotNewImage: function(img) {
@@ -58,13 +70,24 @@ define(['jquery','events','mybackbone','image','container'],
             this.prevImage = undefined;
             this.nextImage = undefined;
             */
-            this.$img = $(this.image.image);
-            this.$img.attr('class','page-image');
-            this.$img.attr('width','100%');
-            this.$img.attr('height','100%');
-            this.$container.append(this.$img);
-            this.$el.append(this.$container);
             this.lastRenderedCSS = {};
+            if (img.loading.state()=="resolved") {
+                console.log('x');
+                this.$img = $(this.image.image);
+                this.$img.attr('class','page-image');
+                this.$img.attr('width','100%');
+                this.$img.attr('height','100%');
+                this.$container.append(this.$img);
+            } else if (img.tnLoading.state()=="resolved") {
+                console.log('y');
+                console.log(this.image.tnImage.src);
+                this.$img = $(this.image.tnImage);
+                this.$img.attr('class','page-image');
+                this.$img.attr('width','100%');
+                this.$img.attr('height','100%');
+                this.$container.append(this.$img);
+            }
+            this.$el.append(this.$container);
             this.render();
 
             events.trigger('changePageImage',img); 
