@@ -98,8 +98,32 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
         events: {
             'click #page-next': 'pageNext',
             'click #page-previous': 'pagePrevious',
-            'change #page-number': 'pageNumber'
+            'change #page-number': 'pageNumber',
+            'keypress #page-number': 'validateInput'
         },
+        validateInput: function(evt) {
+            
+            var key = String.fromCharCode(evt.which);
+            var allowed = '0123456789';
+            var ctrl = [ 0, 8, 9, 13, 27 ];
+            if ( 
+                (allowed.indexOf(key) >= 0)  ||
+                (ctrl.indexOf(evt.which) >= 0) ||
+                (evt.altKey) ||
+                (evt.ctrlKey) ||
+                (evt.metaKey)
+                ) {
+
+                return; // ok
+
+            } else {
+
+                evt.preventDefault();
+
+            }        
+
+        },
+
         documentDirtyStateChanged: function(dirty) {
             if (dirty) {
                 $('#save').addClass('btn-warning');
