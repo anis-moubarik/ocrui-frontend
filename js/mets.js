@@ -172,16 +172,18 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
             events.trigger('documentDirtyStateChanged',mets.isDirty());
         });
     });
-    events.on('changeDocumentAndPage', function (data) {
+    events.on('changeDocument', function (data) {
         currentDocId = data.docId;
         get(data.docId).then(
             function(doc) {
-                events.trigger('changePageMets',doc);
-                events.trigger('changePage',data);
+                events.trigger('changeMets',doc);
+                if (data.pageNumber !== undefined) {
+                    events.trigger('changePage',data);
+                }
             },
             function(msg) {
-                events.trigger('changePageMetsError',{
-                    error: 'changePageMetsError',
+                events.trigger('changeMetsError',{
+                    error: 'changeMetsError',
                     message: msg
             });
         });

@@ -44,6 +44,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
 
             'changeCoordinates': 'setHighlightBoxes',
             'scheduledRender': 'render',
+            'changeMode': 'changeMode',
             'changePage': 'changePage'
 
         },
@@ -57,13 +58,12 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
             'drag .layout-box': 'dragLayoutBox',
             */
         },
+        myModes: ['page'],
         click: function (ev) {
-            //console.log('c',ev);
         },
         dragLayoutBox: function (ev,ui) {
             var x = container.view.getPageX(ui.offset.left);
             var y = container.view.getPageY(ui.offset.top);
-            //console.log(x,y);
         },
         resizeLayoutBox: function (ev,ui) {
             var offsetX = ui.position.left - this.$el.offset().left;
@@ -72,7 +72,6 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
             var y = container.view.getPageY(offsetY);
             var w = container.view.getPageWidth(ui.size.width);
             var h = container.view.getPageHeight(ui.size.height);
-            //console.log(x,y,w,h);
         },
         clickLayoutBox: function(ev) {
             if (ev.type == "dblclick") {

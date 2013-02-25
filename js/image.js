@@ -18,29 +18,33 @@ define(['jquery','mybackbone','mets'],function ($,mybackbone,mets) {
         tnFetch: function () {
             var that = this;
             this.urlSet.done( function () {
-                that.tnImage.src = that.tnUrl;
-                that.tnImage.onload = function() { 
-                    that.set('tnWidth', this.width);
-                    that.set('tnHeight', this.height);
-                    that.tnLoading.resolve(that);
-                };
-                that.tnImage.onerror = function() { 
-                    that.tnLoading.reject(that);
-                };
+                if (that.tnImage.src !== undefined) {
+                    that.tnImage.src = that.tnUrl;
+                    that.tnImage.onload = function() { 
+                        that.set('tnWidth', this.width);
+                        that.set('tnHeight', this.height);
+                        that.tnLoading.resolve(that);
+                    };
+                    that.tnImage.onerror = function() { 
+                        that.tnLoading.reject(that);
+                    };
+                }
             });
         },
         fetch: function () {
             var that = this;
             this.urlSet.done(function() {
-                that.image.src = that.url;
-                that.image.onload = function() { 
-                    that.set('width', this.width);
-                    that.set('height', this.height);
-                    that.loading.resolve(that);
-                };
-                that.image.onerror = function() { 
-                    that.loading.reject(that);
-                };
+                if (that.tnImage.src !== undefined) {
+                    that.image.src = that.url;
+                    that.image.onload = function() { 
+                        that.set('width', this.width);
+                        that.set('height', this.height);
+                        that.loading.resolve(that);
+                    };
+                    that.image.onerror = function() { 
+                        that.loading.reject(that);
+                    };
+                }
             });
         }
     });

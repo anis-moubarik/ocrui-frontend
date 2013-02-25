@@ -18,11 +18,15 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
         return b.index - a.index;
     }
 
-    function registerKeyboardShortcut(which,callback) {
+    function registerKeyboardShortcut(which,modes,callback) {
         if (which in keyboardShortcuts) {
             throw "Trying to reregister shortcut for " + which;
         }
-        keyboardShortcuts [which] = callback;
+        for (var i in modes) {
+            var mode = modes[i];
+            var key = mode+'-'+which;
+            keyboardShortcuts [key] = callback;
+        }
     }
 
     function registerWidget(data) {
@@ -48,13 +52,14 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
             throw "Trying to reregister button " + id;
         }
         buttons [id] = data;
-        if (data.toggle && data.toggleCB) {
+        if (data.toggle && data.toggleCB && (!data.suppressInitialCB)) {
             data.toggleCB.apply(undefined,[data.active]);
         }
     }
 
     $('body').on('keydown',function(ev) {
-        var callback = keyboardShortcuts[ev.which];
+        var key = view.mode+'-'+ev.which;
+        var callback = keyboardShortcuts[key];
         if (callback) {
             callback();
         }
@@ -63,27 +68,23 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
     var View = mybackbone.View.extend({
         initialize: function() {
             var that = this;
-            this.mode = 'empty';
         },
         el : '#toolbar',
         myEvents: {
-            'changePage': 'setPageMode'
+            'changeMode': 'changeMode'
         },
         events: {
             'click button': 'handleClick'
         },
-        setPageMode: function () {
-            this.setMode('page');
-        },
-        setMode: function(mode) {
-            if (this.mode == mode) { return; }
-            this.mode = mode;
+        myModes: ['page','document'],
+        setViewActive: function (mode) {
             this.render();
         },
         handleClick: function (ev) {
             var id = ev.currentTarget.id;
             var b = buttons[id];
             if (b === undefined) return;
+            if (b.modes.indexOf(this.currentMode()) == -1) return;
             var cb = b.click;
             if (cb) {
                 cb.apply(ev.currentTarget,[ev]);
@@ -101,17 +102,21 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
         },
         render: function() {
             
+            var that = this;
             var context = {
                 widgets: _.map(widgets,function(w) { return w; }),
                 buttons: _.map(buttons,function(b) {
                     return {
                         id: b.id,
-                        classes: 'btn'+ (b.active ? ' active' : ''),
+                        classes: 'btn' +
+                                 (b.active ? ' active' : '') +
+                                 (b.modes.indexOf(that.mode) != -1 ?
+                                  '' :
+                                  ' disabled'),
                         extra: b.toggle && 'data-toggle="button"' || '',
                         icon: b.icon,
                         title: b.title,
-                        text: b.text,
-                        modes: b.modes
+                        text: b.text
                     };
                 })
             };

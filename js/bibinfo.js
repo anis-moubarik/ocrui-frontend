@@ -20,7 +20,7 @@ define(['jquery','events','mustache','mybackbone','toolbar','templates'],
             //'click': 'moreBibInfo'
         },
         myEvents: {
-            'changePageMets':function(mets) {
+            'changeMets':function(mets) {
                     this.setDocument(mets);
                     this.render();
                 }
@@ -46,7 +46,6 @@ define(['jquery','events','mustache','mybackbone','toolbar','templates'],
             this.marcxml = this.getMarcXML(mets);
         },
         moreBibInfo : function (ev) {
-                //console.log('x');
                 ev.preventDefault();
                 ev.stopPropagation();
         },

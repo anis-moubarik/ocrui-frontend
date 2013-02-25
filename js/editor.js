@@ -80,10 +80,12 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             'cursorToCoordinate': 'moveCursorToWord',
             'refocus':'refocus',
             'changePage':'changePage',
+            'changeMode':'changeMode',
             'requestLanguageChange':'requestLanguageChange',
             'setupHighlightChange':'setupHighlightChange',
             'pageDirtyStateChanged':'pageDirtyStateChanged'
         },
+        myModes: ['page'],
         virtualKeyboard: function(data) {
             this.cMirror.replaceSelection(data);
             this.cMirror.focus();

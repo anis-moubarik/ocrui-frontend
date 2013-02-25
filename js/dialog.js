@@ -9,9 +9,9 @@ define(['jquery','events','mustache','mybackbone','templates'],function ($,event
         },
         el : '#dialog',
         myEvents: {
-            'changePageMetsError': 'pushEvent',
-            'changePageImageError': 'pushEvent',
-            'changePageAltoError': 'pushEvent',
+            'changeMetsError': 'pushEvent',
+            'changeImageError': 'pushEvent',
+            'changeAltoError': 'pushEvent',
             'changePageError': 'pushEvent',
             'message': 'pushEvent'
         },

@@ -229,10 +229,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         }
 
-            console.log(this.textLineIndex,nextWord && nextWord.textLine);
-            console.log(this.stringStack);
-            console.trace();
-
         // If there are no elements to replace try to use preceding and
         // subsequent words to get bounding box from.
 
@@ -403,8 +399,8 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
                         if (words[wordIndex] === undefined) {
                             
-                            console.log('hyp2 without hyp1');
                             words.push(word);
+                            console.log('hyp2 without hyp1');
 
                         } else {
 

@@ -44,7 +44,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             }});
 
 
-            toolbar.registerKeyboardShortcut(113, function(ev) {
+            toolbar.registerKeyboardShortcut(113, ['page'], function(ev) {
                 $('#pan-zoom').click();
             });
             this.setMouseSensitivity(true);
@@ -58,8 +58,9 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'newViewportRequest' : 'newViewportRequest',
             'mousetail' : 'panTail',
             'setPageGeometry':'setPageGeometry',
-            'changePageImage':'setImageSize',
+            'changeImage':'setImageSize',
             'changePage':'changePage',
+            'changeMode':'changeMode',
             'scrollOneStep':'scrollOneStep',
             'scheduledRender':'render'
         },
@@ -71,6 +72,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'mouseup': 'endPan',
             'mouseout': 'endPan'
         },
+        myModes: ['page'],
         setPageGeometry: function(data) {
             this.pageWidth = data.width;
             this.pageHeight = data.height;

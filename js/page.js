@@ -53,10 +53,10 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             this.options = {};
             var that = this;
 
-            toolbar.registerKeyboardShortcut(33, function() {
+            toolbar.registerKeyboardShortcut(33, ['page'], function() {
                 that.pagePrevious();
             });
-            toolbar.registerKeyboardShortcut(34, function() {
+            toolbar.registerKeyboardShortcut(34, ['page'], function() {
                 that.pageNext();
             });
 
@@ -92,7 +92,7 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             'requestPrevPage' : 'pagePrevious',
             */
             'changePage' : 'changePage',
-            'changePageMets' : 'changePageMets',
+            'changeMets' : 'changeMets',
             'documentDirtyStateChanged' : 'documentDirtyStateChanged'
         },
         events: {
@@ -111,7 +111,7 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             this.options.pageNumber = data.pageNumber;
             this.render();
         },
-        changePageMets: function(mets) {
+        changeMets: function(mets) {
             var pages = mets.getNumberOfPages();
             this.mets = mets;
             this.setPageNumberBounds(1,pages);

@@ -13,47 +13,47 @@ define(['events','backbone'],
         }
     });
 
+    var previousPageNumber;
     var currentPageNumber;
+    var previousDocId;
     var currentDocId;
+    var currentMode;
+    var currentVP = {};
     var changePageInProgress;
     var router = new Router();
 
-    events.on('appReady', function() { Backbone.history.start(); });
-
     router.on("route:default", function routeEmpty() {
 
-        events.trigger('message','Default view');
+        events.trigger('changeMode','browser');
 
     });
 
-    router.on("route:document", function routeDoc(id) {
+    router.on("route:document", function routeDoc(docId) {
 
-        events.trigger('message','Document view');
+        previousDocId = currentDocId;
+        currentDocId = docId;
+        events.trigger('changeMode','document');
+        events.trigger('changeDocument',{
+            docId: docId,
+            pageNumber: undefined
+        });
 
     });
     
     router.on("route:page", routePage);
     function routePage(docId,pageId,viewport) {
 
-        var pageNumber = Math.floor(parseInt(pageId,10));
-
-        if (currentDocId != docId) {
-            events.trigger('changeDocumentAndPage',{
-                docId:docId,
-                pageNumber:pageNumber
-            });
-        } else if (currentPageNumber != pageNumber) {
-            events.trigger('changePage',{
-                pageNumber:pageNumber
-            });
-        }
+        previousDocId = currentDocId;
         currentDocId = docId;
-        currentPageNumber = pageNumber;
+        previousPageNumber = currentPageNumber;
+        currentPageNumber = Math.floor(parseInt(pageId,10));
         changePageInProgress = {
             docId: docId,
-            pageNumber: pageNumber,
+            pageNumber: currentPageNumber,
             viewport: viewport
         }
+
+        events.trigger('changeMode','page');
 
     }
 
@@ -62,12 +62,41 @@ define(['events','backbone'],
     events.on('newViewport',function newViewport(vp) {
 
         if (changePageInProgress) return;
+        if (currentMode != "page") return;
+
+        currentVP = vp;
 
         var parts = Backbone.history.fragment.split('/');
         var viewRoute = vp.originX + 'x' + vp.originY + 'x' + vp.pageScale +
             'x' + (vp.vertical ? 'V' : 'H');
         var route = parts[0] + '/' + parts[1] + '/' + viewRoute;
         router.navigate(route,{replace:true,trigger:false});
+
+    });
+
+    events.on('appReady', function() { Backbone.history.start(); });
+    events.on('changeMode', function(mode) {
+        currentMode = mode;
+        if (mode == 'document') {
+            router.navigate('#'+currentDocId,{replace:true,trigger:false});
+        } else  {
+            if (currentDocId != previousDocId) {
+                events.trigger('changeDocument',{
+                    docId: currentDocId,
+                    pageNumber: currentPageNumber
+                });
+            } else if (currentPageNumber != previousPageNumber) {
+                events.trigger('changePage',{
+                    pageNumber:currentPageNumber
+                });
+            } else {
+
+                var parts = Backbone.history.fragment.split('/');
+                var route = currentDocId + '/' + currentPageNumber + '/' + currentVP;;
+                events.trigger('newViewportRequest',currentVP);
+                router.navigate(route,{replace:true,trigger:false});
+            }
+        }
 
     });
 
@@ -87,6 +116,7 @@ define(['events','backbone'],
                     pageScale: parseFloat(vParts[2]),
                     vertical: vParts[3] == 'V' ? true : false
                 };
+                currentVP = vp;
                 events.trigger('newViewportRequest',vp);
             }
         }
@@ -95,7 +125,6 @@ define(['events','backbone'],
         router.navigate(route,{replace:true,trigger:false});
 
     });
-
 
 
     return {

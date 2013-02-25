@@ -7,6 +7,7 @@ require.config({
         "mustache": "../lib/mustache",
         "underscore": "../lib/underscore-min",
         "jquery-ui": "../lib/jquery-ui-1.10.0.custom/js/jquery-ui-1.10.0.custom.min",
+        "jquery-appear": "../lib/jquery-appear",
         "backbone": "../lib/backbone",
         "jsdiff": "../lib/jsdiff",
         "spin": "../lib/spin",
@@ -36,6 +37,7 @@ require(
         "jquery",
         "geometry",
         'events',
+        "jquery-appear",
         "bootstrap",
         "mustache",
         "underscore",
@@ -55,7 +57,9 @@ require(
         'container',
         'boxes',
         'compatibility',
-        'dialog'
+        'dialog',
+        'browser',
+        'document'
     ], function($, geometry,events) {
 
         try {

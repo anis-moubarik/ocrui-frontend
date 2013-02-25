@@ -13,12 +13,14 @@ define(['jquery','events','mybackbone','image','container'],
         myEvents: {
             'changePage': 'changePage',
             'scheduledRender': 'render',
-            'facsimileGotNewImage': 'facsimileGotNewImage'
+            'facsimileGotNewImage': 'facsimileGotNewImage',
+            'changeMode': 'changeMode'
         },
 
         events: {
         },
 
+        myModes: ['page'],
         getAttributes: function(attributes, pageDelta) {
             var a = {
                 docId : attributes.docId,
@@ -48,8 +50,8 @@ define(['jquery','events','mybackbone','image','container'],
                 },
                 function fail (msg) {
 
-                    events.trigger('changePageImageError',{
-                        error: 'changePageImageError',
+                    events.trigger('changeImageError',{
+                        error: 'changeImageError',
                         message: msg
                     });
 
@@ -87,7 +89,7 @@ define(['jquery','events','mybackbone','image','container'],
             this.$el.append(this.$container);
             this.render();
 
-            events.trigger('changePageImage',img); 
+            events.trigger('changeImage',img); 
 
             /*
 

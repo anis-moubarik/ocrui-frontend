@@ -53,6 +53,7 @@ define(['jquery','events', 'toolbar'], function($,events,toolbar) {
             $('#editor').height(availableH);
             $('.CodeMirror').height(availableH);
             $('#facsimile-container').height(availableH);
+            $('#document').css('max-height',availableH);
             $('#spinner').height(availableH);
             currentGeometry = data;
             events.trigger('setGeometry',data);

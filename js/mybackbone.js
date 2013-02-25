@@ -15,6 +15,28 @@ define(['backbone','underscore','events'],function (Backbone,_,events) {
         this.delegateEvents();
     };
 
+    View.prototype.currentMode = function() {
+        return this.mode;
+    };
+
+    View.prototype.isViewActive = function() {
+        return this.viewIsActive ? true : false;
+    };
+
+    View.prototype.changeMode = function(mode) {
+        if (this.mode == mode) { return; }
+        this.mode = mode;
+        if (this.myModes.indexOf(mode) != -1) {
+            this.viewIsActive = true;
+            this.$el.css('display','block');
+            if (this.setViewActive !== undefined) this.setViewActive(mode);
+        } else {
+            this.viewIsActive = false;
+            this.$el.css('display','none');
+            if (this.setViewInactive !== undefined) this.setViewInactive(mode);
+        }
+    };
+
     View.prototype.delegateMyEvents = function (evs) {
         var that = this;
         function cbFactory(m) {
