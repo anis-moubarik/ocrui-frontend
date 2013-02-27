@@ -132,11 +132,12 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
                     // add the matching word if pending edits didn't
                     // use its bounding box and it didin't get added
                     // in this.processPending()
+                    var previousTextLineIndex = this.textLineIndex();
                     this.targetWords.push(
                         this.dupWordWithSideEffects(currentWord,false)
                     );
                     this.inLineIndex ++;
-                    if (this.textLineIndex != currentWord.textLine) {
+                    if (previousTextLineIndex != currentWord.textLine) {
                         this.inLineIndex = 0;
                     }
 
@@ -288,12 +289,12 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
     ContentUpdateProcess.prototype.textBlockIndex = function () {
         if (this.targetWords.length==0) return 0;
-        this.targetWords[this.targetWords.length - 1].textBlock;
+        return this.targetWords[this.targetWords.length - 1].textBlock;
     };
 
     ContentUpdateProcess.prototype.textLineIndex = function () {
         if (this.targetWords.length==0) return 0;
-        this.targetWords[this.targetWords.length - 1].textLine;
+        return this.targetWords[this.targetWords.length - 1].textLine;
     };
 
     ContentUpdateProcess.prototype.dummyWord = function (changed) {
@@ -326,9 +327,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         } else {
             dup.changed = false;
         }
-        dup.textLine = this.textLineIndex();
         dup.index = this.wordIndex();
-        dup.textBlock = this.textBlockIndex();
         dup.inLineIndex = this.inLineIndex;
 
         return dup;
@@ -545,7 +544,9 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     Alto.prototype.getNthWord = function(index) {
         return this.words[index];
     };
-
+    Alto.prototype.getWordSequence = function() {
+        return _.map(this.words,_.identity);
+    };
     Alto.prototype.getStringSequence = function() {
         return _.map(this.words,function(w) {return w.content;});
     };

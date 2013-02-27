@@ -1,3 +1,7 @@
+.CodeMirror {
+    font-family: sans-serif;    
+}
+
 .more-bib-info {
     padding: 1em;
     width: 40em;

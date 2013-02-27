@@ -26,9 +26,6 @@ define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
         getNthWord: function(index) {
             return this.alto.getNthWord(index);
         },
-        getStringSequence: function() {
-            return this.alto.getStringSequence();
-        },
         getChangedSequence: function() {
             return this.alto.getChangedSequence();
         },
@@ -41,18 +38,29 @@ define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
         getLayoutBoxes: function() {
             return this.alto.getLayoutBoxes();
         },
-        getString: function() {
-            var s = "";
-            var layoutBoxes = this.getLayoutBoxes();
-            var strings = this.getStringSequence();
-            _.map(layoutBoxes,function (l) {
-                for (var i = l.fromIndex; i <= l.toIndex; i++) {
-                    if (i > l.fromIndex) s += " ";
-                    s += strings[i];
+        getString: function(lineBreaks) {
+            var previousTextBlock = 0;
+            var previousTextLine = 0;
+            var words = this.alto.getWordSequence();
+            var strings = _.map(words,function (w,i) {
+
+                var rv;
+                if (previousTextBlock != w.textBlock) {
+                    rv = '\n\n' + w.content;
+                } else if (previousTextLine != w.textLine) {
+                    rv = (lineBreaks ? '\n' : ' ') + w.content;
+                } else {
+                    rv = (i != 0 ? ' ' : '') + w.content;
                 }
-                s += "\n\n";
+
+                previousTextBlock = w.textBlock;
+                previousTextLine = w.textLine;
+
+                return rv;
+
             });
-            return s;
+
+            return strings.join('');
         },
         parse: function (response) {
             var data = {};

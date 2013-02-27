@@ -66,15 +66,7 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
                 text:"Save",
                 title:"Save",
                 modes:["page"],
-                click: function () {
-                    var dirtyPages = that.mets.dirtyPages();
-                    var pNums = _.map(dirtyPages,function (p) {
-                        return p.get('pageNumber');
-                    });
-                    var dString = pNums.join(' ');
-                    console.log('dirty pages:', dString);
-                    console.log('should now PUT');
-                }
+                click: function () { that.saveDocument(); }
             });
 
             toolbar.registerWidget({
@@ -126,8 +118,10 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
 
         documentDirtyStateChanged: function(dirty) {
             if (dirty) {
+                this.dirty = true;
                 $('#save').addClass('btn-warning');
             } else {
+                this.dirty = false;
                 $('#save').removeClass('btn-warning');
             }
         },
@@ -171,6 +165,15 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
                 (pageNumber > this.options.maxPage)) {
                 this.boundedSetPage(pageNumber);
             }
+        },
+        saveDocument: function () {
+            var dirtyPages = that.mets.dirtyPages();
+            var pNums = _.map(dirtyPages,function (p) {
+                return p.get('pageNumber');
+            });
+            var dString = pNums.join(' ');
+            console.log('dirty pages:', dString);
+            console.log('should now PUT');
         },
         render: function() {
             var context = {

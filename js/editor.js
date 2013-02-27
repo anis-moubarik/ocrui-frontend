@@ -22,6 +22,23 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             CodeMirror.commands.goPageDown = function () { };
 
             toolbar.registerButton({
+                id:'toggle-linebreaks',
+                toggle:true,
+                active:true,
+                icon:'icon-align-left',
+                title:'Line break after each text line',
+                modes:['page'],
+                toggleCB:function(newState) {
+                    that.lineBreaks = newState;
+                    if (newState) {
+                        that.cMirror.setOption('lineWrapping',false);
+                    } else {
+                        that.cMirror.setOption('lineWrapping',true);
+                    }
+                    that.setValueFromAlto();
+                    that.cMirror.replaceSelection(that.cMirror.getSelection());
+                }});
+            toolbar.registerButton({
                 id:'highlight-editor-word',
                 toggle:true,
                 active:false,
@@ -108,7 +125,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             var content = this.cMirror.getValue();
             var line = 0;
             var ch = 0;
-            var inMiddleOfWord = false;
+            var betweenWords = false;
             if (!this.alto) { return; }
             var word = this.alto.getWordAt(coords.x,coords.y);
             if (word === undefined) {return;}
@@ -119,12 +136,12 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                     line ++;
                     ch = 0;
                 }
-                if (c.match(/\S/)) {
-                    if (inMiddleOfWord) wordIndex --;
-                    if (wordIndex === 0) {break;}
-                    inMiddleOfWord = false;
+                if (c.match(/\s/)) {
+                    betweenWords = true;
                 } else {
-                    inMiddleOfWord = true;
+                    if (betweenWords) wordIndex --;
+                    if (wordIndex === 0) {break;}
+                    betweenWords = false;
                 }
                 ch ++;
             }
@@ -153,45 +170,44 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             var s_ch = start.ch;
             var e_line = end.line;
             var e_ch = end.ch;
-            var inMiddleOfWord = false;
-            var slice = "";
+            var betweenWords = false;
+            var stillBetweenWords = false;
+
             for (var i in content) {
+
                 var c = content[i];
-                if (c.match(/\S/)) {
-                    if (inMiddleOfWord) wordIndex ++;
-                    inMiddleOfWord = false;
+
+                if (c.match(/\s/)) {
+
+                    if (betweenWords) stillBetweenWords = true;
+                    betweenWords = true;
+
                 } else {
-                    inMiddleOfWord = true;
+
+                    if (betweenWords) wordIndex ++;
+                    betweenWords = false;
+                    stillBetweenWords = false;
+
                 }
+
                 if (s_line <= 0) {
-
-                    if (s_ch <= 0) {
-
-                        wordIndexes[wordIndex] = true;
-                        slice += c;
-                    }
                     s_ch --;
-                    if (e_line <=0) {
-                        if (e_ch <= 0) {
-                            var isEmpty = true;
-                            for (var j in wordIndexes) {
-                                isEmpty = false;
-                                break;
-                            }
-                            if (isEmpty) {
-                                slice += c;
-                                wordIndexes[wordIndex] = true;
-                            }
-                            break;
-                        }
-                        e_ch --;
+                    if ((s_ch < 0) && (!stillBetweenWords)) {
+                        wordIndexes[wordIndex] = true;
                     }
                 }
+
+                if (e_line <=0) {
+                    e_ch --;
+                    if (e_ch < 0) break;
+                }
+
                 if (c == '\n') {
                     s_line --;
                     e_line --;
                 }
             }
+
             this.words = wordIndexes;
             var wordIndexArray = _.map(wordIndexes,function (v,k) {
                 return parseInt(k,10);
@@ -240,10 +256,17 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 this.$el.removeClass('dirty');
             }
         },
+        setValueFromAlto: function(alto) {
+            if (this.alto === undefined) {
+                this.cMirror.setValue("");
+            } else {
+                var s = this.alto.getString(this.lineBreaks);
+                this.cMirror.setValue(s);
+            }
+        },
         setAlto: function(alto) {
             this.alto = alto;
-            var s = alto.getString();
-            this.cMirror.setValue(s);
+            this.setValueFromAlto();
             this.cMirror.clearHistory();
             var word = this.alto.getNthWord(0);
             this.cMirror.focus();
