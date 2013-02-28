@@ -33,7 +33,6 @@ casper.then(function() {
     cursor = casper.getElementBounds(".CodeMirror-cursor");
     var x = 900;
     var y = 480;
-    casper.capture('layout.png');
     casper.log('cursor originally:' + JSON.stringify(cursor));
     casper.log('click '+x+' '+y);
     casper.page.sendEvent('click',x,y); // on word 'sylikummit'
