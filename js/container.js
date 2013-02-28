@@ -58,7 +58,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'newViewportRequest' : 'newViewportRequest',
             'mousetail' : 'panTail',
             'setPageGeometry':'setPageGeometry',
-            'changeImage':'setImageSize',
+            'changeImage':'changeImage',
             'changePage':'changePage',
             'changeMode':'changeMode',
             'scrollOneStep':'scrollOneStep',
@@ -443,9 +443,10 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                 vertical:this.isLayoutVertical()
             });
         },
-        setImageSize: function(image) {
+        changeImage: function(image) {
             this.imageWidth = image.get('width');
             this.imageHeight = image.get('height');
+            this.scheduleRender();
         },
         /*
         setNextImageSize: function(w,h) {

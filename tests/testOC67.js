@@ -24,10 +24,6 @@ function cmpObjects(o1,o2) {
     return true;
 }
 
-function getHLB() {
-    return require('boxes').view.highlight;
-}
-
 casper.start(settings.defaultPageUrl,mytests.initCasper());
 
 casper.then(function() {
@@ -52,50 +48,50 @@ casper.then(function() {
     }
     this.test.assert((!!newCursor),'new cursor was read');
     this.test.assertEqual(newCursor.line,0, "cursor move line");
-    this.test.assertEqual(newCursor.ch,120, "cursor move ch");
+    this.test.assertEqual(newCursor.ch,8, "cursor move ch");
 
 });
 
 casper.waitFor(function() {
 
-    var hb = this.evaluate( getHLB );
+    var hb = this.evaluate( function () {return require('boxes').view.highlight;} );
+    
+
     return hb;
 
 },null,null,10000);
 
 casper.then(function() {
 
-    var hbs = this.evaluate( getHLB );
+    var hbs = this.evaluate( function () {return require('boxes').view.highlight;} );
     expectedHbs = [{
-        hpos:887,
-        vpos:410,
-        width:41,
-        height:25}];
+        hpos:96,
+        vpos:112,
+        width:163,
+        height:43}];
     assertHighlightBoxes(this,hbs,expectedHbs);
 
 });
 
 casper.then(function() {
     var x = 680;
-    var y = 130;
+    var y = 550;
     this.echo('click',x,y);
     this.page.sendEvent('click',x,y); // on word 'päässä'
 });
 
 casper.waitFor(function () {
-    var expectedBounds = {
-        "height": 34,
-        "left": 64,
-        "top": 650,
-        "width": 57
+    var expectedBounds = {"height":36,"left":378,"top":648,"width":76};
+
+    if (casper.exists(".highlight-box")) {
+        var bounds = casper.getElementBounds(".highlight-box");
+
+        if (cmpObjects(bounds,expectedBounds)) {
+            this.test.assert(true, "Got correct highlight box after click");
+            return true;
+        }
     }
 
-    var bounds = casper.getElementBounds(".highlight-box");
-
-    if (cmpObjects(bounds,expectedBounds)) {
-        this.test.assert(true, "Got correct highlight box after click");
-        return true;
-    }
     return false;
 
 });

@@ -9,7 +9,7 @@ define([], function () {
         "bib-info": ' <div class="dropdown"> <a class="dropdown-toggle bib-info" data-toggle="dropdown" data-target="#">{{author}}: {{title}}</a> <div class="more-bib-info dropdown-menu" role="menu" aria-labelledby="dLabel"> <h2> marcxml</h2> <p> {{marcxml}} </p> </div> </div>',
 
 
-        "language-selector": ' <div class="pull-right"> <form id="language-selector" class="navbar-form"> <select> {{#languages}} <option {{{selected}}} value="{{code}}" >{{name}}</option> {{/languages}} </select> </form> </div> {{#chars}} <a href="#" class="btn" data-character="{{.}}">{{.}}</a> {{/chars}}',
+        "language-selector": ' <div class="pull-right"> <form id="language-selector" class="navbar-form"> <select name="lang"> {{#languages}} <option {{{selected}}} value="{{code}}" >{{name}}</option> {{/languages}} </select> </form> </div> {{#chars}} <a href="#" class="btn" data-character="{{.}}">{{.}}</a> {{/chars}}',
 
         "dialog": ' {{#dialogs}} <div class="modal hide" id="{{id}}"> <div class="modal-header"> <h3>{{header}}</h3> </div> <div class="modal-body"> {{#messages}} <p>{{.}}</p> {{/messages}} </div> <div class="modal-footer"> {{#buttons}} <button class="{{classes}}" {{{extra}}} id="{{id}}"> {{name}} </a> {{/buttons}} </div> </div> {{/dialogs}} '
 

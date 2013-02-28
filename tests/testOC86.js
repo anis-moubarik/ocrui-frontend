@@ -27,12 +27,9 @@ casper.then(function() {
 casper.waitForText( "Pienet" ); // ensure editor is there
 
 casper.then(function() {
-    var selectorButton = casper.getElementInfo("#language-selector a");
-    var selectorText = selectorButton.text.replace(/\s+/g, '');
-    casper.test.assertEqual(selectorText,'');
-});
-
-casper.then(function() {
+    var selectedLang = casper.getElementInfo("#language-selector select option[selected]");
+    var lang = selectedLang.attributes.value;
+    casper.test.assert(lang=='', "No language selected");
     cursor = casper.getElementBounds(".CodeMirror-cursor");
     var x = 900;
     var y = 480;
@@ -54,9 +51,11 @@ casper.waitFor(function () {
 });
 
 casper.then(function() {
-    var selectorButton = casper.getElementInfo("#language-selector a");
-    var selectorText = selectorButton.text.replace(/\s+/g, '');
-    casper.test.assertEqual(selectorText,'Vepsä');
+    var selectedLang = casper.getElementInfo("#language-selector select option[selected]");
+    console.log(JSON.stringify(selectedLang));
+    var lang = selectedLang.attributes.value;
+    casper.test.assert(lang=='veps', "Vepsä language selected");
+    casper.capture('koe.png');
 });
 
 casper.run(function() {

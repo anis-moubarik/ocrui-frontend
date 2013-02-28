@@ -37,14 +37,13 @@ casper.waitFor(function () {
 
 casper.then(function() {
     var expectedBounds = {
-        "height": 18,
-        "left": 845,
-        "top": 80,
+        "height": 14,
+        "left": 629,
+        "top": 182,
         "width": 9
     }
 
     var bounds = casper.getElementBounds(".CodeMirror-cursor");
-    this.echo('new cursor:' + JSON.stringify(bounds));
     this.test.assert(mytests.cmpObjects(bounds,expectedBounds),
         "Cursor moves to right place");
 });

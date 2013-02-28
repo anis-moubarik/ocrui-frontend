@@ -13,10 +13,10 @@ casper.then(function() {
 
 
     this.test.assertExists(selector)
-    var bibinfo = this.getElementInfo(selector + ' input');
-    var value = bibinfo.attributes.value;
+    var bibinfo = this.getElementInfo(selector + ' a');
+    var text = bibinfo.text;
     var expected = settings.testAuthor + ': ' + settings.testTitle
-    this.test.assertEqual(value,expected,'Correct bibinfo');
+    this.test.assertEqual(text,expected,'Correct bibinfo');
 });
 
 casper.run(function() {

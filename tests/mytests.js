@@ -1,3 +1,6 @@
+
+'use strict';
+
 function onError  (msg, trace) {
     var msgStack = ['ERROR: ' + msg];
     if (trace) {
@@ -72,12 +75,12 @@ function elementInfoContainsClass(info,cls) {
     return false;
 }
 
-viewportSize = {
+var viewportSize = {
     width:1024,
     height:768
 };
 
-debugOptions = {
+var debugOptions = {
 
     //onResourceRequested : onResourceRequested,
     //onResourceReceived : onResourceReceived,
@@ -87,7 +90,7 @@ debugOptions = {
 };
 
 
-normalOptions = {
+var normalOptions = {
 
     viewportSize: viewportSize
 

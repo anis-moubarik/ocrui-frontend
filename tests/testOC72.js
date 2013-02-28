@@ -21,7 +21,7 @@ casper.waitFor( function () {
     return value == '12';
 });
 
-casper.waitForText( "The age demanded an image ofits accelerated grimace" );
+casper.waitForText( "The age demanded an image" );
 
 casper.then(function() {
     var value = casper.getElementInfo('#page-number').attributes.value;

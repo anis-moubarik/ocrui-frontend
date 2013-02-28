@@ -16,27 +16,31 @@ casper.then(function() {
     initialContent = casper.evaluate(function () {
         return require('editor').view.cMirror.getValue();
     });
-    casper.clickLabel('Suomi'); 
+    casper.fill('#language-selector',{lang:'fi'});
     casper.echo('clicked Suomi');
+    casper.capture('koe.png');
 
 });
 
 // Wait for virtual keyboard to change
 casper.waitFor(function () {
 
-    var expectedButtons = ['å','ä','ö'];
+    var expectedButtons = [
+        "A","a","Ä","ä","Å","å","B","в","C","c","Ç","ç","D","d","Ə",
+        "ә","E","e","F","f","G","g","Y","y","I","i","J","j","K","k",
+        "L","l","M","m","N","n","O","o","Ö","ö","P","p","R","r","S",
+        "s","Ş ş","T","t","U","u","V","v","X","x","Z","z","Ƶ","ƶ","Ь",
+        "ь","rx","lh"
+    ];
 
     var buttons = casper.evaluate(function () {
-        var buttons = $('#vkeyboard div a').contents().get();
-        var buttons = $('#vkeyboard div a').contents().get();
-        var buttons = $('#vkeyboard div a').map(function () {
+        var buttons = $('#vkeyboard a').map(function () {
             return this.textContent;
         }).get();
 
         return buttons;
     });
 
-    console.log(buttons);
     for (var i in expectedButtons) {
         if (buttons[i] != expectedButtons[i]) return false;
     }
@@ -49,19 +53,19 @@ casper.waitFor(function () {
 });
 
 casper.then(function() {
-    casper.click('#vkeyboard div a');
+    casper.click('#vkeyboard a');
 });
 
 casper.waitFor(function () {
     var contentNow = casper.evaluate(function () {
         return require('editor').view.cMirror.getValue();
     });
-    if (contentNow == 'å' + initialContent) {
+    if (contentNow == 'A' + initialContent) {
         casper.test.assert(true,'Got expected editor value change.');
         return true;
     }
     if (contentNow == initialContent) {
-        return casper.log('Editor content still unchanged');
+        casper.log('Editor content still unchanged');
     }
     return false;
 });
