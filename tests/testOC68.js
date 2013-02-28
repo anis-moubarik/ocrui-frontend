@@ -14,7 +14,7 @@ casper.waitForText( "Pienet",
     function () {
         casper.test.assert(true, "Editor text not found.");
         casper.die();
-    });
+    },10000);
 
 casper.then(function() {
     cursor = casper.getElementBounds(".CodeMirror-cursor");
@@ -36,16 +36,27 @@ casper.waitFor(function () {
 });
 
 casper.then(function() {
+
     var expectedBounds = {
-        "height": 14,
-        "left": 629,
-        "top": 182,
-        "width": 9
-    }
+        "height": 0,
+        "left": 0,
+        "top": 0,
+        "width": 0
+    };
 
     var bounds = casper.getElementBounds(".CodeMirror-cursor");
-    this.test.assert(mytests.cmpObjects(bounds,expectedBounds),
-        "Cursor moves to right place");
+    mytests.assertEqualObjects(casper.test,bounds,expectedBounds);
+
+    var expectedBounds2 = {
+        "height": 14,
+        "left": 622,
+        "top": 182,
+        "width": 40
+    };
+
+    var bounds2 = casper.getElementBounds(".CodeMirror-selected");
+    mytests.assertEqualObjects(casper.test,bounds2,expectedBounds2);
+
 });
 
 casper.run(function() {

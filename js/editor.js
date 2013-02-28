@@ -125,11 +125,14 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             var content = this.cMirror.getValue();
             var line = 0;
             var ch = 0;
+            var anchor,head;
             var betweenWords = false;
             if (!this.alto) { return; }
             var word = this.alto.getWordAt(coords.x,coords.y);
             if (word === undefined) {return;}
             var wordIndex = word.index;
+            var wordLength = word.content.length;
+            console.log(JSON.stringify(word),wordLength);
             for (var i in content) {
                 var c = content[i];
                 if (c == '\n') {
@@ -140,12 +143,29 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                     betweenWords = true;
                 } else {
                     if (betweenWords) wordIndex --;
-                    if (wordIndex === 0) {break;}
+                    if (wordIndex === 0) {
+                        if (anchor === undefined) {
+                            anchor = {
+                                line: line,
+                                ch: ch-1
+                            }
+                        }
+                        head = {
+                            line: line,
+                            ch: ch
+                        }
+                        console.log(wordLength);
+                        wordLength --;
+                        if (wordLength == 0) {
+                            break;
+                        }
+                    }
                     betweenWords = false;
                 }
                 ch ++;
             }
-            this.cMirror.setCursor(line,ch);
+            console.log(anchor,head);
+            this.cMirror.setSelection(anchor,head);
             this.cMirror.focus();
         },
         configureCMMode: function () {

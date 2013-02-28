@@ -47,6 +47,19 @@ function cmpObjects (o1,o2) {
     return true;
 }
 
+function assertEqualObjects (test,o1,o2) {
+
+    test.assertEqual(Object.keys(o1).length, Object.keys(o2).length,
+        "Objects have same amount of keys");
+
+    for (var key in o1) {
+        
+        test.assertEqual (o1[key],o2[key], "property '"+key+"' matches.");
+
+    }
+
+}
+
 function getEditorData(casper) {
     var data = casper.evaluate(function () {
         var cMirror = require('editor').view.cMirror;
@@ -98,14 +111,15 @@ var normalOptions = {
 
 
 exports.elementInfoContainsClass = elementInfoContainsClass;
+exports.assertEqualObjects = assertEqualObjects;
 exports.cmpObjects = cmpObjects;
 exports.onResourceRequested = onResourceRequested;
 exports.onResourceReceived = onResourceReceived;
 exports.onConsoleMessage = onConsoleMessage;
-exports.initCasper = initCasper
-exports.getEditorData = getEditorData
+exports.initCasper = initCasper;
+exports.getEditorData = getEditorData;
 
 exports.viewportSize = viewportSize;
 exports.normalOptions = normalOptions;
-exports.debugOptions = debugOptions
+exports.debugOptions = debugOptions;
 

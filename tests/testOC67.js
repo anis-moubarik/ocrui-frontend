@@ -43,9 +43,6 @@ casper.then(function() {
         return require('editor').view.cMirror.getCursor();
     });
 
-    for (var x in newCursor) {
-        this.echo('newcursor.'+x+' = ' + newCursor[x]);
-    }
     this.test.assert((!!newCursor),'new cursor was read');
     this.test.assertEqual(newCursor.line,0, "cursor move line");
     this.test.assertEqual(newCursor.ch,8, "cursor move ch");
