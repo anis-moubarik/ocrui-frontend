@@ -113,13 +113,12 @@ define(['jquery','events','mybackbone','image','container'],
 
             if (!this.$img) { return; }
 
-            var zoom = container.view.getZoom();
+            this.$el.css('width',container.view.getWorldWidth());
+            this.$el.css('height',container.view.getWorldHeight());
 
             var newCSS = {
-                left : container.view.getOriginX(),
-                top : container.view.getOriginY(),
-                width : zoom * this.image.get('width'),
-                height : zoom * this.image.get('height')
+                width : container.view.getPageWidth(),
+                height : container.view.getPageHeight()
             };
 
             for (var prop in newCSS) {

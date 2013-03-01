@@ -31,7 +31,7 @@ casper.then(function() {
     casper.log(slice);
 });
 
-casper.waitForText( "koeSisällys" ); // wait for text to be rendered
+casper.waitForText( "koeSisällys",null,null,10000 ); // wait for text to be rendered
 
 casper.then(function() {
     var info = casper.getElementInfo('.cm-changed');

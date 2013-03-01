@@ -8,10 +8,19 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
             var that = this;
             this.pageScale = 1; // 0.4; // some default...
-            this.originX = 0; //
-            this.originY = 0; //
+            this.margin = 100;
+            this.pageLeft = this.margin;
+            this.pageTop = this.margin;
+            this.viewportLeft = 0;
+            this.viewportTop = 0;
             this.imageWidth = 500; // initial something
             this.imageHeight = 500; // initial something
+            this.altoWidth = 500; // these are the alto coordinates
+            this.altoHeight = 500; // these are the alto coordinates
+            this.maxAltoWidth = 500;
+            this.maxAltoHeight = 500;
+            this.pageWidth = 500; // these are in pixels on screen
+            this.pageHeight = 500; // these are in pixels on screen
             this.mouseTailStack = new mousetailstack.MouseTailStack();
 
             toolbar.registerButton({
@@ -43,12 +52,10 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                     that.wheelPan = newState;
             }});
 
-
             toolbar.registerKeyboardShortcut(113, ['page'], function(ev) {
                 $('#pan-zoom').click();
             });
             this.setMouseSensitivity(true);
-
 
         },
         el: '#facsimile-container',
@@ -74,8 +81,16 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         },
         myModes: ['page'],
         setPageGeometry: function(data) {
-            this.pageWidth = data.width;
-            this.pageHeight = data.height;
+            this.altoWidth = data.width;
+            this.altoHeight = data.height;
+            this.pageWidth = data.width * this.pageScale;
+            this.pageHeight = data.height * this.pageScale;
+            if (this.altoWidth > this.maxAltoWidth) {
+                this.maxAltoWidth = this.altoWidth;
+            }
+            if (this.altoHeight > this.maxAltoHeight) {
+                this.maxAltoHeight = this.altoHeight;
+            }
         },
         setLayoutVertical: function(vertical) {
             this.vertical = vertical ? true : false;
@@ -94,7 +109,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             this.mouseSensitivity = b ? true : false;
         },
         newViewportRequest: function(vp) {
-            this.setOrigin(vp.originX,vp.originY);
+            this.setPan(vp.originX,vp.originY);
             this.setZoom(vp.pageScale);
             this.scrollingTo = undefined;
             this.scheduleRender();
@@ -105,9 +120,9 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             var x = ev.pageX - offset.left;
             var y = ev.pageY - offset.top;
             if (this.wheelPan) {
-                this.setOrigin(
-                        this.originX + 32*deltaX,
-                        this.originY + 32*deltaY
+                this.setPan(
+                        this.viewportLeft - 32*deltaX,
+                        this.viewportTop - 32*deltaY
                     );
                 this.scheduleRender();
             } else {
@@ -117,16 +132,18 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                     this.zoomTo(1/1.4,x,y);
                 }
             }
+            ev.preventDefault();
         },
 
         beginPan: function(ev) {
+            
             if (!this.mouseSensitivity) return;
             if (ev.which != 1) return;
             this.propageteNextClick = true;
             this.panning = true;
             this.mouseTailStack.init(ev);
-            this.savedOriginX = this.originX;
-            this.savedOriginY = this.originY;
+            this.savedOriginX = this.viewportLeft;
+            this.savedOriginY = this.viewportTop;
 
             var offset = this.$el.offset();
             this.panBeginX = ev.pageX - offset.left;
@@ -142,7 +159,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         cancelPan: function(ev) {
             if (!this.mouseSensitivity) return;
             if (!this.panning) return;
-            this.setOrigin(this.savedOriginX, this.savedOriginY);
+            this.setPan(this.savedOriginX, this.savedOriginY);
             this.scheduleRender();
             this.panning = false;
 
@@ -156,17 +173,17 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             var currentX = ev.pageX - offset.left;
             var currentY = ev.pageY - offset.top;
 
-            this.setOrigin(
-                this.savedOriginX - (this.panBeginX - currentX),
-                this.savedOriginY - (this.panBeginY - currentY));
+            var panX = this.savedOriginX + (this.panBeginX - currentX);
+            var panY = this.savedOriginY + (this.panBeginY - currentY);
+            this.setPan(panX, panY);
             this.scheduleRender();
 
         },
         panTail: function(data) {
             if (!this.mouseSensitivity) return;
-            this.setOrigin(
-                this.originX + data[0],
-                this.originY + data[1]);
+            this.setPan(
+                this.viewportLeft - data[0],
+                this.viewportTop - data[1]);
             this.scheduleRender();
         },
         propagateClick: function(ev) {
@@ -175,55 +192,105 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             if (ev.which != 1) return;
 
             var pageCoords = {
-                x: this.getPageX(ev.pageX-this.$el.offset().left),
-                y: this.getPageY(ev.pageY-this.$el.offset().top)
+                x: this.viewport2AltoX(ev.pageX-this.$el.offset().left),
+                y: this.viewport2AltoY(ev.pageY-this.$el.offset().top)
             };
             events.trigger('cursorToCoordinate',pageCoords);
         },
-        getPageWidth: function (screenWidth) {
-            return screenWidth / this.hScale();
+        getWorldLeft: function () {
+            return 0;
         },
-        getPageHeight: function (screenHeight) {
-            return screenHeight / this.vScale();
+        getWorldTop: function () {
+            return 0;
         },
-        getPageX: function (screenX) {
-            return (screenX - this.originX) / this.hScale();
+        getWorldWidth: function () {
+            return this.getMaxPageWidth() + 2 * this.margin;
         },
-        getPageY: function (screenY) {
-            return (screenY - this.originY) / this.vScale();
+        getWorldHeight: function () {
+            var nPages = 1;
+            return nPages * (this.getMaxPageHeight() + this.margin) +
+                this.margin;
         },
-        hScale: function () {
-            return this.imageWidth * this.pageScale / this.pageWidth;
+        getWorldBottom: function () {
+            return this.getWorldHeight();
         },
-        vScale: function () {
-            return this.imageHeight * this.pageScale / this.pageHeight;
+        getWorldRight: function () {
+            return this.getWorldWidth();
         },
-        getScreenX: function(pageX) {
-            return Math.round(pageX * this.hScale() + this.originX);
+        getViewportLeft: function() {
+            return this.viewportLeft;
         },
-        getScreenY: function(pageY) {
-            return Math.round(pageY * this.vScale() + this.originY);
+        getViewportTop: function() {
+            return this.viewportTop;
         },
-        getScreenWidth: function(pageWidth) {
-            return Math.round(pageWidth * this.hScale());
+        getViewportRight: function() {
+            return this.horizontalPixels + this.viewportLeft;
         },
-        getScreenHeight: function(pageHeight) {
-            return Math.round(pageHeight * this.vScale());
+        getViewportBottom: function() {
+            return this.verticalPixels + this.viewportTop;
         },
-        getWidth: function() {
+        getViewportWidth: function() {
             return this.horizontalPixels;
         },
-        getHeight: function() {
+        getViewportHeight: function() {
             return this.verticalPixels;
         },
-        getZoom: function() {
+        getPageLeft: function() {
+            return this.pageLeft;
+        },
+        getPageTop: function() {
+            return this.pageTop;
+        },
+        getPageRight: function() {
+            return this.pageLeft + this.getPageWidth();
+        },
+        getPageBottom: function() {
+            return this.pageTop + this.getPageHeight();
+        },
+        getPageWidth: function() {
+            return this.pageWidth;
+        },
+        getPageHeight: function() {
+            return this.pageHeight;
+        },
+        getMaxPageWidth: function() {
+            return this.maxAltoWidth * this.pageScale;
+        },
+        getMaxPageHeight: function() {
+            return this.maxAltoHeight * this.pageScale;
+        },
+        getPageScale: function () {
             return this.pageScale;
         },
-        getOriginX: function() {
-            return this.originX; // return origin x of viewport in global crds
+        getOnPageWidth: function (screenWidth) {
+            return screenWidth / this.pageScale();
         },
-        getOriginY: function() {
-            return this.originY; // return origin y of viewport in global crds
+        getOnPageHeight: function (screenHeight) {
+            return screenHeight / this.pageScale();
+        },
+        getOnPageX: function (worldX) {
+            return (worldX - this.pageLeft) / this.pageScale;
+        },
+        getOnPageY: function (worldY) {
+            return (worldY - this.pageTop) / this.pageScale;
+        },
+        viewport2AltoX: function (viewportX) {
+            return (viewportX + this.viewportLeft - this.pageLeft) / this.pageScale;
+        },
+        viewport2AltoY: function (viewportY) {
+            return (viewportY + this.viewportTop - this.pageTop) / this.pageScale;
+        },
+        alto2WorldX: function(altoX) {
+            return Math.round(altoX * this.pageScale + this.pageLeft);
+        },
+        alto2WorldY: function(altoY) {
+            return Math.round(altoY * this.pageScale + this.pageTop);
+        },
+        alto2WorldWidth: function(altoWidth) {
+            return Math.round(altoWidth * this.pageScale);
+        },
+        alto2WorldHeight: function(altoHeight) {
+            return Math.round(altoHeight * this.pageScale);
         },
         changePage: function() {
             this.initialHighlightSet = false;
@@ -235,92 +302,134 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                 this.initialHighlightSet = true;
                 return;
             }
+
             var hl = utils.getCombinedBoundingBox(highlight);
 
-            var hpos = Math.round(hl.hpos * this.hScale());
-            var vpos = Math.round(hl.vpos * this.vScale());
-            var width = Math.round(hl.width * this.hScale());
-            var height = Math.round(hl.height * this.vScale());
-            var cX = hpos + width / 2;
-            var cY = vpos + height / 2;
-            var vLeft = -this.originX;
-            var vTop = -this.originY;
-            var vRight = vLeft + this.horizontalPixels;
-            var vBottom = vTop + this.verticalPixels;
-            var scrollToX = cX;
-            var scrollToY = cY;
-
-            var xx = this.inVisibleX(cX,this.scrollMargin);
-            var yy = this.inVisibleY(cY,this.scrollMargin);
-
-            if ((xx === 0) && (yy === 0)) {
-                return; // no need to scroll
-            }
-
-            // fit whole box to screen if possible otherwise just scroll thereabouts */
-            if (width + 2*this.scrollMargin < this.horizontalPixels) {
-                if (xx < 0) { scrollToX = hpos; }
-                else if (xx > 0) { scrollToX = hpos + width; }
-            }
-            if (height + 2*this.scrollMargin < this.vertivalPixels) {
-                if (yy < 0) { scrollToY = vpos; }
-                else if (yy > 0) { scrollToY = vpos + height; }
-            }
-
-            // setup scroll
-
-            var that = this;
-
-            if (this.scrollingTo === undefined) {
-                events.delay('scrollOneStep',undefined,this.scrollTimeout);
-            }
-
-            this.scrollingTo = {x:scrollToX,y:scrollToY};
-
+            // combined box is still in alto coordinates so scale and then
+            // think about scrolling
+            this.scrollOneStep( {
+                hpos: this.alto2WorldX(hl.hpos),
+                vpos: this.alto2WorldY(hl.vpos),
+                width: this.alto2WorldWidth(hl.width),
+                height: this.alto2WorldHeight(hl.height),
+            } );
         },
-        scrollSpeed: 0.25, // speed of scroll 0 < speed <= 1
-        scrollTimeout: 40, // => about 25 frames per sec
-        scrollMargin: 50,
-        scrollOneStep: function () {
+        scrollOneStep: function(hl) {
 
-            if (this.scrollingTo === undefined) return;
-            var that = this;
-            var xDelta = Math.ceil(this.inVisibleX(this.scrollingTo.x,this.scrollMargin) * this.scrollSpeed);
-            var yDelta = Math.ceil(this.inVisibleY(this.scrollingTo.y,this.scrollMargin) * this.scrollSpeed);
-            this.setOrigin(this.originX - xDelta, this.originY - yDelta);
-            this.scheduleRender();
-            if ((xDelta !== 0) || (yDelta !== 0)) {
-                events.delay('scrollOneStep',undefined,this.scrollTimeout);
-            } else {
-                this.scrollingTo = undefined;
+            var scrollSpeed = 0.25; // speed of scroll 0 < speed <= 1
+            var scrollTimeout = 40; // => about 25 frames per sec
+            var scrollHMargin = Math.min(50, this.getViewportWidth() / 4);
+            var scrollVMargin = Math.min(50, this.getViewportHeight() / 4);
+
+            function inVisibleX(xLeft,xRight,vpLeft,vpRight) {
+                var left = vpLeft + scrollHMargin;
+                var right = vpRight - scrollHMargin;
+
+                if (right-left < xRight-xLeft) {
+                    // won't fit to vp with margin, try without.
+                    left = vpLeft;
+                    right = vpRight;
+
+                }
+
+                if (right-left < xRight-xLeft) {
+                    // won't fit to vp at all, just use the center point
+                    xLeft = xLeft + (xRight-xLeft)/2;
+                    xRight = xLeft;
+                }
+
+                // return amount of pixels x is off viewport + scroll margin
+                if (xLeft < left) {
+                    return xLeft-left;
+                } else if (xRight > right) {
+                    return xRight-right;
+                } else {
+                    return 0;
+                }
+            };
+
+            function inVisibleY(xTop,xBottom,vpTop,vpBottom) {
+                // return amount of pixels x is off viewport + scroll margin
+                var top = vpTop + scrollVMargin;
+                var bottom = vpBottom - scrollVMargin;
+
+                if (bottom-top < xBottom-xTop) {
+                    // won't fit to vp with margin, try without.
+                    top = vpTop;
+                    bottom = vpBottom;
+
+                }
+
+                if (bottom-top < xBottom-xTop) {
+                    // won't fit to vp at all, just use the center point
+                    xTop = xTop + (xBottom-xTop)/2;
+                    xBottom = xTop;
+                }
+
+                if (xTop < top) {
+                    return xTop - top;
+                } else if (xBottom > bottom) {
+                    return xBottom - bottom;
+                } else {
+                    return 0;
+                }
+            };
+
+            if (hl) {
+                // initial call
+
+                var hpos = Math.round(this.getPageLeft() + hl.hpos * this.pageScale);
+                var vpos = Math.round(this.getPageTop() + hl.vpos * this.pageScale);
+                var width = Math.round(hl.width * this.pageScale);
+                var height = Math.round(hl.height * this.pageScale);
+
+                var xx = inVisibleX(
+                    hl.hpos,
+                    hl.hpos+hl.width,
+                    this.getViewportLeft(),
+                    this.getViewportRight());
+                var yy = inVisibleY(
+                    hl.vpos,
+                    hl.vpos+hl.height,
+                    this.getViewportTop(),
+                    this.getViewportBottom());
+
+                if ((xx === 0) && (yy === 0)) return;
+
+                // setup scroll if it is not already setup
+                if (this.scrollingTo === undefined) {
+                    events.delay('scrollOneStep',undefined,scrollTimeout);
+                }
+
+                this.scrollingTo = {
+                    left : this.getViewportLeft() + xx,
+                    top : this.getViewportTop() + yy
+                };
+
             }
-        },
-        inVisibleX: function (x,margin) {
-            if (margin === undefined) margin = 0;
-            if (margin > this.horizontalPixels / 4) margin = this.horizontalPixels / 4;
-            var left = -this.originX + margin;
-            var right = left + this.horizontalPixels - (margin * 2);
-            // return amount of pixels x is off the visible canvas
-            if (x < left) {
-                return x-left;
-            } else if (x > right) {
-                return x-right;
-            } else {
-                return 0;
-            }
-        },
-        inVisibleY: function (y,margin) {
-            // return amount of pixels y is off the visible canvas
-            if (margin === undefined) margin = 0;
-            if (margin > this.verticalPixels / 4) margin = this.verticalPixels / 4;
-            var top = -this.originY + margin;
-            var bottom = top + this.verticalPixels - (margin * 2);
-            if (y < top) {
-                return y - top;
-            } else if (y > bottom) {
-                return y - bottom;
-            } else {
-                return 0;
+
+            if (this.scrollingTo) {
+
+                var xDelta = Math.ceil(
+                        ( this.scrollingTo.left - this.getViewportLeft()) *
+                        scrollSpeed
+                    );
+                var yDelta = Math.ceil(
+                        (this.scrollingTo.top - this.getViewportTop()) *
+                        scrollSpeed
+                    );
+
+                var newViewportLeft = this.getViewportLeft() + xDelta;
+                var newViewportTop = this.getViewportTop() + yDelta;
+                this.setPan(newViewportLeft,newViewportTop);
+                    
+                this.scheduleRender();
+                if ((xDelta !== 0) || (yDelta !== 0)) {
+                    events.delay('scrollOneStep',undefined,scrollTimeout);
+                } else {
+                    this.scrollingTo = undefined;
+                }
+
             }
         },
         zoomTo: function(amount,fixedX,fixedY) {
@@ -330,115 +439,69 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             if (fixedY === undefined) {
                 fixedY = this.verticalPixels / 2;
             }
+
             var scale = this.pageScale * amount;
             if (scale < 0.01) scale = 0.01;
             if (scale > 2) scale = 2;
 
-            var oldScale = this.pageScale;
-
+            if (this.oldPageScale === undefined) {
+                this.fixedX = fixedX;
+                this.fixedY = fixedY;
+                this.oldPageScale = this.pageScale;
+            }
+            
             this.setZoom(scale);
-
-            var newScale = this.pageScale;
-
-            // (fixedX, fixedY) on screen point that should remain fixed to a
-            // point in page soon to be calculated
-
-            var scaleChange = (newScale / oldScale);
-            var ofX = fixedX - this.originX;
-            var ofY = fixedY - this.originY;
-            var newOfX = ofX * scaleChange;
-            var newOfY = ofY * scaleChange;
-            var newOriginX = fixedX - newOfX;
-            var newOriginY = fixedY - newOfY;
-
-            this.setOrigin( newOriginX, newOriginY);
 
             this.scheduleRender();
         },
         setZoom: function (newScale) {
             // TODO: don't let zoom too far
 
-            var margin = 100;
-            var canvasLeft = -this.originX;
-            var canvasTop = -this.originY;
-            var canvasRight = canvasLeft + this.horizontalPixels;
-            var canvasBottom = canvasTop + this.verticalPixels;
-            var pageLeft = 0 * newScale;
-            var pageTop = 0 * newScale;
-            var pageRight = this.imageWidth * newScale;
-            var pageBottom = this.imageHeight * newScale;
-            var pageMarginLeft = pageLeft - margin;
-            var pageMarginTop = pageTop - margin;
-            var pageMarginRight = pageRight + margin;
-            var pageMarginBottom = pageBottom + margin;
+            //if (this.horizontalPixels > this.pageWidth + 2 * margin) return;
+            //if (this.verticalPixels > this.pageHeight + 2 * margin) return;
 
-            var canvasWidth = canvasRight - canvasLeft;
-            var canvasHeight = canvasBottom - canvasTop;
-            var pageMarginWidth = pageMarginRight - pageMarginLeft;
-            var pageMarginHeight = pageMarginBottom - pageMarginTop;
 
-            // this computes minimum scales based on horizontal and vertical widths.
-            var newHScale = (canvasWidth - margin * 2) / this.imageWidth;
-            var newVScale = (canvasHeight - margin * 2) / this.imageHeight;
+
+
+            // compute minimum scales based on horizontal and vertical
+            // widths.
+            var minHScale = (this.getViewportWidth() - 2*this.margin) / this.altoWidth;
+            var minVScale = (this.getViewportHeight() - 2*this.margin) / this.altoHeight;
 
             // select maximum of requested scale and two minimums
-            this.pageScale = _.max([newScale,newHScale,newVScale]);
+            this.pageScale = _.max([
+                newScale,
+                minHScale,
+                minVScale
+            ]);
+
+            this.pageWidth = this.altoWidth * this.pageScale;
+            this.pageHeight = this.altoHeight * this.pageScale;
             this.triggerNewViewport();
+            
+
         },
-        setOrigin: function (originX,originY) {
-            this.originX = parseInt(originX,10); // logical coordinate origin for panning
-            this.originY = parseInt(originY,10); // logical coordinate origin for panning
+        setPan: function (newLeft,newTop) {
 
-            // Don't let user scroll too far
-            // Count bounding boxes of canvas and page in pixels from originX,originY.
+            console.log('p',newLeft,newTop);
+            // (newLeft,newTop) is the new coordinate of top left point of
+            // viewport in relation to page coordinates. I.e.
+            // coordinates are >= -margin and
+            // <= this.imageWidth*scale - this.horizontalPixels + margin
 
-            var margin = 100; // acceptable margin
-            var canvasLeft = -this.originX;
-            var canvasTop = -this.originY;
-            var canvasRight = canvasLeft + this.horizontalPixels;
-            var canvasBottom = canvasTop + this.verticalPixels;
-            var pageLeft = 0 * this.pageScale;
-            var pageTop = 0 * this.pageScale;
-            var pageRight = this.imageWidth * this.pageScale;
-            var pageBottom = this.imageHeight * this.pageScale;
-            var pageMarginLeft = pageLeft - margin;
-            var pageMarginTop = pageTop - margin;
-            var pageMarginPrevTop = pageTop - margin - this.imageHeight*this.pageScale;
-            var pageTriggerPrev = pageTop - this.imageHeight*0.6*this.pageScale;
-            var pageMarginRight = pageRight + margin;
-            var pageMarginBottom = pageBottom + margin;
-            var pageMarginNextBottom = pageBottom + margin + this.imageHeight*this.pageScale;
-            var pageTriggerNext = pageBottom + this.imageHeight*0.6*this.pageScale;
-
-            if (canvasLeft < pageMarginLeft) {
-                this.originX = - pageMarginLeft;
-            } else if (canvasRight > pageMarginRight) {
-                this.originX = - (pageMarginRight - this.horizontalPixels);
-            }
-
-            if (canvasTop < pageMarginTop) {
-                this.originY = - pageMarginTop;
-            } else if (canvasBottom > pageMarginBottom) {
-                this.originY = - ( pageMarginBottom - this.verticalPixels );
-            }
-
-/*
-            if (canvasTop < pageTriggerPrev) {
-                events.trigger('requestPrevPage');
-                //this.setOrigin(this.originX,this.originY - (margin + this.imageHeight*this.pageScale));
-            } else if (canvasBottom > pageTriggerNext) {
-                events.trigger('requestNextPage');
-                //this.setOrigin(this.originX,this.originY + (margin + this.imageHeight*this.pageScale));
-            }
-*/
-
+            this.$el.scrollTop(newTop);
+            this.$el.scrollLeft(newLeft);
+            this.viewportTop = this.$el.scrollTop();
+            this.viewportLeft = this.$el.scrollLeft();
+            this.scheduleRender();
             this.triggerNewViewport();
 
         },
+
         triggerNewViewport: function() {
             events.delay('newViewport',{
-                originX:this.originX,
-                originY:this.originY,
+                originX:this.pageLeft,
+                originY:this.pageTop,
                 pageScale:this.pageScale,
                 vertical:this.isLayoutVertical()
             });
@@ -464,7 +527,33 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         },
         render: function() {
 
-            return;
+            // change canvas scroll state if necessary. This is to keep a
+            // chosen point fixed on screen
+            if (this.oldPageScale !== undefined) {
+
+                var newScale = this.pageScale;
+
+                // (fixedX, fixedY) on screen point that should remain
+                // fixed to a point in page soon to be calculated
+
+                var scaleChange = (newScale / this.oldPageScale);
+
+                // fixed point in pixels on canvas
+                var onPageX = this.fixedX + this.getViewportLeft() -
+                        this.getPageLeft();
+                var onPageY = this.fixedY + this.getViewportTop() -
+                        this.getPageTop();
+                var newOnPageX = onPageX * scaleChange;
+                var newOnPageY = onPageY * scaleChange;
+                var newVPLeft = this.getPageLeft() + newOnPageX - this.fixedX;
+                var newVPTop = this.getPageTop() + newOnPageY - this.fixedY;
+
+                this.setPan( newVPLeft, newVPTop);
+                delete this.oldPageScale;
+                delete this.fixedX;
+                delete this.fixedY;
+
+            }
 
         }
 

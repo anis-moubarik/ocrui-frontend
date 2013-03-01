@@ -31,10 +31,23 @@ function onResourceRequested (casper,request) {
         JSON.stringify(request.url),'info');
 }
 
+var _initDone = false;
+
 function initCasper () {
-    return function () {
+    return function() {
+        if (_initDone) return;
+        _initDone = true;
         this.on('error',onError);
-    }
+        this.on('resource.received', function (resource) {
+            if ( resource.stage == 'end' ) {
+                casper.log('Received: ' + JSON.stringify(resource.url),'info');
+            }
+        });
+
+        this.on('resource.requested', function(req) {
+            console.log('Request: ' + JSON.stringify(req.url));
+        });
+    };
 }
 
 function cmpObjects (o1,o2) {
@@ -95,8 +108,6 @@ var viewportSize = {
 
 var debugOptions = {
 
-    //onResourceRequested : onResourceRequested,
-    //onResourceReceived : onResourceReceived,
     viewportSize: viewportSize,
     verbose: true,
     logLevel: 'debug'

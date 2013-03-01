@@ -30,7 +30,7 @@ casper.then(function() {
     this.test.assertExists('#editor');
 });
 
-casper.waitForText( "Pienet" );
+casper.waitForText( "Pienet", null, null, 10000);
 
 casper.then(function() {
 
@@ -78,7 +78,7 @@ casper.then(function() {
 });
 
 casper.waitFor(function () {
-    var expectedBounds = {"height":36,"left":378,"top":648,"width":76};
+    var expectedBounds = {"height":25,"left":392,"top":641,"width":59};
 
     if (casper.exists(".highlight-box")) {
         var bounds = casper.getElementBounds(".highlight-box");
@@ -91,7 +91,7 @@ casper.waitFor(function () {
 
     return false;
 
-});
+},null,null,10000);
 
 casper.run(function() {
     this.test.done();

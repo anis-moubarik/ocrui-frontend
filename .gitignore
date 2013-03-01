@@ -1,3 +1,4 @@
 .*.swp
 items
 npm-debug.log
+tests/failed.png

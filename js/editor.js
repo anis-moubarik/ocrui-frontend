@@ -132,7 +132,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             if (word === undefined) {return;}
             var wordIndex = word.index;
             var wordLength = word.content.length;
-            console.log(JSON.stringify(word),wordLength);
             for (var i in content) {
                 var c = content[i];
                 if (c == '\n') {
@@ -154,7 +153,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                             line: line,
                             ch: ch
                         }
-                        console.log(wordLength);
                         wordLength --;
                         if (wordLength == 0) {
                             break;
@@ -164,7 +162,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }
                 ch ++;
             }
-            console.log(anchor,head);
             this.cMirror.setSelection(anchor,head);
             this.cMirror.focus();
         },

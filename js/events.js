@@ -16,7 +16,7 @@ define(function () {
     var schedule = {};
 
     // debug:
-    // onAny(function(ev,data) {console.log(ev,data);});
+    //onAny(function(ev,data) {console.log(ev,data);});
 
     // listen to all sent events, for testing and debugging
     function onAny (cb) {
@@ -39,6 +39,11 @@ define(function () {
         var i;
         var cb;
 
+        for (i in anyListeners) {
+            cb = anyListeners[i];
+            cb(ev,data);
+        }
+
         if (!(ev in listeners)) {
             listeners[ev] = [];
         }
@@ -46,11 +51,6 @@ define(function () {
         for (i in listeners[ev]) {
             cb = listeners[ev][i];
             cb(data);
-        }
-
-        for (i in anyListeners) {
-            cb = anyListeners[i];
-            cb(ev,data);
         }
 
         schedule[ev] = undefined; // clear timeout id

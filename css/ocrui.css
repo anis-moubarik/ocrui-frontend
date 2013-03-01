@@ -59,30 +59,28 @@
 }
 
 #facsimile-container {
+    background-color: rgb(220,220,220);
     overflow:hidden;
-    position:relative;
+    /* overflow:auto;*/
+    position:relative; /*to fit boxes*/
     top:0px;
     left:0px;
     outline: 1px solid #aaaaaa;
 }
 
 #facsimile-canvas {
-    background-color: rgb(220,220,220);
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index:980;
+    position: static;
 }
 
 .page-image-container {
     position: absolute;
+    top: 100px;
+    left: 100px;
     box-shadow: 0px 0px 10px 0px black;
 }
 
 .page-image {
+    position: absolute;
 }
 
 #editor {

@@ -10,13 +10,8 @@ casper.then(function() {
 });
 
 casper.waitForSelector("#language-selector",null,function() {
-    var r = casper.evaluate(function() {
-        var r = require('router').fragment;
-        console.log('r:',r);
-        return r;
-    });
-    casper.log(r);
-    casper.die();
+    casper.capture('failed.png');
+    casper.test.done();
 });
 
 casper.then(function() {

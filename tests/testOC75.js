@@ -23,8 +23,9 @@ casper.waitFor(function() {
 
 casper.then(function() {
 
-    var canvasB64 = casper.captureBase64('png','#facsimile-canvas');
+    var canvasB64 = casper.captureBase64('png','#facsimile-container');
     var expected = btoa(fs.read('images/canvas.png','b'));
+
     //fs.write('koe.png',atob(canvasB64),'b'); // to see what we got
 
     casper.test.assert(canvasB64 == expected, "Canvas renders correctly");
@@ -45,9 +46,12 @@ casper.waitFor(function() {
 });
 
 casper.then(function() {
-    var canvas = casper.captureBase64('png','#facsimile-canvas');
+    var canvasB64 = casper.captureBase64('png','#facsimile-container');
     var expected = btoa(fs.read('images/canvas-zoomed.png','b'));
-    casper.test.assert(canvas == expected, "Canvas renders correctly zoomed");
+
+    //fs.write('koe2.png',atob(canvasB64),'b'); // to see what we got
+
+    casper.test.assert(canvasB64 == expected, "Canvas renders correctly zoomed");
 
 });
 

@@ -12,8 +12,9 @@ casper.then(function() {
 casper.waitForText( "Pienet",
     function () { casper.test.assert(true, "Found editor text");},
     function () {
-        casper.test.assert(true, "Editor text not found.");
-        casper.die();
+        casper.test.assert(false, "Editor text not found.");
+        casper.capture('failed.png');
+        casper.test.done();
     }, 10000);
 
 casper.then(function() {
@@ -49,11 +50,12 @@ casper.then(function() {
 
     var expectedBounds2 = {
         "height": 14,
-        "left": 622,
-        "top": 182,
-        "width": 40
+        "left": 608,
+        "top": 196,
+        "width": 69
     };
 
+    casper.capture('failed.png');
     var bounds2 = casper.getElementBounds(".CodeMirror-selected");
     mytests.assertEqualObjects(casper.test,bounds2,expectedBounds2);
 
