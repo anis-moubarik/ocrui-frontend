@@ -130,9 +130,15 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             this.render();
         },
         changeMets: function(mets) {
-            var pages = mets.getNumberOfPages();
             this.mets = mets;
-            this.setPageNumberBounds(1,pages);
+            this.options.minPage = 1;
+            this.options.maxPage = mets.getNumberOfPages();
+            var pageNumber = this.getPageNumber();
+            if ((pageNumber < this.options.minPage) ||
+                (pageNumber > this.options.maxPage)) {
+                this.boundedSetPage(pageNumber);
+            }
+
             this.render();
         },
         pageNext : function (ev) {
@@ -156,15 +162,6 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             if (number < this.options.minPage) number = this.options.minPage;
             if (number > this.options.maxPage) number = this.options.maxPage;
             events.delay('changePage',{pageNumber:number},100);
-        },
-        setPageNumberBounds : function (min,max) {
-            this.options.minPage = min;
-            this.options.maxPage = max;
-            var pageNumber = this.getPageNumber();
-            if ((pageNumber < this.options.minPage) ||
-                (pageNumber > this.options.maxPage)) {
-                this.boundedSetPage(pageNumber);
-            }
         },
         saveDocument: function () {
             var dirtyPages = that.mets.dirtyPages();

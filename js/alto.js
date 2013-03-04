@@ -7,6 +7,7 @@ define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
             this.set('pageNumber',options.pageNumber);
             this.url = options.doc.getAltoUrl(options.pageNumber);
             options.doc.registerAlto(options.pageNumber,this);
+            this.set('pageIndex',options.pageNumber-1);
             this.alto = new libalto.Alto();
         },
         isDirty: function() {
@@ -65,8 +66,9 @@ define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
         parse: function (response) {
             var data = {};
             var page = $(response).find('Page').get(0);
-            data.width = page.getAttribute("WIDTH");
-            data.height = page.getAttribute("HEIGHT");
+            data.width = parseInt(page.getAttribute("WIDTH"),10);
+            data.height = parseInt(page.getAttribute("HEIGHT"),10);
+            data.pageIndex = this.get('pageIndex');
             events.trigger('setPageGeometry',data);
             this.alto.setOriginalXML(response);
             this.alto.setCurrentXML(response);
