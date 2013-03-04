@@ -8,7 +8,7 @@ casper.start(settings.defaultPageUrl,mytests.initCasper());
 casper.waitForSelector(selector2,undefined,function() {
     casper.echo( 'not found.' );
     // casper.echo( casper.page.content );
-},10000);
+});
 
 casper.then(function() {
 

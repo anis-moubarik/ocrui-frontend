@@ -9,7 +9,7 @@ casper.then(function() {
     casper.test.assertExists('#vkeyboard');
 });
 
-casper.waitForText( "Pienet", null, null, 10000 ); // ensure editor is there
+casper.waitForText( "Pienet" ); // ensure editor is there
 
 casper.then(function() {
 

@@ -1,36 +1,13 @@
 casper.echo( "OC-67: Siirrettäessä kursoria editorissa faksimiilin highlight siirtyy oikeaan kohtaan" );
 
 
-function assertHighlightBoxes(c,hbs1,hbs2) {
-    c.test.assertEqual(hbs1.length,hbs2.length,
-        'right number of highlight boxes');
-    for (var i in hbs1) {
-        var hb1 = hbs1[i];
-        var hb2 = hbs2[i];
-        c.test.assertEqual(hb1.hpos, hb2.hpos, "hpos same");
-        c.test.assertEqual(hb1.vpos, hb2.vpos, "vpos same");
-        c.test.assertEqual(hb1.width, hb2.width, "width same");
-        c.test.assertEqual(hb1.height, hb2.height, "height same")
-    }
-}
-
-function cmpObjects(o1,o2) {
-    for (var key in o1) {
-        if (o1[key] != o2[key]) return false;
-    }
-    for (var key in o2) {
-        if (o1[key] != o2[key]) return false;
-    }
-    return true;
-}
-
 casper.start(settings.defaultPageUrl,mytests.initCasper());
 
 casper.then(function() {
     this.test.assertExists('#editor');
 });
 
-casper.waitForText( "Pienet", null, null, 10000);
+casper.waitForText( "Pienet");
 
 casper.then(function() {
 
@@ -56,7 +33,7 @@ casper.waitFor(function() {
 
     return hb;
 
-},null,null,10000);
+});
 
 casper.then(function() {
 
@@ -66,7 +43,7 @@ casper.then(function() {
         vpos:112,
         width:163,
         height:43}];
-    assertHighlightBoxes(this,hbs,expectedHbs);
+    mytests.assertHighlightBoxes(this,hbs,expectedHbs);
 
 });
 
@@ -83,7 +60,7 @@ casper.waitFor(function () {
     if (casper.exists(".highlight-box")) {
         var bounds = casper.getElementBounds(".highlight-box");
 
-        if (cmpObjects(bounds,expectedBounds)) {
+        if (mytests.cmpObjects(bounds,expectedBounds)) {
             this.test.assert(true, "Got correct highlight box after click");
             return true;
         }
@@ -91,7 +68,7 @@ casper.waitFor(function () {
 
     return false;
 
-},null,null,10000);
+});
 
 casper.run(function() {
     this.test.done();

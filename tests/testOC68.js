@@ -15,7 +15,7 @@ casper.waitForText( "Pienet",
         casper.test.assert(false, "Editor text not found.");
         casper.capture('failed.png');
         casper.test.done();
-    }, 10000);
+    });
 
 casper.then(function() {
     cursor = casper.getElementBounds(".CodeMirror-cursor");

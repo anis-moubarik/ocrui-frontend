@@ -73,6 +73,19 @@ function assertEqualObjects (test,o1,o2) {
 
 }
 
+function assertHighlightBoxes(c,hbs1,hbs2) {
+    c.test.assertEqual(hbs1.length,hbs2.length,
+        'right number of highlight boxes');
+    for (var i in hbs1) {
+        var hb1 = hbs1[i];
+        var hb2 = hbs2[i];
+        c.test.assertEqual(hb1.hpos, hb2.hpos, "hpos same");
+        c.test.assertEqual(hb1.vpos, hb2.vpos, "vpos same");
+        c.test.assertEqual(hb1.width, hb2.width, "width same");
+        c.test.assertEqual(hb1.height, hb2.height, "height same")
+    }
+}
+
 function getEditorData(casper) {
     var data = casper.evaluate(function () {
         var cMirror = require('editor').view.cMirror;
@@ -116,13 +129,14 @@ var debugOptions = {
 
 var normalOptions = {
 
-    viewportSize: viewportSize
-
+    viewportSize: viewportSize,
+    waitTimeout: 10000
 };
 
 
 exports.elementInfoContainsClass = elementInfoContainsClass;
 exports.assertEqualObjects = assertEqualObjects;
+exports.assertHighlightBoxes = assertHighlightBoxes;
 exports.cmpObjects = cmpObjects;
 exports.onResourceRequested = onResourceRequested;
 exports.onResourceReceived = onResourceReceived;
