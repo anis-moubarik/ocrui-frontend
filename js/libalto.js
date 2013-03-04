@@ -30,7 +30,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             } else {
 
                 // this one corresponds to one original word
-                // but there bight be removes before this one
+                // but there might be removes before this one
                 while (_.isString(diff.o[oi])) {
                     seq.push('delete');
                     oi ++;
@@ -60,6 +60,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     }
 
     function splitBoundingBoxes(words,bbs) {
+		console.log(words,bbs);
         if (bbs.length == 0) { return; }
         var stringLengths = _.map(words,function(word) {
             return word.content.length;
@@ -106,6 +107,8 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             return prev || cur != 'match';
         },false);
 
+		console.log(seq);
+
         this.targetWords = []; // New words array to be created
         this.stringStack = []; // stack of pending words to add
         this.wordStack = []; // stack of pending element indexes to replace
@@ -120,7 +123,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             var currentWord = alto.originalWords[wi];
             var currentString = newStrings[si];
             var currentEdit = seq[i];
-
+			console.log(currentWord, currentString, currentEdit);
             var oldWi = wi;
 
             if (currentEdit == 'match') {
@@ -205,7 +208,8 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         // push edit and process earlier stack if this is a new line
 
-        if ( (word !== undefined) && (this.textLineIndex != word.textLine) ) {
+		console.log('x');
+        if ( (word !== undefined) && (this.textLineIndex() != word.textLine) ) {
             this.processPending(word);
         }
 
@@ -215,7 +219,8 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         if (word !== undefined) {
             this.wordStack.push(this.dupWordWithSideEffects(word,true));
-        } 
+        }
+        console.log(this.stringStack,this.wordStack);
 
     };
 
@@ -230,6 +235,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         }
 
+		console.log(this.stringStack,this.wordStack);
         // If there are no elements to replace try to use preceding and
         // subsequent words to get bounding box from.
 
@@ -241,7 +247,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
                 this.wordStack.splice(0,0,precedingWord);
             }
 
-            if ((nextWord) && (nextWord.textLine == this.textLineIndex)) {
+            if ((nextWord) && (nextWord.textLine == this.textLineIndex())) {
                 this.stringStack.push(nextWord.content);
                 this.wordStack.push(nextWord);
                 nextWordUsed = true;
@@ -293,8 +299,17 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     };
 
     ContentUpdateProcess.prototype.textLineIndex = function () {
-        if (this.targetWords.length==0) return 0;
-        return this.targetWords[this.targetWords.length - 1].textLine;
+		// Current line edits will be sticked into. It is either the
+		// line of words in current wordStack or the line of last
+		// targetWord or defaults to 0.
+        if (this.wordStack.length > 0) {
+			return this.wordStack[0].textLine;
+		} else if (this.targetWords.length > 0) {
+			return this.targetWords[this.targetWords.length - 1].textLine;	
+        } else {
+			return 0;
+		}
+        
     };
 
     ContentUpdateProcess.prototype.dummyWord = function (changed) {

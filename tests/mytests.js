@@ -34,20 +34,19 @@ function onResourceRequested (casper,request) {
 var _initDone = false;
 
 function initCasper () {
-    return function() {
-        if (_initDone) return;
-        _initDone = true;
-        this.on('error',onError);
-        this.on('resource.received', function (resource) {
-            if ( resource.stage == 'end' ) {
-                casper.log('Received: ' + JSON.stringify(resource.url),'info');
-            }
-        });
+	casper.waitForHighlight = waitForHighlight;
+	casper.getHighlight = getHighlight;
 
-        this.on('resource.requested', function(req) {
-            console.log('Request: ' + JSON.stringify(req.url));
-        });
-    };
+	casper.on('error',onError);
+	casper.on('resource.received', function (resource) {
+		if ( resource.stage == 'end' ) {
+			casper.log('Received: ' + JSON.stringify(resource.url),'info');
+		}
+	});
+
+	casper.on('resource.requested', function(req) {
+		console.log('Request: ' + JSON.stringify(req.url));
+	});
 }
 
 function cmpObjects (o1,o2) {
@@ -85,6 +84,50 @@ function assertHighlightBoxes(c,hbs1,hbs2) {
         c.test.assertEqual(hb1.height, hb2.height, "height same")
     }
 }
+
+function getHighlight () {
+
+    var bbs = []
+    var i = 0;
+
+    while ( true ) {
+
+        var n = i + 1;
+        var selector = ".highlight-box:nth-of-type("+n+")";
+        if (!this.exists(selector)) break;
+        bbs[i] = this.getElementBounds(selector)
+  		console.log(i);
+		console.log(JSON.stringify(bbs[i]));
+        i++;
+
+    }
+
+    
+    return bbs;
+
+}
+
+function waitForHighlight (expected, success, error, timeout) {
+    this.waitFor(function() {
+
+        var bbs = this.getHighlight ();
+
+		if (bbs.length != expected.length) return false;
+		
+        for (var i in expected) {
+            var eb = expected[i];
+            var b = bbs[i];
+
+			if (mytests.cmpObjects(b,eb)) {
+                return true;
+            }
+        }
+
+        return false
+
+    }, success, error, timeout);
+
+};
 
 function getEditorData(casper) {
     var data = casper.evaluate(function () {

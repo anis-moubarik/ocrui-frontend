@@ -16,6 +16,8 @@ var loadIncludes = ['includes', 'pre', 'post'];
 var tests        = [];
 var casper       = require('casper').create( mytests.normalOptions );
 
+mytests.initCasper();
+
 // local utils
 function checkSelfTest(tests) {
     "use strict";

@@ -11,7 +11,7 @@ casper.waitForText( "Pienet");
 casper.then(function() {
 
     // place cursor on 'kultahanhet'
-    newCursor = this.evaluate( function () {
+    var newCursor = this.evaluate( function () {
         require('editor').view.cMirror.setCursor(15,50);
         return require('editor').view.cMirror.getCursor();
     });
@@ -23,19 +23,19 @@ casper.then(function() {
 
 casper.waitFor(function() {
 
-    expectedBoundss = [
+    var expectedBoundss = [
         { left:373, top:640, width:78, height:26},
         { left:-367, top:686, width:110, height:27}
     ];
     if (casper.exists(".highlight-box")) {
-        var boundss = [
-            casper.getElementBounds(".highlight-box:nth-of-type(1)"),
-            casper.getElementBounds(".highlight-box:nth-of-type(2)"),
-        ];
 
         for (var i in expectedBoundss) {
             var eb = expectedBoundss[i];
-            var b = boundss[i];
+            var n = i + 1;
+            var selector = ".highlight-box:nth-of-type("+n+")";
+            var b = casper.exists(selector) ?
+                casper.getElementBounds(selector) :
+                {};
 
             if (mytests.cmpObjects(b,eb)) {
                 this.test.assert(true, "Got correct highlight box after click");

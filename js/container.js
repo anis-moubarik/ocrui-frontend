@@ -421,10 +421,15 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
                 var newViewportLeft = this.getViewportLeft() + xDelta;
                 var newViewportTop = this.getViewportTop() + yDelta;
+                
                 this.setPan(newViewportLeft,newViewportTop);
-                    
+                var yScroll = this.$el.scrollTop() - newViewportTop;
+                var xScroll = this.$el.scrollLeft() - newViewportLeft;
                 this.scheduleRender();
-                if ((xDelta !== 0) || (yDelta !== 0)) {
+                              
+                if ( ((xDelta !== 0) || (yDelta !== 0)) &&
+					((xScroll === 0) || (yScroll === 0) ) ) {
+					
                     events.delay('scrollOneStep',undefined,scrollTimeout);
                 } else {
                     this.scrollingTo = undefined;
@@ -483,7 +488,13 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         },
         setPan: function (newLeft,newTop) {
 
-            console.log('p',newLeft,newTop);
+			var oldTop = this.$el.scrollTop();
+			var oldLeft = this.$el.scrollLeft();
+			
+			console.log('p',newLeft,newTop,oldTop,oldLeft)
+			if ((oldTop == newTop) && (oldLeft == newLeft)) return;
+            
+            
             // (newLeft,newTop) is the new coordinate of top left point of
             // viewport in relation to page coordinates. I.e.
             // coordinates are >= -margin and
