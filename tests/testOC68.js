@@ -3,7 +3,7 @@ casper.echo( "OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan ko
 
 var cursor;
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 casper.then(function() {
     this.test.assertExists('#boxes');
@@ -63,7 +63,6 @@ casper.then(function() {
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 
 

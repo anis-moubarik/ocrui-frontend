@@ -1,6 +1,6 @@
 casper.echo( "OC-110: tavutettu sana jakautuu oikein kahdeksi highlight boksiksi" );
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 casper.then(function() {
     this.test.assertExists('#editor');
@@ -50,7 +50,6 @@ casper.waitFor(function() {
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 
 

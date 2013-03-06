@@ -1,8 +1,10 @@
 casper.echo( "OC-75: Zoom: Zoom button renderöi faksimiilin zoomatussa muodossa" );
 
 var fs = require('fs');
+var expected1 = btoa(fs.read('images/canvas.png','b'));
+var expected2 = btoa(fs.read('images/canvas-zoomed.png','b'));
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 casper.then(function() {
     var r = casper.evaluate(function() {
@@ -24,11 +26,10 @@ casper.waitFor(function() {
 casper.then(function() {
 
     var canvasB64 = casper.captureBase64('png','#facsimile-container');
-    var expected = btoa(fs.read('images/canvas.png','b'));
 
     //fs.write('koe.png',atob(canvasB64),'b'); // to see what we got
 
-    casper.test.assert(canvasB64 == expected, "Canvas renders correctly");
+    casper.test.assert(canvasB64 == expected1, "Canvas renders correctly");
     casper.evaluate(function() {
         window.facsimileRendered = false;
     });
@@ -47,17 +48,15 @@ casper.waitFor(function() {
 
 casper.then(function() {
     var canvasB64 = casper.captureBase64('png','#facsimile-container');
-    var expected = btoa(fs.read('images/canvas-zoomed.png','b'));
 
     //fs.write('koe2.png',atob(canvasB64),'b'); // to see what we got
 
-    casper.test.assert(canvasB64 == expected, "Canvas renders correctly zoomed");
+    casper.test.assert(canvasB64 == expected2, "Canvas renders correctly zoomed");
 
 });
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 
 

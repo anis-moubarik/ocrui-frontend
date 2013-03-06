@@ -3,7 +3,7 @@ casper.echo( "OC-76: Työkalupalkki: Buttonit ja widgetit löytyvät dom-puusta.
 
 var myButton = "#show-original-changes";
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 casper.waitForSelector( myButton ); // wait for my button
 
@@ -68,6 +68,5 @@ casper.then(function() {
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 

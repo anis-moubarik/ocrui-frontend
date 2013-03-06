@@ -3,7 +3,7 @@ casper.echo( "OC-72: Sivun vaihto toimii. Uusi sivunumero näkyy oikein ja valit
 
 var myButton = "#page-next";
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 casper.waitForSelector( myButton ); // wait for my button
 
@@ -38,6 +38,5 @@ casper.waitFor( function () {
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 

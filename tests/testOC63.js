@@ -1,6 +1,6 @@
 casper.echo( "OC-63: HTML-sivun komonentit ovat paikallaan" );
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 casper.then(function() {
 
@@ -21,6 +21,5 @@ casper.then(function() {
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 

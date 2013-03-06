@@ -1,6 +1,6 @@
 casper.echo( "OC-62: Virtuaalinäppäimistö: klikattava näppäin tulee editoriin, kielen vaihtaminen vaihtaa näppäimistön halutuksi" );
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 var cursor;
 var initialContent;
@@ -72,7 +72,6 @@ casper.waitFor(function () {
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 
 

@@ -3,7 +3,7 @@ casper.echo( "OC-86: kielivalitsin, editorin kursorin alla olevan sanan kieli n√
 
 var cursor;
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 casper.then(function() {
     casper.test.assertExists('#vkeyboard');
@@ -53,7 +53,6 @@ casper.then(function() {
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 
 

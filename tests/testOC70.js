@@ -1,7 +1,7 @@
 casper.echo( "OC-70: Tekstiä editoitaessa muutetut sanat renderöidään omalla tyylillään" );
 
 
-casper.start(settings.defaultPageUrl,mytests.initCasper());
+casper.start(settings.defaultPageUrl);
 
 casper.waitForText( "Pienet" ); // ensure editor is there
 
@@ -33,7 +33,6 @@ casper.then(function() {
 
 casper.run(function() {
     this.test.done();
-    this.test.renderResults();
 });
 
 

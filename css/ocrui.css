@@ -60,7 +60,7 @@
 
 #facsimile-container {
     background-color: rgb(220,220,220);
-    overflow:auto;
+    overflow:hidden;
     /* overflow:auto;*/
     position:relative; /*to fit boxes*/
     top:0px;
