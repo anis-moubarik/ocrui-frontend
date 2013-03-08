@@ -38,6 +38,7 @@ function initCasper () {
 	casper.getHighlight = getHighlight;
 
 	casper.on('error',onError);
+        /*
 	casper.on('resource.received', function (resource) {
 		if ( resource.stage == 'end' ) {
 			casper.log('Received: ' + JSON.stringify(resource.url),'info');
@@ -47,6 +48,7 @@ function initCasper () {
 	casper.on('resource.requested', function(req) {
 		console.log('Request: ' + JSON.stringify(req.url));
 	});
+        */
 }
 
 function cmpObjects (o1,o2) {

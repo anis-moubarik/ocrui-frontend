@@ -94,7 +94,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
         el: '#editor',
         myEvents: {
             'virtualKeyboard':'virtualKeyboard',
-            'cursorToCoordinate': 'moveCursorToWord',
+            'cursorToCoordinate': 'cursorToCoordinate',
             'refocus':'refocus',
             'changePage':'changePage',
             'changeMode':'changeMode',
@@ -121,7 +121,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
         refocus: function(ev) {
             this.cMirror.focus();
         },
-        moveCursorToWord: function(coords) {
+        cursorToCoordinate: function(coords) {
             var content = this.cMirror.getValue();
             var line = 0;
             var ch = 0;
@@ -136,7 +136,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 var c = content[i];
                 if (c == '\n') {
                     line ++;
-                    ch = 0;
+                    ch = -1;
                 }
                 if (c.match(/\s/)) {
                     betweenWords = true;
@@ -146,12 +146,12 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                         if (anchor === undefined) {
                             anchor = {
                                 line: line,
-                                ch: ch-1
+                                ch: ch
                             }
                         }
                         head = {
                             line: line,
-                            ch: ch
+                            ch: ch + 1
                         }
                         wordLength --;
                         if (wordLength == 0) {
@@ -162,6 +162,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }
                 ch ++;
             }
+            console.log(JSON.stringify(anchor),JSON.stringify(head))
             this.cMirror.setSelection(anchor,head);
             this.cMirror.focus();
         },

@@ -40,15 +40,15 @@ define(['jquery','events', 'toolbar'], function($,events,toolbar) {
         var facsimileWidth = $('#facsimile-container').innerWidth();
         var facsimileHeight = availableH;
         var data = {
-            facsimileWidth: facsimileWidth,
-            facsimileHeight: facsimileHeight,
+            width: facsimileWidth,
+            height: facsimileHeight,
             vertical: vertical
         };
 
         if (
             (data.vertical != currentGeometry.vertical) ||
-            (data.facsimileWidth != currentGeometry.facsimileWidth) ||
-            (data.facsimileHeight != currentGeometry.facsimileHeight)
+            (data.width != currentGeometry.facsimileWidth) ||
+            (data.height != currentGeometry.facsimileHeight)
             ) {
             $('#editor').height(availableH);
             $('.CodeMirror').height(availableH);

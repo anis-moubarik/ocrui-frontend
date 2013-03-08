@@ -62,16 +62,16 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
         click: function (ev) {
         },
         dragLayoutBox: function (ev,ui) {
-            var x = container.view.getOnPageX(ui.offset.left);
-            var y = container.view.getOnPageY(ui.offset.top);
+            var x = container.cm.getOnPageX(ui.offset.left);
+            var y = container.cm.getOnPageY(ui.offset.top);
         },
         resizeLayoutBox: function (ev,ui) {
             var offsetX = ui.position.left - this.$el.offset().left;
             var offsetY = ui.position.top - this.$el.offset().top;
-            var x = container.view.getOnPageX(offsetX);
-            var y = container.view.getOnPageY(offsetY);
-            var w = container.view.getOnPageWidth(ui.size.width);
-            var h = container.view.getOnPageHeight(ui.size.height);
+            var x = container.cm.getOnPageX(offsetX);
+            var y = container.cm.getOnPageY(offsetY);
+            var w = container.cm.getOnPageWidth(ui.size.width);
+            var h = container.cm.getOnPageHeight(ui.size.height);
         },
         clickLayoutBox: function(ev) {
             if (ev.type == "dblclick") {
@@ -89,8 +89,8 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
                 var el = ev.toElement;
 
                 var box = {
-                    hpos: container.view.getOnPageX(ev.offsetX),
-                    vpos: container.view.getOnPageY(ev.offsetY),
+                    hpos: container.cm.getOnPageX(ev.offsetX),
+                    vpos: container.cm.getOnPageY(ev.offsetY),
                     width: 100,
                     height: 100 
                 };
@@ -146,10 +146,10 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
 
                 box = boxes[i];
                 rect = {
-                    hpos : container.view.getPageScale() * (box.hpos),
-                    vpos : container.view.getPageScale() * (box.vpos),
-                    width : container.view.getPageScale() * (box.width),
-                    height : container.view.getPageScale() * (box.height)
+                    hpos : container.cm.getPageScale() * (box.hpos),
+                    vpos : container.cm.getPageScale() * (box.vpos),
+                    width : container.cm.getPageScale() * (box.width),
+                    height : container.cm.getPageScale() * (box.height)
                 };
 
                 $div = $('<div> </div>');
@@ -175,10 +175,10 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
         },
         render: function() {
             this.$el.html('');
-            this.$el.css('top',container.view.getPageTop());
-            this.$el.css('left',container.view.getPageLeft());
-            this.$el.css('width',container.view.getPageWidth());
-            this.$el.css('height',container.view.getPageHeight());
+            this.$el.css('top',container.cm.getPageTop());
+            this.$el.css('left',container.cm.getPageLeft());
+            this.$el.css('width',container.cm.getPageWidth());
+            this.$el.css('height',container.cm.getPageHeight());
 
             if (this.showHighlight && this.highlight) {
 
