@@ -1,6 +1,16 @@
 define(['underscore'],function (_) {
     "use strict";
 
+    function bounded(value,min,max) {
+        if (min !== undefined) {
+            value = _.max([value,min]);
+        }
+        if (max !== undefined) {
+            value = _.min([value,max]);
+        }
+        return value;
+    }
+
     function getCombinedBoundingBox(bbs) {
         
         var xs = [];
@@ -23,6 +33,7 @@ define(['underscore'],function (_) {
     }
 
     return {
+        bounded: bounded,
         getCombinedBoundingBox: getCombinedBoundingBox
     };
 });

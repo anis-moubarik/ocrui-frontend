@@ -122,6 +122,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             this.cMirror.focus();
         },
         cursorToCoordinate: function(coords) {
+            console.log(coords);
             var content = this.cMirror.getValue();
             var line = 0;
             var ch = 0;
@@ -162,7 +163,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }
                 ch ++;
             }
-            console.log(JSON.stringify(anchor),JSON.stringify(head))
             this.cMirror.setSelection(anchor,head);
             this.cMirror.focus();
         },

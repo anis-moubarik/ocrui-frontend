@@ -69,8 +69,11 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
                 });
 
                 // loop through alto files
-                $(data).find('fileGrp[ID="ALTOGRP"] file').each(function() {
+                $(data).find('fileGrp[ID="ALTOGRP"] file').each(function(i,e) {
                     var seq = parseInt(this.getAttribute('SEQ'),10);
+                    if (isNaN(seq)) {
+                        seq = i;
+                    }
                     var element = $(this).find('FLocat').get(0);
                     var altoFilename = element.getAttribute('xlink:href');
                     altoFilename = altoFilename.replace(/^file:\/\//,'').replace(/.\//,'');

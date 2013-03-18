@@ -9,12 +9,12 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
             var that = this;
             this.layoutBoxes = [];
 
-/*
+            /*
             toolbar.registerButton({
-                id:'show-layout',
+                id:'edit-layout',
                 toggle:true,
                 icon:'icon-th',
-                title:'Show page layout',
+                title:'Edit page layout',
                 modes:['page'],
                 toggleCB:function(newState) {
                     that.showLayout = newState;
@@ -25,7 +25,8 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
                     }
                     that.render();
                 }});
-*/
+            */
+
             toolbar.registerButton({
                 id:'show-highlight',
                 toggle:true,
@@ -48,18 +49,34 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
             'changePage': 'changePage'
 
         },
+        /*
         events: {
-            /*
             'click': 'click',
-            'dblclick #boxes': 'clickOutsideBoxes',
+            'dblclick': 'click',
             'click .layout-box': 'clickLayoutBox',
             'dblclick .layout-box': 'clickLayoutBox',
             'resize .layout-box': 'resizeLayoutBox',
             'drag .layout-box': 'dragLayoutBox',
-            */
         },
+        */
         myModes: ['page'],
         click: function (ev) {
+
+            if (ev.type=='dblclick') {
+                // create new layoutBox.
+                console.log('c');
+                var el = ev.toElement;
+
+                var box = {
+                    hpos: container.cm.getOnPageX(ev.offsetX),
+                    vpos: container.cm.getOnPageY(ev.offsetY),
+                    width: 100,
+                    height: 100 
+                };
+
+                this.renderBoxes ([box],"layout-box",true);
+                ev.stopPropagation();
+            }
         },
         dragLayoutBox: function (ev,ui) {
             var x = container.cm.getOnPageX(ui.offset.left);
@@ -81,25 +98,8 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
                 $('.selected-layout-box').removeClass('selected-layout-box');
                 $(ev.toElement).addClass('selected-layout-box');
             }
+            ev.stopPropagation();
         },
-        clickOutsideBoxes: function(ev) {
-            // create new layoutBox.
-
-            if (ev.type=='dblclick') {
-                var el = ev.toElement;
-
-                var box = {
-                    hpos: container.cm.getOnPageX(ev.offsetX),
-                    vpos: container.cm.getOnPageY(ev.offsetY),
-                    width: 100,
-                    height: 100 
-                };
-
-                this.renderBoxes ([box],"layout-box",true);
-                ev.stopPropagation();
-            }
-        },
-
         changePage: function(attributes) {
             var that = this;
             this.attributes = attributes;

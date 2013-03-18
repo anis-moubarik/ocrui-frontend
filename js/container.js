@@ -37,6 +37,22 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             }
         },
         setViewportOrigin: function (top,left) {
+            // (left,top) is the new coordinate of top left point of
+            // viewport in relation to page coordinates. I.e.
+            // coordinates are >= -margin and
+            // <= this.pageWidth*scale - this.horizontalPixels + margin
+
+            top = utils.bounded(
+                top,
+                this.getWorldTop(),
+                this.getWorldBottom() - this.getViewportHeight()
+            );
+            left = utils.bounded(
+                left,
+                this.getWorldLeft(),
+                this.getWorldRight() - this.getViewportWidth()
+            );
+
             this.viewportTop = top;
             this.viewportLeft = left;
         },
@@ -45,6 +61,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             if (typeof(height) != 'number') throw(typeof(height));
             this.horizontalPixels = width;
             this.verticalPixels = height;
+            this.setViewportOrigin(this.viewportTop,this.viewportLeft);
             this.setPageScale(this.pageScale);
         },
         setPageScale: function (newScale) {
@@ -126,10 +143,10 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             return this.pageScale;
         },
         getOnPageWidth: function (screenWidth) {
-            return screenWidth / this.pageScale();
+            return screenWidth / this.pageScale;
         },
         getOnPageHeight: function (screenHeight) {
-            return screenHeight / this.pageScale();
+            return screenHeight / this.pageScale;
         },
         getOnPageX: function (worldX) {
             return (worldX - this.pageLeft) / this.pageScale;
@@ -212,7 +229,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'changePage':'changePage',
             'changeMode':'changeMode',
             'scrollOneStep':'scrollOneStep',
-            'scheduledRender':'render'
+            'scheduledRender':'render',
         },
         events: {
             'click': 'propagateClick',
@@ -498,23 +515,11 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         },
         setPan: function (newLeft,newTop) {
 
-			var oldTop = this.$el.scrollTop();
-			var oldLeft = this.$el.scrollLeft();
-			
-			if ((oldTop == newTop) && (oldLeft == newLeft)) return;
-            
-            
-            // (newLeft,newTop) is the new coordinate of top left point of
-            // viewport in relation to page coordinates. I.e.
-            // coordinates are >= -margin and
-            // <= this.pageWidth*scale - this.horizontalPixels + margin
+            this.cm.setViewportOrigin( newTop,newLeft );
 
-            this.$el.scrollTop(newTop);
-            this.$el.scrollLeft(newLeft);
-            this.cm.setViewportOrigin(
-                this.$el.scrollTop(),
-                this.$el.scrollLeft()
-            );
+            this.$el.scrollTop(this.cm.getViewportTop());
+            this.$el.scrollLeft(this.cm.getViewportLeft());
+
             this.scheduleRender();
             this.triggerNewViewport();
 
