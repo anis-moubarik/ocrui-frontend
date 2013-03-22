@@ -9,7 +9,7 @@ casper.start(settings.defaultPageUrl);
 casper.waitFor(function() {
 
     var canvasB64 = casper.captureBase64('png','#facsimile-container');
-    fs.write('koe.png',atob(canvasB64),'b'); // to see what we got
+    //fs.write('koe.png',atob(canvasB64),'b'); // to see what we got
     return (canvasB64 == expected1);
 
 });
@@ -25,7 +25,7 @@ casper.then(function() {
 casper.waitFor(function() {
 
     var canvasB64 = casper.captureBase64('png','#facsimile-container');
-    fs.write('koe2.png',atob(canvasB64),'b'); // to see what we got
+    //fs.write('koe2.png',atob(canvasB64),'b'); // to see what we got
     return (canvasB64 == expected2);
 
 });

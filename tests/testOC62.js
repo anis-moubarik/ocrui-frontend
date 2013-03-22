@@ -18,7 +18,7 @@ casper.then(function() {
     });
     casper.fill('#language-selector',{lang:'fi'});
     casper.echo('clicked Suomi');
-    casper.capture('koe.png');
+    //casper.capture('koe.png');
 
 });
 

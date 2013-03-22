@@ -48,7 +48,7 @@ casper.then(function() {
     var selectedLang = casper.getElementInfo("#language-selector select option[selected]");
     var lang = selectedLang.attributes.value;
     casper.test.assert(lang=='veps', "Vepsä language selected");
-    casper.capture('koe.png');
+    //casper.capture('koe.png');
 });
 
 casper.run(function() {

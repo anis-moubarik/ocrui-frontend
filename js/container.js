@@ -471,8 +471,8 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                 var newViewportTop = this.cm.getViewportTop() + yDelta;
                 
                 this.setPan(newViewportLeft,newViewportTop);
-                var yScroll = this.$el.scrollTop() - newViewportTop;
-                var xScroll = this.$el.scrollLeft() - newViewportLeft;
+                var yScroll = this.cm.getViewportTop() - newViewportTop;
+                var xScroll = this.cm.getViewportLeft() - newViewportLeft;
                 this.scheduleRender();
                               
                 if ( ((xDelta !== 0) || (yDelta !== 0)) &&
@@ -483,6 +483,9 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                     this.scrollingTo = undefined;
                 }
 
+            }
+            if (this.scrollingTo === undefined) {
+                console.log(this.scrollingTo);
             }
         },
         zoomTo: function(amount,fixedX,fixedY) {
