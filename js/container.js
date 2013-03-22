@@ -229,7 +229,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'changePage':'changePage',
             'changeMode':'changeMode',
             'scrollOneStep':'scrollOneStep',
-            'scheduledRender':'render',
+            'scheduledRender':'render'
         },
         events: {
             'click': 'propagateClick',
