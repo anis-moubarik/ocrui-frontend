@@ -485,9 +485,6 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                 }
 
             }
-            if (this.scrollingTo === undefined) {
-                console.log(this.scrollingTo);
-            }
         },
         zoomTo: function(amount,fixedX,fixedY) {
             if (fixedX === undefined) {
