@@ -247,6 +247,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             this.cm.setLayoutVertical(data.vertical);
             this.cm.setViewportSize(data.width,data.height);
             this.scheduleRender ();
+            this.triggerNewViewport();
         },
         setMouseSensitivity: function(b) {
             this.mouseSensitivity = b ? true : false;
@@ -530,8 +531,8 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
         triggerNewViewport: function() {
             events.delay('newViewport',{
-                originX:this.cm.getPageLeft(),
-                originY:this.cm.getPageTop(),
+                originX:this.cm.getViewportLeft(),
+                originY:this.cm.getViewportTop(),
                 pageScale:this.cm.getPageScale(),
                 vertical:this.cm.isLayoutVertical()
             });

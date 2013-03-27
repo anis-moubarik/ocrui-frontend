@@ -1,15 +1,6 @@
 define(['events','backbone'], function (events,Backbone) {
     "use strict";
 
-    var previousPageNumber;
-    var currentPageNumber;
-    var previousDocId;
-    var currentDocId;
-    var currentMode;
-    var currentVP;
-    var changePageInProgress;
-    var router;
-
     var Router = Backbone.Router.extend({
         initialize: function () {
             var that = this;
@@ -36,8 +27,8 @@ define(['events','backbone'], function (events,Backbone) {
 
         document: function (docId) {
 
-            previousDocId = currentDocId;
-            currentDocId = docId;
+            this.previousDocId = this.currentDocId;
+            this.currentDocId = docId;
             events.trigger('changeMode','document');
             events.trigger('changeDocument',{
                 docId: docId,
@@ -48,13 +39,13 @@ define(['events','backbone'], function (events,Backbone) {
         
         page: function (docId,pageId,viewport) {
 
-            previousDocId = currentDocId;
-            currentDocId = docId;
-            previousPageNumber = currentPageNumber;
-            currentPageNumber = Math.floor(parseInt(pageId,10));
-            changePageInProgress = {
+            this.previousDocId = this.currentDocId;
+            this.currentDocId = docId;
+            this.previousPageNumber = this.currentPageNumber;
+            this.currentPageNumber = Math.floor(parseInt(pageId,10));
+            this.changePageInProgress = {
                 docId: docId,
-                pageNumber: currentPageNumber,
+                pageNumber: this.currentPageNumber,
                 viewport: viewport
             }
 
@@ -64,10 +55,10 @@ define(['events','backbone'], function (events,Backbone) {
 
         newViewport: function (vp) {
 
-            if (changePageInProgress) return;
-            if (currentMode != "page") return;
+            if (this.changePageInProgress) return;
+            if (this.currentMode != "page") return;
 
-            currentVP = vp;
+            this.currentVP = vp;
 
             var parts = Backbone.history.fragment.split('/');
             var viewRoute = encodeVP(vp);
@@ -77,26 +68,26 @@ define(['events','backbone'], function (events,Backbone) {
         },
 
         changeMode:  function(mode) {
-            currentMode = mode;
+            this.currentMode = mode;
             if (mode == 'document') {
-                router.navigate('#'+currentDocId,{replace:true,trigger:false});
+                router.navigate('#'+this.currentDocId,{replace:true,trigger:false});
             } else  {
-                if (currentDocId != previousDocId) {
+                if (this.currentDocId != this.previousDocId) {
                     events.trigger('changeDocument',{
-                        docId: currentDocId,
-                        pageNumber: currentPageNumber
+                        docId: this.currentDocId,
+                        pageNumber: this.currentPageNumber
                     });
-                } else if (currentPageNumber != previousPageNumber) {
+                } else if (this.currentPageNumber != this.previousPageNumber) {
                     events.trigger('changePage',{
-                        pageNumber:currentPageNumber
+                        pageNumber:this.currentPageNumber
                     });
                 } else {
 
                     var parts = Backbone.history.fragment.split('/');
-                    var route = currentDocId + '/' + currentPageNumber;
-                    if (currentVP !== undefined) {
-                        route += '/' + encodeVP(currentVP);
-                        events.trigger('newViewportRequest',currentVP);
+                    var route = this.currentDocId + '/' + this.currentPageNumber;
+                    if (this.currentVP !== undefined) {
+                        route += '/' + encodeVP(this.currentVP);
+                        events.trigger('newViewportRequest',this.currentVP);
                     }
                     router.navigate(route,{replace:true,trigger:false});
                 }
@@ -113,17 +104,18 @@ define(['events','backbone'], function (events,Backbone) {
             var vp = decodeVP(viewport);
             if (vp !== undefined) {
                 route += '/' + viewport;
-                currentVP = vp;
+                this.currentVP = vp;
                 events.trigger('newViewportRequest',vp);
             }
-            changePageInProgress = undefined;
+            this.changePageInProgress = undefined;
             router.navigate(route,{replace:true,trigger:false});
 
         }
 
     });
 
-    router = new Router();
+    var router = new Router();
+
     function decodeVP(string) {
 
         if (string === undefined) return;

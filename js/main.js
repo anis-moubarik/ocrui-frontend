@@ -1,5 +1,5 @@
 require.config({
-    //'urlArgs': "bust="+Date.now(), // fix caching troubles
+    'urlArgs': "bust="+Date.now(), // fix caching troubles
     'paths': {
         "bootstrap": "../lib/bootstrap/js/bootstrap",
         "codemirror": "../lib/codemirror-3.0/lib/codemirror",
