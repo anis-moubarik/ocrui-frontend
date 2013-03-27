@@ -7,6 +7,7 @@ define(['underscore','jquery','image','events','templates','mustache','mybackbon
 
             toolbar.registerButton({
                 id:'show-index',
+                index: 4,
                 toggle:true,
                 suppressInitialCB: true,
                 icon:'icon-chevron-left',

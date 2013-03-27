@@ -185,6 +185,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
             toolbar.registerButton({
                 id:'zoom-in',
+                index: 11,
                 toggle:false,
                 icon:'icon-zoom-in',
                 title:'Zoom in',
@@ -194,6 +195,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
             toolbar.registerButton({
                 id:'zoom-out',
+                index: 12,
                 toggle:false,
                 icon:'icon-zoom-out',
                 title:'Zoom out',
@@ -204,6 +206,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
             toolbar.registerButton({
                 id:'pan-zoom',
+                index: 13,
                 toggle:true,
                 icon:'icon-move',
                 title:'Mouse wheel pan/zoom',

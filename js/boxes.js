@@ -29,6 +29,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
 
             toolbar.registerButton({
                 id:'show-highlight',
+                index: 33,
                 toggle:true,
                 active:true,
                 icon:'icon-font',

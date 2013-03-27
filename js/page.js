@@ -62,6 +62,7 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
 
             toolbar.registerButton({
                 id:"save",
+                index: 62,
                 toggle:false,
                 text:"Save",
                 title:"Save",

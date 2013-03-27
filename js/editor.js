@@ -23,6 +23,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
 
             toolbar.registerButton({
                 id:'toggle-linebreaks',
+                index: 21,
                 toggle:true,
                 active:true,
                 icon:'icon-align-left',
@@ -40,6 +41,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }});
             toolbar.registerButton({
                 id:'highlight-editor-word',
+                index: 22,
                 toggle:true,
                 active:false,
                 icon:'icon-star',
@@ -51,6 +53,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }});
             toolbar.registerButton({
                 id:'show-saved-changes',
+                index: 23,
                 toggle:true,
                 icon:'icon-check',
                 title:'Show unsaved changes',
@@ -61,6 +64,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }});
             toolbar.registerButton({
                 id:'show-original-changes',
+                index: 24,
                 toggle:true,
                 active:true,
                 icon:'icon-edit',
@@ -72,6 +76,7 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
                 }});
             toolbar.registerButton({
                 id:'show-language',
+                index: 25,
                 toggle:true,
                 active:true,
                 icon:'icon-globe',

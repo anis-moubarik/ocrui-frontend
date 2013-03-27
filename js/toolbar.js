@@ -11,11 +11,11 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
     function itemSort(a,b) {
         if ( ( a.index === undefined ) && (b.index === undefined) ) return 0;
 
-        if ( ( a.index !== undefined ) && (b.index === undefined) ) return -1;
+        if ( ( a.index !== undefined ) && (b.index === undefined) ) return 1;
 
-        if ( ( a.index === undefined ) && (b.index !== undefined) ) return 1;
+        if ( ( a.index === undefined ) && (b.index !== undefined) ) return -1;
 
-        return b.index - a.index;
+        return a.index - b.index;
     }
 
     function registerKeyboardShortcut(which,modes,callback) {
@@ -48,6 +48,9 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
         // events on clicks.
 
         var id = data.id;
+        if (data.index === undefined) {
+            throw 'Sort index must be given for buttons.';
+        }
         if (id in buttons) {
             throw "Trying to reregister button " + id;
         }
@@ -108,6 +111,7 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
                 buttons: _.map(buttons,function(b) {
                     return {
                         id: b.id,
+                        index: b.index,
                         classes: 'btn' +
                                  (b.active ? ' active' : '') +
                                  (b.modes.indexOf(that.mode) != -1 ?

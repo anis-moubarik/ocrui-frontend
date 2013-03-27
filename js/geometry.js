@@ -70,6 +70,7 @@ define(['jquery','events', 'toolbar'], function($,events,toolbar) {
 
     toolbar.registerButton({
         id:'layout-selector',
+        index: 52,
         toggle:true,
         active: false,
         icon:'icon-repeat',
