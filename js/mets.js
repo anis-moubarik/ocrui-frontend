@@ -37,16 +37,19 @@ define(['jquery','mybackbone','events'],function ($,mybackbone,events) {
         getImageThumbnailUrl : function (pageNumber) {
             var page = this.pageInfo[pageNumber - 1]; //pageNumber is 1-based
             if (page === undefined) return undefined;
+            if (page[3] === undefined) return undefined;
             return this.urlBase + '/' + page[3];
         },
         getImageUrl : function (pageNumber) {
             var page = this.pageInfo[pageNumber - 1]; //pageNumber is 1-based
             if (page === undefined) return undefined;
+            if (page[0] === undefined) return undefined;
             return this.urlBase + '/' + page[0];
         },
         getAltoUrl : function (pageNumber) {
             var page = this.pageInfo[pageNumber - 1]; //pageNumber is 1-based
             if (page === undefined) return undefined;
+            if (page[1] === undefined) return undefined;
             return this.urlBase + '/' + page[1];
         },
         parsePageInfo : function (data) {

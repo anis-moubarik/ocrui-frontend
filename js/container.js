@@ -231,6 +231,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'changeImage':'changeImage',
             'changePage':'changePage',
             'changeMode':'changeMode',
+            'panAfterZoom':'panAfterZoom',
             'scrollOneStep':'scrollOneStep',
             'scheduledRender':'render'
         },
@@ -398,7 +399,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                 } else {
                     return 0;
                 }
-            };
+            }
 
             function inVisibleY(xTop,xBottom,vpTop,vpBottom) {
                 // return amount of pixels x is off viewport + scroll margin
@@ -425,7 +426,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                 } else {
                     return 0;
                 }
-            };
+            }
 
             if (hl) {
                 // initial call
@@ -523,6 +524,8 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
             this.$el.scrollTop(this.cm.getViewportTop());
             this.$el.scrollLeft(this.cm.getViewportLeft());
+            var sLeft = $('#facsimile-container').scrollLeft();
+            var sTop = $('#facsimile-container').scrollTop();
 
             this.scheduleRender();
             this.triggerNewViewport();
@@ -554,10 +557,16 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             events.delayOrIgnore('scheduledRender',undefined,20);
 
         },
+        panAfterZoom: function(data) {
+            this.setPan( data.newVPLeft, data.newVPTop);
+        },
         render: function() {
 
+            // Don't really render anything but just
             // change canvas scroll state if necessary. This is to keep a
-            // chosen point fixed on screen
+            // chosen point fixed on screen during zoom
+            // Juho: Why is this done here and not in the actual zooming
+            // functions?
             if (this.oldPageScale !== undefined) {
 
                 var newScale = this.cm.getPageScale();
@@ -567,7 +576,8 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
 
                 var scaleChange = (newScale / this.oldPageScale);
 
-                // fixed point in pixels on canvas
+                // fixed point in image pixels on canvas
+
                 var onPageX = this.fixedX + this.cm.getViewportLeft() -
                         this.cm.getPageLeft();
                 var onPageY = this.fixedY + this.cm.getViewportTop() -
@@ -577,7 +587,13 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
                 var newVPLeft = this.cm.getPageLeft() + newOnPageX - this.fixedX;
                 var newVPTop = this.cm.getPageTop() + newOnPageY - this.fixedY;
 
-                this.setPan( newVPLeft, newVPTop);
+                var panData = {newVPLeft:newVPLeft,newVPTop:newVPTop};
+                /* Do panning twice as pan may not always succeed
+                 * because it might be done before facsimile has chance to
+                 * do its css-trick
+                 */
+                this.panAfterZoom(panData);
+                events.trigger('panAfterZoom',panData);
                 delete this.oldPageScale;
                 delete this.fixedX;
                 delete this.fixedY;
@@ -587,6 +603,7 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
         }
 
     });
+
 
     return {
         cm: CoordinateManager,
