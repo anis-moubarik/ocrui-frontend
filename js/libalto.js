@@ -402,6 +402,11 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
                     var subsType = s.getAttribute('SUBS_TYPE');
                     var subsContent = s.getAttribute('SUBS_CONTENT');
 
+                    if (typeof(subsContent) == typeof('')) {
+                        // strip whitespace as a workaround for some buggy alto
+                        subsContent = subsContent.replace(/(^\s+|\s+$)/g,'');
+                    }
+
                     if (subsType == 'HypPart2')  {
 
                         if (words[wordIndex] === undefined) {
