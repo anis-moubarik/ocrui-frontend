@@ -65,7 +65,7 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
 
             if (ev.type=='dblclick') {
                 // create new layoutBox.
-                console.log('c');
+                //console.log('c');
                 var el = ev.toElement;
 
                 var box = {

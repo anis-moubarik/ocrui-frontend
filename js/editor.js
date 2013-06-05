@@ -127,7 +127,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             this.cMirror.focus();
         },
         cursorToCoordinate: function(coords) {
-            console.log(coords);
             var content = this.cMirror.getValue();
             var line = 0;
             var ch = 0;
