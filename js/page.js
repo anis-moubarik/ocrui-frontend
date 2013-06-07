@@ -53,23 +53,6 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             this.options = {};
             var that = this;
 
-            toolbar.registerKeyboardShortcut(33, ['page'], function() {
-                that.pagePrevious();
-            });
-            toolbar.registerKeyboardShortcut(34, ['page'], function() {
-                that.pageNext();
-            });
-
-            toolbar.registerButton({
-                id:"save",
-                index: 62,
-                toggle:false,
-                text:"Save",
-                title:"Save",
-                modes:["page"],
-                click: function () { that.saveDocument(); }
-            });
-
             toolbar.registerWidget({
                 id:'page-selector',
                 view:this,
@@ -86,7 +69,10 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             */
             'changePage' : 'changePage',
             'changeMets' : 'changeMets',
-            'documentDirtyStateChanged' : 'documentDirtyStateChanged'
+            'documentDirtyStateChanged' : 'documentDirtyStateChanged',
+            'saveDocument' : 'saveDocument',
+            'pageNext': 'pageNext',
+            'pagePrevious': 'pagePrevious',
         },
         events: {
             'click #page-next': 'pageNext',
@@ -165,7 +151,7 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             events.delay('changePage',{pageNumber:number},100);
         },
         saveDocument: function () {
-            var dirtyPages = that.mets.dirtyPages();
+            var dirtyPages = this.mets.dirtyPages();
             var pNums = _.map(dirtyPages,function (p) {
                 return p.get('pageNumber');
             });

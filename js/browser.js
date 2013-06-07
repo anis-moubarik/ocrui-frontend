@@ -1,5 +1,5 @@
-define(['underscore','jquery','events','templates','mustache','mybackbone','languages'],
-        function (_,$,events,templates,mustache,mybackbone,languages) {
+define(['underscore','jquery','mybackbone'],
+        function (_,$,mybackbone) {
     "use strict";
 
     var View = mybackbone.View.extend({

@@ -1,5 +1,5 @@
-define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone','cmmode'],
-    function (_,$,events,toolbar,CodeMirror,alto,mybackbone) {
+define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'],
+    function (_,$,events,CodeMirror,alto,mybackbone) {
     "use strict";
 
     var View = mybackbone.View.extend({
@@ -21,72 +21,6 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             CodeMirror.commands.goPageUp = function () { };
             CodeMirror.commands.goPageDown = function () { };
 
-            toolbar.registerButton({
-                id:'toggle-linebreaks',
-                index: 21,
-                toggle:true,
-                active:true,
-                icon:'icon-align-left',
-                title:'Line break after each text line',
-                modes:['page'],
-                toggleCB:function(newState) {
-                    that.lineBreaks = newState;
-                    if (newState) {
-                        that.cMirror.setOption('lineWrapping',false);
-                    } else {
-                        that.cMirror.setOption('lineWrapping',true);
-                    }
-                    that.setValueFromAlto();
-                    that.cMirror.replaceSelection(that.cMirror.getSelection());
-                }});
-            toolbar.registerButton({
-                id:'highlight-editor-word',
-                index: 22,
-                toggle:true,
-                active:false,
-                icon:'icon-star',
-                title:'Highlight word under cursor in editor',
-                modes:['page'],
-                toggleCB:function(newState) {
-                    that.cMirror.setOption('showHighlight',newState);
-                    that.cMirror.replaceSelection(that.cMirror.getSelection());
-                }});
-            toolbar.registerButton({
-                id:'show-saved-changes',
-                index: 23,
-                toggle:true,
-                icon:'icon-check',
-                title:'Show unsaved changes',
-                modes:['page'],
-                toggleCB:function(newState) {
-                    that.cMirror.setOption('showUnsavedChanges',newState);
-                    that.cMirror.replaceSelection(that.cMirror.getSelection());
-                }});
-            toolbar.registerButton({
-                id:'show-original-changes',
-                index: 24,
-                toggle:true,
-                active:true,
-                icon:'icon-edit',
-                title:'Show changes made to original',
-                modes:['page'],
-                toggleCB:function(newState) {
-                    that.cMirror.setOption('showOriginalChanges',newState);
-                    that.cMirror.replaceSelection(that.cMirror.getSelection());
-                }});
-            toolbar.registerButton({
-                id:'show-language',
-                index: 25,
-                toggle:true,
-                active:true,
-                icon:'icon-globe',
-                title:'Show language of words',
-                modes:['page'],
-                toggleCB:function(newState) {
-                    that.cMirror.setOption('showLanguage',newState);
-                    that.cMirror.replaceSelection(that.cMirror.getSelection());
-                }});
-
             this.cMirror.on('cursorActivity',function () {
                 events.delayOrIgnore('setupHighlightChange',undefined,100);
             });
@@ -105,9 +39,40 @@ define(['underscore','jquery','events','toolbar','codemirror','alto','mybackbone
             'changeMode':'changeMode',
             'requestLanguageChange':'requestLanguageChange',
             'setupHighlightChange':'setupHighlightChange',
-            'pageDirtyStateChanged':'pageDirtyStateChanged'
+            'pageDirtyStateChanged':'pageDirtyStateChanged',
+            'showLanguage':'showLanguage',
+            'showOriginalChanges':'showOriginalChanges',
+            'showSavedChanges':'showSavedChanges',
+            'highlightEditorWord':'highlightEditorWord',
+            'toggleLineBreak':'toggleLineBreak',
         },
         myModes: ['page'],
+        toggleLineBreak:function(newState) {
+            this.lineBreaks = newState;
+            if (newState) {
+                this.cMirror.setOption('lineWrapping',false);
+            } else {
+                this.cMirror.setOption('lineWrapping',true);
+            }
+            this.setValueFromAlto();
+            this.cMirror.replaceSelection(this.cMirror.getSelection());
+        },
+        highlightEditorWord:function(newState) {
+            this.cMirror.setOption('showHighlight',newState);
+            this.cMirror.replaceSelection(this.cMirror.getSelection());
+        },
+        showSavedChanges:function(newState) {
+            this.cMirror.setOption('showUnsavedChanges',newState);
+            this.cMirror.replaceSelection(this.cMirror.getSelection());
+        },
+        showOriginalChanges:function(newState) {
+            this.cMirror.setOption('showOriginalChanges',newState);
+            this.cMirror.replaceSelection(this.cMirror.getSelection());
+        },
+        showLanguage:function(newState) {
+            this.cMirror.setOption('showLanguage',newState);
+            this.cMirror.replaceSelection(this.cMirror.getSelection());
+        },
         virtualKeyboard: function(data) {
             this.cMirror.replaceSelection(data);
             this.cMirror.focus();

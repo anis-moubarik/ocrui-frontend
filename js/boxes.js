@@ -1,45 +1,11 @@
-define(['jquery','toolbar','events','mybackbone','container','alto'],
-        function ($,toolbar,events,mybackbone,container,alto) {
+define(['jquery','events','mybackbone','container','alto'],
+        function ($,events,mybackbone,container,alto) {
     "use strict";
 
     var View = mybackbone.View.extend({
 
         initialize: function() {
-
-            var that = this;
             this.layoutBoxes = [];
-
-            /*
-            toolbar.registerButton({
-                id:'edit-layout',
-                toggle:true,
-                icon:'icon-th',
-                title:'Edit page layout',
-                modes:['page'],
-                toggleCB:function(newState) {
-                    that.showLayout = newState;
-                    if (newState) {
-                        container.view.setMouseSensitivity(false);
-                    } else {
-                        container.view.setMouseSensitivity(true);
-                    }
-                    that.render();
-                }});
-            */
-
-            toolbar.registerButton({
-                id:'show-highlight',
-                index: 33,
-                toggle:true,
-                active:true,
-                icon:'icon-font',
-                title:'Show editor word highlight',
-                modes:['page'],
-                toggleCB:function(newState) {
-                    that.showHighlight = newState;
-                    that.render();
-                }});
-
         },
         el: '#boxes',
         myEvents: {
@@ -47,7 +13,9 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
             'changeCoordinates': 'setHighlightBoxes',
             'scheduledRender': 'render',
             'changeMode': 'changeMode',
-            'changePage': 'changePage'
+            'changePage': 'changePage',
+            'toggleShowHighlight': 'toggleShowHighlight'
+            /*'showLayout': 'showLayout'*/
 
         },
         /*
@@ -61,6 +29,22 @@ define(['jquery','toolbar','events','mybackbone','container','alto'],
         },
         */
         myModes: ['page'],
+
+        toggleShowHighlight: function (newState) {
+            console.log('x',newState);
+            this.showHighlight = newState;
+            this.render();
+        },
+
+        toggleShowLayout:function(newState) {
+            this.showLayout = newState;
+            if (newState) {
+                container.view.setMouseSensitivity(false);
+            } else {
+                container.view.setMouseSensitivity(true);
+            }
+            this.render();
+        },
         click: function (ev) {
 
             if (ev.type=='dblclick') {

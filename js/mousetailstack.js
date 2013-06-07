@@ -1,4 +1,4 @@
-define(['jquery','toolbar','events'],function ($,toolbar,events) {
+define(['jquery','events'],function ($,events) {
     "use strict";
 
     // This is used to implement nice non-sticky panning

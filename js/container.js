@@ -1,5 +1,5 @@
-define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','utils'],
-        function (_,$,toolbar,events,mybackbone,mousetailstack,utils) {
+define(['underscore','jquery','events','mybackbone','mousetailstack','utils'],
+        function (_,$,events,mybackbone,mousetailstack,utils) {
     "use strict";
 
     var CoordinateManager = {
@@ -183,41 +183,6 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             this.cm.init();
             this.mouseTailStack = new mousetailstack.MouseTailStack();
 
-            toolbar.registerButton({
-                id:'zoom-in',
-                index: 11,
-                toggle:false,
-                icon:'icon-zoom-in',
-                title:'Zoom in',
-                modes:['page'],
-                click:function(data) { that.zoomTo(2); }
-            });
-
-            toolbar.registerButton({
-                id:'zoom-out',
-                index: 12,
-                toggle:false,
-                icon:'icon-zoom-out',
-                title:'Zoom out',
-                modes:['page'],
-                click:function(data) { that.zoomTo(0.5); }
-            
-            });
-
-            toolbar.registerButton({
-                id:'pan-zoom',
-                index: 13,
-                toggle:true,
-                icon:'icon-move',
-                title:'Mouse wheel pan/zoom',
-                modes:['page'],
-                toggleCB:function(newState) {
-                    that.wheelPan = newState;
-            }});
-
-            toolbar.registerKeyboardShortcut(113, ['page'], function(ev) {
-                $('#pan-zoom').click();
-            });
             this.setMouseSensitivity(true);
 
         },
@@ -233,7 +198,10 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'changeMode':'changeMode',
             'panAfterZoom':'panAfterZoom',
             'scrollOneStep':'scrollOneStep',
-            'scheduledRender':'render'
+            'scheduledRender':'render',
+            'zoomIn':'zoomIn',
+            'zoomOut':'zoomOut',
+            'panZoom':'panZoom'
         },
         events: {
             'click': 'propagateClick',
@@ -244,6 +212,9 @@ define(['underscore','jquery','toolbar','events','mybackbone','mousetailstack','
             'mouseout': 'endPan'
         },
         myModes: ['page'],
+        zoomIn:function(data) { this.zoomTo(2); },
+        zoomOut:function(data) { this.zoomTo(0.5); },
+        panZoom:function(newState) { this.wheelPan = newState; },
         setPageGeometry: function(data) {
             this.cm.setAltoSize(data.width,data.height);
         },

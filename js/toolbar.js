@@ -1,5 +1,5 @@
-define(['jquery','underscore','events','mustache','mybackbone','templates'],
-        function ($,_,events,mustache,mybackbone,templates) {
+define(['jquery','underscore','events','mustache','mybackbone','templates','conf'],
+        function ($,_,events,mustache,mybackbone,templates,conf) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -18,17 +18,6 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
         return a.index - b.index;
     }
 
-    function registerKeyboardShortcut(which,modes,callback) {
-        if (which in keyboardShortcuts) {
-            throw "Trying to reregister shortcut for " + which;
-        }
-        for (var i in modes) {
-            var mode = modes[i];
-            var key = mode+'-'+which;
-            keyboardShortcuts [key] = callback;
-        }
-    }
-
     function registerWidget(data) {
         // widget is a backbone view that renders widget
         // modes is an array of modes in which this widget is active
@@ -42,35 +31,18 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
         widgets [id] = data;
     }
 
-    function registerButton(data) {
-        // toggle makes button togleable, otherwise clickable
-        // toolbar takes care of firing button-{{id}}-click,
-        // events on clicks.
-
-        var id = data.id;
-        if (data.index === undefined) {
-            throw 'Sort index must be given for buttons.';
-        }
-        if (id in buttons) {
-            throw "Trying to reregister button " + id;
-        }
-        buttons [id] = data;
-        if (data.toggle && data.toggleCB && (!data.suppressInitialCB)) {
-            data.toggleCB.apply(undefined,[data.active]);
-        }
-    }
-
     $('body').on('keydown',function(ev) {
         var key = view.mode+'-'+ev.which;
-        var callback = keyboardShortcuts[key];
-        if (callback) {
-            callback();
+        var event = keyboardShortcuts[key];
+        if (event) {
+            events.trigger(event);
         }
     });
 
     var View = mybackbone.View.extend({
         initialize: function() {
-            var that = this;
+            conf.buttons.map(this.registerButton);
+            conf.shortcuts.map(this.registerKeyboardShortcut);
         },
         el : '#toolbar',
         myEvents: {
@@ -83,19 +55,41 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
         setViewActive: function (mode) {
             this.render();
         },
+        registerKeyboardShortcut: function (shortcut) {
+            if (shortcut.which in keyboardShortcuts) {
+                throw "Trying to reregister shortcut for " + shortcut.code;
+            }
+            for (var i in shortcut.modes) {
+                var mode = shortcut.modes[i];
+                var key = mode+'-'+shortcut.code;
+                keyboardShortcuts [key] = shortcut.event;
+                console.log(shortcut)
+            }
+        },
+
+        registerButton: function (data) {
+            var id = data.id;
+            if (data.index === undefined) {
+                throw 'Sort index must be given for buttons.';
+            }
+            if (id in buttons) {
+                throw "Trying to reregister button " + id;
+            }
+            buttons [id] = data;
+            if (data.toggle && (!data.suppressInitialCB)) {
+                events.trigger(data.event,data.active);
+            }
+        },
         handleClick: function (ev) {
             var id = ev.currentTarget.id;
             var b = buttons[id];
             if (b === undefined) return;
             if (b.modes.indexOf(this.currentMode()) == -1) return;
-            var cb = b.click;
-            if (cb) {
-                cb.apply(ev.currentTarget,[ev]);
-            }
-            cb = b.toggleCB;
-            if (cb) {
+            if (b.toggle) {
                 var toggled = !($(ev.currentTarget).hasClass("active"));
-                cb.apply(ev.currentTarget,[toggled]);
+                events.trigger(b.event,toggled);
+            } else {
+                events.trigger(b.event);
             }
 
             events.trigger('refocus');
@@ -143,9 +137,7 @@ define(['jquery','underscore','events','mustache','mybackbone','templates'],
     var view = new View();
     return {
         view : view,
-        registerKeyboardShortcut : registerKeyboardShortcut,
         registerWidget : registerWidget,
-        registerButton : registerButton
     };
 
 });

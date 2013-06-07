@@ -1,5 +1,5 @@
 /*globals window:false */
-define(['jquery','events', 'toolbar'], function($,events,toolbar) {
+define(['jquery','events'], function($,events) {
     "use strict";
 
     var vertical = false;
@@ -67,17 +67,7 @@ define(['jquery','events', 'toolbar'], function($,events,toolbar) {
     events.on('changePageError',resizeHandler);
     events.on('keyboardLayoutChanged',resizeHandler);
     events.on('newViewportRequest',newViewportRequest);
-
-    toolbar.registerButton({
-        id:'layout-selector',
-        index: 52,
-        toggle:true,
-        active: false,
-        icon:'icon-repeat',
-        title:'Horizontal / vertical layout',
-        modes:['page'],
-        toggleCB:changeLayout
-    });
+    events.on('changeLayout',changeLayout);
 
     return {
         resizeHandler: resizeHandler

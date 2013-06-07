@@ -1,26 +1,9 @@
-define(['underscore','jquery','image','events','templates','mustache','mybackbone','toolbar'],
-        function (_,$,image,events,templates,mustache,mybackbone,toolbar) {
+define(['underscore','jquery','image','events','templates','mustache','mybackbone'],
+        function (_,$,image,events,templates,mustache,mybackbone) {
     "use strict";
 
     var View = mybackbone.View.extend({
         initialize:function() {
-
-            toolbar.registerButton({
-                id:'show-index',
-                index: 4,
-                toggle:true,
-                suppressInitialCB: true,
-                icon:'icon-chevron-left',
-                title:'Show index',
-                modes:['page','document'],
-                toggleCB:function(newState) {
-                    if (newState) {
-                        events.trigger('changeMode','document');
-                    } else {
-                        events.trigger('changeMode','page');
-                    }
-                }
-            });
 
             $('#document a img').appear();
         },
@@ -32,8 +15,16 @@ define(['underscore','jquery','image','events','templates','mustache','mybackbon
         myEvents: {
             'changeMode':'changeMode',
             'changeMets':'changeMets',
+            'setDocumentOrPageMode':'setDocumentOrPageMode'
         },
         myModes: ['document'],
+        setDocumentOrPageMode: function(newState) {
+            if (newState) {
+                events.trigger('changeMode','document');
+            } else {
+                events.trigger('changeMode','page');
+            }
+        },
         changeMets: function (mets) {
             this.pages = [];
             this.images = [];

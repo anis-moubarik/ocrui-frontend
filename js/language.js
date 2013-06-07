@@ -1,5 +1,5 @@
-define(['underscore','jquery','events','templates','mustache','mybackbone','languages'],
-        function (_,$,events,templates,mustache,mybackbone,languages) {
+define(['underscore','jquery','events','templates','mustache','mybackbone','conf'],
+        function (_,$,events,templates,mustache,mybackbone,conf) {
     "use strict";
 
     var View = mybackbone.View.extend({
@@ -12,7 +12,7 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','lang
             'click a': 'vkeyboardClick'
         },
         myEvents: {
-            'appReady': 'load',
+            'appReady': 'render',
             'changeCoordinates':'changeCoordinates'
         },
         vkeyboardClick: function(ev) {
@@ -20,11 +20,6 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','lang
             events.trigger('virtualKeyboard',ch);
             ev.preventDefault();
             ev.stopPropagation();
-        },
-        load: function() {
-            var that = this;
-            this.languages = languages;
-            this.render();
         },
         changeCoordinates: function (words) {
             if (words === undefined) return; // do something else
@@ -34,8 +29,8 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','lang
                 if (prev != l) return undefined;
                 return l;
             }, null);
-            if (this.languages) {
-                this.languages.selected= newLanguage;
+            if (conf.languages) {
+                conf.selected_language = newLanguage;
             }
 
             this.render();
@@ -44,7 +39,7 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','lang
             var l = $(ev.target).find(':selected').attr('value');
             ev.preventDefault();
             ev.stopPropagation();
-            this.languages.selected=l;
+            conf.selected_language=l;
             events.trigger('requestLanguageChange',l);
             this.render();
 
@@ -54,18 +49,18 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','lang
             var that = this;
 
             var context = {
-                xselected: this.languages.selected,
-                selectedName: this.languages.selected,
+                xselected: conf.selected_language,
+                selectedName: conf.selected_language,
                 chars: []
             };
             var isAnySelected = false;
-            context.languages = _.map(this.languages.languages, function(e) {
+            context.languages = _.map(conf.languages, function(e) {
                     var o = {
                         code: e.code,
                         name: e.name,
                         selected: ' '
                     };
-                    if (e.code==that.languages.selected) {
+                    if (e.code==conf.selected_language) {
                         context.selectedName = e.name;
                         o.selected = "selected";
                         isAnySelected = true;
@@ -78,9 +73,9 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','lang
                 selected: isAnySelected ? ' ' : 'selected'
                 });
 
-            for (var i in this.languages.languages) {
-                var l = this.languages.languages[i];
-                if (l.code==this.languages.selected) {
+            for (var i in conf.languages) {
+                var l = conf.languages[i];
+                if (l.code==conf.selected_language) {
                     context.chars = l.keyboard;
                 }
             }
