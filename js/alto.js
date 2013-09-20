@@ -27,6 +27,9 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
         getNthWord: function(index) {
             return this.alto.getNthWord(index);
         },
+        getAsAltoXML: function() {
+            return this.alto.getAsAltoXML();
+        },
         getChangedSequence: function() {
             return this.alto.getChangedSequence();
         },

@@ -62,6 +62,43 @@ define(['jquery','mybackbone','events','conf'],function (
                 return aN < bN;
             });
             return {};
+        },
+        saveDirtyPages : function () { 
+
+            var dirtyPages = this.dirtyPages();
+
+            var data = _.map(dirtyPages,function (p) {
+
+                // BUG: pageNumber should be what comes out from ocruidoc i
+                // guess
+                var i = p.get('pageNumber');
+
+                var xml = p.getAsAltoXML();
+                var xmlString = (new XMLSerializer()).serializeToString(xml);
+                
+                return 'Content-Type:text/xml\n' +
+                       'Content-Disposition: attachment; filename='+ i + '\n' +
+                       '\n' + xmlString+'\n--frontier';
+
+            });
+
+            var options = {
+
+                data : '--frontier\n' + data,
+                type:'POST',
+                url: this.urlBase,
+                contentType: 'multipart/mixed; boundary=frontier',
+                processData: false
+            }
+            console.log('Now PUTing');
+            $.ajax(options)
+                .done(function(x) {
+                    console.log('success',x);
+                })
+                .fail(function(x) {
+                    console.log('error',x);
+                });
+
         }
 
     });

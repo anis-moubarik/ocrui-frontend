@@ -323,7 +323,8 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         };
     };
 
-    ContentUpdateProcess.prototype.dupWordWithSideEffects = function(original,changed) {
+    ContentUpdateProcess.prototype.dupWordWithSideEffects
+                = function(original,changed) {
 
         var dup = {}
         for (var key in original) {
@@ -360,12 +361,12 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     }
 
     Alto.prototype.setOriginalXML = function (xml) {
-        //this.original = xml;
+        this.originalXML = xml;
         this.originalWords = this.constructWords(xml);
     };
 
     Alto.prototype.setCurrentXML = function (xml) {
-        //this.current = xml;
+        this.currentXML = xml;
         this.words = this.constructWords(xml);
         this.layoutBoxes = this.constructLayoutBoxes(this.words);
     };
@@ -412,7 +413,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
                         if (words[wordIndex] === undefined) {
                             
                             words.push(word);
-                            console.log('hyp2 without hyp1');
+                            //console.log('hyp2 without hyp1');
 
                         } else {
 
@@ -547,6 +548,57 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             selection = minDistanceWord;
         }
         return selection;
+    };
+
+    Alto.prototype.getAsAltoXML = function () {
+
+        var newXML = $(this.originalXML.firstChild).clone().get(0);
+
+        // remove old strings and get lines array
+        var $textlines = $(newXML).find('TextLine').map(removeChildren);
+        
+        function removeChildren (tlIndex,tl) {
+            $(tl).empty();
+            return tl;
+        }
+
+        for (var i in this.words) {
+
+            var word = this.words[i];
+            var $textLine = $textlines.eq(word.textLine);
+            var $word = $('<String/>').attr({
+                'CONTENT' : word.content,
+                'LANGUAGE' : word.language,
+                'CHANGED' : word.changed,
+                'HPOS' : word.hpos,
+                'VPOS' : word.vpos,
+                'WIDTH' : word.width,
+                'HEIGHT' : word.height
+            });
+
+            if (word.hyphenated) {
+
+                $word.attr({
+                    'SUBS_CONTENT' : word.content,
+                    'SUBS_TYPE' : 'HypPart1',
+                    'CONTENT' : word.hyp1
+                });
+                var $hyp2 = $word.clone();
+                $hyp2.attr({
+                    'SUBS_TYPE' : 'HypPart2',
+                    'CONTENT' : word.hyp2
+                });
+                var $nextTextLine = $textlines.eq(word.textLine+1);
+                $nextTextLine.append($hyp2);
+
+            }
+
+            $textLine.append($word);
+            
+        }
+
+        return newXML;
+
     };
 
     Alto.prototype.setNthWordLanguage = function(index,language) {

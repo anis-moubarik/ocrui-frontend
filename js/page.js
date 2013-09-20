@@ -151,13 +151,9 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             events.delay('changePage',{pageNumber:number},100);
         },
         saveDocument: function () {
-            var dirtyPages = this.mets.dirtyPages();
-            var pNums = _.map(dirtyPages,function (p) {
-                return p.get('pageNumber');
-            });
-            var dString = pNums.join(' ');
-            console.log('dirty pages:', dString);
-            console.log('should now PUT');
+
+            this.mets.saveDirtyPages();
+
         },
         render: function() {
             var context = {
