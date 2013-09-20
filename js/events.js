@@ -16,7 +16,7 @@ define(function () {
     var schedule = {};
 
     // debug:
-    onAny(function(ev,data) {console.log(ev,data);});
+    // onAny(function(ev,data) {console.log(ev,data);});
 
     // listen to all sent events, for testing and debugging
     function onAny (cb) {

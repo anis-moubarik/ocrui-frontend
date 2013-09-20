@@ -31,7 +31,7 @@ define(['jquery','events','mybackbone','container','alto'],
         myModes: ['page'],
 
         toggleShowHighlight: function (newState) {
-            console.log('x',newState);
+            //console.log('x',newState);
             this.showHighlight = newState;
             this.render();
         },

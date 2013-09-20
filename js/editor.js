@@ -143,6 +143,9 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         },
         changed: function (instance) {
             var content = instance.getValue();
+
+            if (!this.alto) return;
+
             this.alto.updateStringContent(content);
             this.configureCMMode();
             this.setupHighlightChange();

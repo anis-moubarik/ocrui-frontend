@@ -1,5 +1,5 @@
 /*globals Image:false */
-define(['jquery','mybackbone','mets'],function ($,mybackbone,mets) {
+define(['jquery','mybackbone','ocruidoc'],function ($,mybackbone,mets) {
     "use strict";
 
     var ImageModel = mybackbone.Model.extend({

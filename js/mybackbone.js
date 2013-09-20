@@ -80,7 +80,7 @@ define(['backbone','underscore','events'],function (Backbone,_,events) {
         });
 
         // Default JSON-request options.
-        var params = {type: type, dataType: 'xml'};
+        var params = {type: type, dataType: this.dataType||'xml'};
 
         // Ensure that we have a URL.
         if (!options.url) {

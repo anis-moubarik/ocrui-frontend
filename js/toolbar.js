@@ -63,7 +63,7 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
                 var mode = shortcut.modes[i];
                 var key = mode+'-'+shortcut.code;
                 keyboardShortcuts [key] = shortcut.event;
-                console.log(shortcut)
+                // console.log(shortcut)
             }
         },
 

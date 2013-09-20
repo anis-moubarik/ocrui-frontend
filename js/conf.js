@@ -209,7 +209,10 @@ define([],function () {
                 "name":"Venäjä",
                 "keyboard":kkbd
             }
-        ]
+        ],
+        "urls": {
+            "docBase": '/api/id/<id>/pages/'
+        }
     };
 
 });

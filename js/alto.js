@@ -1,4 +1,4 @@
-define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
+define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'],
         function (_,$,libalto,mybackbone,mets,utils,events) {
     "use strict";
 
@@ -66,6 +66,7 @@ define(['underscore','jquery','libalto','mybackbone','mets','utils','events'],
         parse: function (response) {
             var data = {};
             var page = $(response).find('Page').get(0);
+            if (!page) return {};
             data.width = parseInt(page.getAttribute("WIDTH"),10);
             data.height = parseInt(page.getAttribute("HEIGHT"),10);
             data.pageIndex = this.get('pageIndex');
