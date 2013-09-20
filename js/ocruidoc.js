@@ -70,7 +70,8 @@ define(['jquery','mybackbone','events','conf'],function (
             var data = _.map(dirtyPages,function (p) {
 
                 // BUG: pageNumber should be what comes out from ocruidoc i
-                // guess
+                // guess. Now it works if pages are numbered continuously
+                // 1... Otherwise this overwrites wrong pages
                 var i = p.get('pageNumber');
 
                 var xml = p.getAsAltoXML();
@@ -86,6 +87,9 @@ define(['jquery','mybackbone','events','conf'],function (
 
                 data : '--frontier\n' + data,
                 type:'POST',
+                headers: {
+                    'X-Authenticated-User':'1'
+                },
                 url: this.urlBase,
                 contentType: 'multipart/mixed; boundary=frontier',
                 processData: false
