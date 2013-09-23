@@ -76,16 +76,19 @@ define(['jquery','mybackbone','events','conf'],function (
 
                 var xml = p.getAsAltoXML();
                 var xmlString = (new XMLSerializer()).serializeToString(xml);
-                
-                return 'Content-Type:text/xml\n' +
-                       'Content-Disposition: attachment; filename='+ i + '\n' +
-                       '\n' + xmlString+'\n--frontier';
+                var b64String = btoa(xmlString);
+
+                return '--frontier\r\n' +
+                       'Content-Type:text/xml\r\n' +
+                       'Content-Transfer-encoding: base64\r\n' + 
+                       'Content-Disposition: attachment; filename=' + i +
+                       '\r\n' + '\r\n' + b64String +'\r\n';
 
             });
 
             var options = {
 
-                data : '--frontier\n' + data,
+                data : data + '--frontier--\n',
                 type:'POST',
                 headers: {
                     'X-Authenticated-User':'1'
