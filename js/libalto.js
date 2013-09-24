@@ -566,7 +566,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
             var word = this.words[i];
             var $textLine = $textlines.eq(word.textLine);
-            var $word = $('<String/>').attr({
+            var $word = $($.parseXML('<String/>').documentElement).attr({
                 'CONTENT' : word.content,
                 'LANGUAGE' : word.language,
                 'CHANGED' : word.changed,

@@ -59,7 +59,7 @@ define(['jquery','mybackbone','events','conf'],function (
             this.pages = this.data.Revision.pages.sort( function (a,b) {
                 var aN = parseInt(a.number,10);
                 var bN = parseInt(b.number,10);
-                return aN < bN;
+                return aN - bN;
             });
             return {};
         },
@@ -79,10 +79,11 @@ define(['jquery','mybackbone','events','conf'],function (
                 var b64String = btoa(xmlString);
 
                 return '--frontier\r\n' +
-                       'Content-Type:text/xml\r\n' +
+                       'Content-Type: application/octet-stream\r\n' +
                        'Content-Transfer-encoding: base64\r\n' + 
-                       'Content-Disposition: attachment; filename=' + i +
-                       '\r\n' + '\r\n' + b64String +'\r\n';
+                       'Content-Disposition: form-data; name="' + i +
+                       '"; filename="' + i + '"\r\n' + '\r\n' +
+                       b64String + '\r\n';
 
             });
 
@@ -94,9 +95,10 @@ define(['jquery','mybackbone','events','conf'],function (
                     'X-Authenticated-User':'1'
                 },
                 url: this.urlBase,
-                contentType: 'multipart/mixed; boundary=frontier',
+                contentType: 'multipart/form-data; boundary=frontier',
                 processData: false
-            }
+            };
+
             console.log('Now PUTing');
             $.ajax(options)
                 .done(function(x) {
@@ -149,6 +151,7 @@ define(['jquery','mybackbone','events','conf'],function (
             events.trigger('documentDirtyStateChanged',mets.isDirty());
         });
     });
+
     events.on('changeDocument', function (data) {
         currentDocId = data.docId;
         get(data.docId).then(
@@ -166,7 +169,6 @@ define(['jquery','mybackbone','events','conf'],function (
         });
     });
 
-    
     function getCurrent() {
         return get(currentDocId);
     }
