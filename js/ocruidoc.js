@@ -54,7 +54,6 @@ define(['jquery','mybackbone','events','conf'],function (
             return page.urls.text;
         },
         parse: function (response) {
-            console.log('got response');
             this.data = response;
             this.pages = this.data.Revision.pages.sort( function (a,b) {
                 var aN = parseInt(a.number,10);
@@ -139,7 +138,8 @@ define(['jquery','mybackbone','events','conf'],function (
         doc.loading.then(
             function () {promise.resolve(doc);},
             function (err) {
-                promise.reject("Cannot load document.");console.log(err);
+                promise.reject("Cannot load document.");
+                console.log(err);
             }
         );
 

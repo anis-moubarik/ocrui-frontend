@@ -2,7 +2,7 @@ require.config({
     'urlArgs': "bust="+Date.now(), // fix caching troubles
     'paths': {
         "bootstrap": "../lib/bootstrap/js/bootstrap",
-        "codemirror": "../lib/codemirror-3.0/lib/codemirror",
+        "codemirror": "../CodeMirror/lib/codemirror",
         "jquery": "../lib/jquery",
         "mustache": "../lib/mustache",
         "underscore": "../lib/underscore-min",

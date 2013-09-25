@@ -102,6 +102,8 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         var diff = jsdiff.diff(originalStrings,_.map(newStrings,_.identity));
         var seq = getEditSequence(diff);
+        console.log('edit seq:',seq);
+        window.seq=seq;
         this.dirty = _.reduce(seq,function(prev,cur){
             return prev || cur != 'match';
         },false);
@@ -314,7 +316,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             inLineIndex: this.inLineIndex,
             language: null,
             changed: true,
-            changedSinceSave: null,
+            changedSinceSave: true,
             hpos: null,
             vpos: null,
             width: null,
@@ -326,15 +328,14 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     ContentUpdateProcess.prototype.dupWordWithSideEffects
                 = function(original,changed) {
 
-        var dup = {}
-        for (var key in original) {
-            dup[key] = original[key];
-        }
+        var dup = _.extend({},original);
         if (changed) {
             dup.changed = true;
+            dup.changedSinceSave = true;
             this.inLineIndex ++;
         } else {
             dup.changed = false;
+            dup.changedSinceSave = false;
         }
         dup.index = this.wordIndex();
         dup.inLineIndex = this.inLineIndex;
@@ -390,8 +391,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
                         content: s.getAttribute('CONTENT'),
                         language: s.getAttribute('LANGUAGE'),
                         changed: s.getAttribute('CHANGED') ?
-                            true : false,
-                        changedSinceSave: s.getAttribute('CHANGED_SINCE_SAVE') ?
                             true : false,
                         hpos: parseInt(s.getAttribute('HPOS'),10),
                         vpos: parseInt(s.getAttribute('VPOS'),10),
@@ -490,6 +489,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         var process = new ContentUpdateProcess( this, content );
 
         this.words = process.getNewWords();
+        console.log('words',this.words);
 
         this.dirty = process.isDirty();
     };
@@ -624,6 +624,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     };
 
     Alto.prototype.getChangedSequence = function() {
+        console.log('ch:',_.map(this.words,function(e,i) {return e.changed;}));
         return _.map(this.words,function(e,i) {return e.changed;});
     };
 

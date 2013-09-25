@@ -24,7 +24,7 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','conf
         changeCoordinates: function (words) {
             if (words === undefined) return; // do something else
             var newLanguage = _.reduce(words, function (prev,cur) {
-                var l = cur.language;
+                var l = (cur||{}).language;
                 if (prev === null) return l;
                 if (prev != l) return undefined;
                 return l;

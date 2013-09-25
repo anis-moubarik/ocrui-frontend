@@ -14,11 +14,11 @@
 }
 
 .cm-changed {
-    color: #ffaa00;
+    color: #aaaa00;
 }
 
 .cm-changed-unsaved {
-    color: #aaaa00;
+    color: #ffaa00;
 }
 
 .cm-language {

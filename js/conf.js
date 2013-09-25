@@ -117,6 +117,7 @@ define([],function () {
                 id:'show-saved-changes',
                 index: 23,
                 toggle:true,
+                active:true,
                 icon:'icon-check',
                 title:'Show unsaved changes',
                 modes:['page'],

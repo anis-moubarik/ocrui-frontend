@@ -62,10 +62,12 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.cMirror.replaceSelection(this.cMirror.getSelection());
         },
         showSavedChanges:function(newState) {
+            console.log('show unsaved changes',newState);
             this.cMirror.setOption('showUnsavedChanges',newState);
             this.cMirror.replaceSelection(this.cMirror.getSelection());
         },
         showOriginalChanges:function(newState) {
+            console.log('show original changes',newState);
             this.cMirror.setOption('showOriginalChanges',newState);
             this.cMirror.replaceSelection(this.cMirror.getSelection());
         },
@@ -152,7 +154,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         },
         getCurrentWordIndexes: function () {
             var wordIndexes = {};
-            var wordIndex = 0;
+            var wordIndex = -1; // in between words before first word...
             var content = this.cMirror.getValue();
             var start = this.cMirror.getCursor('start');
             var end = this.cMirror.getCursor('end');
@@ -160,7 +162,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             var s_ch = start.ch;
             var e_line = end.line;
             var e_ch = end.ch;
-            var betweenWords = false;
+            var betweenWords = true;
             var stillBetweenWords = false;
 
             for (var i in content) {
@@ -216,7 +218,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
 
             that.cMirror.setOption('highlight',this.words);
             this.suppressChanged = true;
-            this.cMirror.view.frontier = 0;
+            this.cMirror.doc.frontier = 0;
             this.cMirror.replaceSelection(this.cMirror.getSelection());
             this.suppressChanged = false;
 
