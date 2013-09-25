@@ -54,7 +54,6 @@ define(['underscore','jquery','image','events','templates','mustache','mybackbon
             $('#show-index').removeClass('active');
         },
         appear: function (ev) {
-            window.x=ev.target;
             var i = parseInt($(ev.target).attr('data-pageindex'),10);
             this.pages[i].tnFetch();
         },

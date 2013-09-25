@@ -102,8 +102,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         var diff = jsdiff.diff(originalStrings,_.map(newStrings,_.identity));
         var seq = getEditSequence(diff);
-        console.log('edit seq:',seq);
-        window.seq=seq;
         this.dirty = _.reduce(seq,function(prev,cur){
             return prev || cur != 'match';
         },false);
@@ -489,7 +487,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         var process = new ContentUpdateProcess( this, content );
 
         this.words = process.getNewWords();
-        console.log('words',this.words);
 
         this.dirty = process.isDirty();
     };
@@ -624,7 +621,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     };
 
     Alto.prototype.getChangedSequence = function() {
-        console.log('ch:',_.map(this.words,function(e,i) {return e.changed;}));
         return _.map(this.words,function(e,i) {return e.changed;});
     };
 
