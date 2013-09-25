@@ -56,7 +56,6 @@ define(['jquery','mybackbone','ocruidoc'],function ($,mybackbone,mets) {
         var imageOptions = {
             docId: options.docId,
             pageNumber: options.pageNumber,
-            versionNumber: options.versionNumber,
             id: options.docId+'/'+options.pageNumber,
         }
 

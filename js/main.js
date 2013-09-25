@@ -4,6 +4,7 @@ require.config({
         "bootstrap": "../lib/bootstrap/js/bootstrap",
         "codemirror": "../CodeMirror/lib/codemirror",
         "jquery": "../lib/jquery",
+        "async": "../async/lib/async",
         "mustache": "../lib/mustache",
         "underscore": "../lib/underscore-min",
         "jquery-ui": "../lib/jquery-ui-1.10.0.custom/js/jquery-ui-1.10.0.custom.min",

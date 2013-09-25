@@ -10,7 +10,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 value: "",
                 lineWrapping: true,
                 mode: 'ocrui',
-                changedSequence: [],
+                changedSince0Sequence: [],
                 changedSinceSaveSequence: [],
                 languageSequence: [],
                 highlight: {},
@@ -138,9 +138,10 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.cMirror.focus();
         },
         configureCMMode: function () {
-            this.cmConfigchangedSinceSaveSequence =
+            this.cmConfig.changedSinceSaveSequence =
                 this.alto.getChangedSinceSaveSequence();
-            this.cmConfig.changedSequence = this.alto.getChangedSequence();
+            this.cmConfig.changedSince0Sequence
+                = this.alto.getChangedSince0Sequence();
             this.cmConfig.languageSequence = this.alto.getLanguageSequence();
         },
         changed: function (instance) {

@@ -1,17 +1,21 @@
 define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'],
-        function (_,$,libalto,mybackbone,mets,utils,events) {
+        function (_,$,libalto,mybackbone,mets,utils,events,async) {
     "use strict";
 
     var AltoModel = mybackbone.Model.extend({
         initialize: function (options) {
             this.set('pageNumber',options.pageNumber);
-            this.url = options.doc.getAltoUrl(options.pageNumber);
+            this.currentUrl = options.doc.getAltoUrl(options.pageNumber);
+            this.originalUrl = options.doc.getOriginalAltoUrl(options.pageNumber);
             options.doc.registerAlto(options.pageNumber,this);
             this.set('pageIndex',options.pageNumber-1);
             this.alto = new libalto.Alto();
         },
         isDirty: function() {
             return this.alto.isDirty();
+        },
+        isDirty0: function() {
+            return this.alto.isDirty0();
         },
         getWordAt: function(x,y) {
             return this.alto.getWordAt(x,y);
@@ -30,8 +34,8 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
         getAsAltoXML: function() {
             return this.alto.getAsAltoXML();
         },
-        getChangedSequence: function() {
-            return this.alto.getChangedSequence();
+        getChangedSince0Sequence: function() {
+            return this.alto.getChangedSince0Sequence();
         },
         getChangedSinceSaveSequence: function() {
             return this.alto.getChangedSinceSaveSequence();
@@ -66,18 +70,64 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
 
             return strings.join('');
         },
-        parse: function (response) {
-            var data = {};
-            var page = $(response).find('Page').get(0);
-            if (!page) return {};
-            data.width = parseInt(page.getAttribute("WIDTH"),10);
-            data.height = parseInt(page.getAttribute("HEIGHT"),10);
-            data.pageIndex = this.get('pageIndex');
-            events.trigger('setPageGeometry',data);
-            this.alto.setOriginalXML(response);
-            this.alto.setCurrentXML(response);
-            return data;
-        }
+        fetch: function () {
+
+            var self = this;
+            var def = new $.Deferred();
+
+            console.log(this.currentUrl);
+            console.log(this.originalUrl);
+            return $.when(
+                $.get(this.currentUrl)
+                    .done( handlerFactory (this.alto.setCurrentXML,'current') ),
+                $.get(this.originalUrl)
+                    .done ( handlerFactory (this.alto.setOriginalXML,'original') )
+                )
+                .done( function () {
+                    
+                    console.log('done');
+                    window.oo = self.alto.originalXML;
+                    window.cc = self.alto.currentXML;
+                    window.aa = self.alto;
+                });
+
+            function handlerFactory (method,name,url) {
+
+                return function (data) {
+
+                    var parsed;
+
+                    try {
+                        parsed = $.parseXML(data)
+                    } catch (er) {
+                        parsed = null;
+                    }
+
+                    console.log('loaded ' + name + ' alto');
+                    console.log('loaded ' + name + ' alto');
+                    method.apply(self.alto,[parsed]);
+
+                    // TODO: this happens twice, but so what
+                    var page = $(data).find('Page');
+                    var width = parseInt(page.attr("WIDTH"),10);
+                    var height = parseInt(page.attr("HEIGHT"),10);
+                    events.trigger(
+                        'setPageGeometry',
+                        {width:width,height:height}
+                        );
+
+                }
+
+            }
+
+            function sorter (a,b) {
+                var aN = parseInt(a.number,10);
+                var bN = parseInt(b.number,10);
+                return aN - bN;
+            };
+
+        },
+
     });
 
     function get(options) {
@@ -89,7 +139,6 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
                 var altoOptions = {
                     docId: options.docId,
                     pageNumber: options.pageNumber,
-                    versionNumber: options.versionNumber,
                     id: getAltoId(options),
                     doc: doc
                 };

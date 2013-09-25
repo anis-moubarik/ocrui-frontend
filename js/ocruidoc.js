@@ -8,15 +8,15 @@ define(['jquery','mybackbone','events','conf'],function (
         initialize: function (options) {
             this.id = options.id;
             this.urlBase = conf.urls.docBase.replace('<id>',this.id);
-            this.url = this.urlBase;
-            this.pages = [];
+            this.currentPages = [];
+            this.originalPages = [];
         },
         dataType: 'json',
         dirtyPages: function() {
             var dirtyPages = [];
-            for (var i in this.pages) {
+            for (var i in this.currentPages) {
                 var pageNumber = i + 1;
-                var page = this.pages[i];
+                var page = this.currentPages[i];
                 if (page === undefined) { continue; }
                 var alto = page.alto;
                 if (alto === undefined) { continue; }
@@ -25,7 +25,7 @@ define(['jquery','mybackbone','events','conf'],function (
             return dirtyPages;
         },
         registerAlto: function(pageNumber,alto) {
-            var myPage = this.pages[pageNumber - 1];
+            var myPage = this.currentPages[pageNumber - 1];
             if (myPage) {
                 myPage.alto = alto;
             } else {
@@ -36,31 +36,57 @@ define(['jquery','mybackbone','events','conf'],function (
             return this.dirtyPages().length > 0;
         },
         getNumberOfPages : function () {
-            return this.pages.length;
+            return this.currentPages.length;
         },
         getImageThumbnailUrl : function (pageNumber) {
-            var page = this.pages[pageNumber - 1]; //pageNumber is 1-based
+            var page = this.currentPages[pageNumber - 1]; // 1-based
             if (page === undefined) return undefined;
             return page.urls.thumb;
         },
         getImageUrl : function (pageNumber) {
-            var page = this.pages[pageNumber - 1]; //pageNumber is 1-based
+            var page = this.currentPages[pageNumber - 1]; // 1-based
             if (page === undefined) return undefined;
             return page.urls.image;
         },
-        getAltoUrl : function (pageNumber) {
-            var page = this.pages[pageNumber - 1]; //pageNumber is 1-based
+        getOriginalAltoUrl : function (pageNumber) {
+            var page = this.originalPages[pageNumber - 1]; // 1-based
             if (page === undefined) return undefined;
             return page.urls.text;
         },
-        parse: function (response) {
-            this.data = response;
-            this.pages = this.data.Revision.pages.sort( function (a,b) {
+        getAltoUrl : function (pageNumber) {
+            var page = this.currentPages[pageNumber - 1]; // 1-based
+            if (page === undefined) return undefined;
+            return page.urls.text;
+        },
+        fetch: function () {
+
+            var self = this;
+            var def = new $.Deferred();
+
+            return $.when(
+                $.get(this.urlBase)
+                    .done( handlerFactory ('current') ),
+                $.get(this.urlBase+'?r=0')
+                    .done ( handlerFactory ('original') )
+                );
+
+            function handlerFactory (prop) {
+
+                return function (data) {
+
+                    self[prop] = data;
+                    self[prop+'Pages'] = data.Revision.pages.sort( sorter );
+
+                }
+
+            }
+
+            function sorter (a,b) {
                 var aN = parseInt(a.number,10);
                 var bN = parseInt(b.number,10);
                 return aN - bN;
-            });
-            return {};
+            };
+
         },
         saveDirtyPages : function () { 
 
@@ -74,6 +100,8 @@ define(['jquery','mybackbone','events','conf'],function (
                 var i = p.get('pageNumber');
 
                 var xml = p.getAsAltoXML();
+                window.xx = xml
+                console.log(xml);
                 var xmlString = (new XMLSerializer()).serializeToString(xml);
                 var b64String = btoa(xmlString);
 

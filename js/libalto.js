@@ -102,7 +102,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         var diff = jsdiff.diff(originalStrings,_.map(newStrings,_.identity));
         var seq = getEditSequence(diff);
-        this.dirty = _.reduce(seq,function(prev,cur){
+        this.dirtySince0 = _.reduce(seq,function(prev,cur){
             return prev || cur != 'match';
         },false);
 
@@ -164,21 +164,23 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         this.processPending();
 
+        // Handle langauages
         var previousStrings = alto.getStringSequence();
         var currentLangs = alto.getLanguageSequence();
         var diff = jsdiff.diff(previousStrings,_.map(newStrings,_.identity));
         var seq = getEditSequence(diff);
-        
+
         var wi = 0;
         var li = 0;
 
         for (var i = 0; i < seq.length; i++) {
             //  i indexes edit edit sequence
-            // wi indexes just created alto word objects
+            // wi indexes just created word objects
             // li indexes previous languages
 
             if ((seq[i] == 'match') || (seq[i] == 'replace')) {
 
+                
                 this.targetWords[wi].language = currentLangs[li];
                 wi ++;
                 li ++;
@@ -197,7 +199,37 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             }
 
         }
+  
+        // handle changed since save
+        var savedStrings = alto.getSavedStringSequence();
+        var diff = jsdiff.diff(_.map(savedStrings,_.identity),_.map(newStrings,_.identity));
+        var seq = getEditSequence(diff);
 
+        var wi = 0;
+
+        this.dirtySinceSave = false;
+
+        for (var i = 0; i < seq.length; i++) {
+
+            //  i indexes edit edit sequence
+            // wi indexes just created word objects
+
+            if ((seq[i] == 'add') || (seq[i] == 'replace')) {
+
+                this.targetWords[wi].changedSinceSave = true;
+                this.dirtySinceSave = true;
+
+            }
+
+            if (seq[i] != 'delete') {
+
+                wi++;
+
+            }
+
+        }
+
+        
     }
 
     ContentUpdateProcess.prototype.queueEdit = function(string, word) {
@@ -314,7 +346,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             inLineIndex: this.inLineIndex,
             language: null,
             changed: true,
-            changedSinceSave: true,
             hpos: null,
             vpos: null,
             width: null,
@@ -329,11 +360,9 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         var dup = _.extend({},original);
         if (changed) {
             dup.changed = true;
-            dup.changedSinceSave = true;
             this.inLineIndex ++;
         } else {
             dup.changed = false;
-            dup.changedSinceSave = false;
         }
         dup.index = this.wordIndex();
         dup.inLineIndex = this.inLineIndex;
@@ -342,19 +371,11 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
     };
 
-    ContentUpdateProcess.prototype.getNewWords = function() {
-        return this.targetWords;
-    };
-
-    ContentUpdateProcess.prototype.isDirty = function () {
-        return this.dirty;
-    };
-
-
 
     function Alto () {
 
-        this.dirty = false;
+        this.dirtySince0 = false;
+        this.dirtySinceSave = false;
         this.words = [];
 
     }
@@ -367,6 +388,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     Alto.prototype.setCurrentXML = function (xml) {
         this.currentXML = xml;
         this.words = this.constructWords(xml);
+        this.savedWords = this.constructWords(xml);
         this.layoutBoxes = this.constructLayoutBoxes(this.words);
     };
 
@@ -471,7 +493,11 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
 
     Alto.prototype.isDirty = function() {
-        return this.dirty;
+        return this.dirtySinceSave;
+    };
+
+    Alto.prototype.isDirty0 = function() {
+        return this.dirtySince0;
     };
 
     Alto.prototype.getLayoutBoxes = function () {
@@ -485,10 +511,10 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         // original alto structure
 
         var process = new ContentUpdateProcess( this, content );
+        this.words = process.targetWords;
+        this.dirtySinceSave = process.dirtySinceSave;
+        this.dirtySince0 = process.dirtySince0;
 
-        this.words = process.getNewWords();
-
-        this.dirty = process.isDirty();
     };
 
     Alto.prototype.getWordAt = function (x,y) {
@@ -549,19 +575,19 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
     Alto.prototype.getAsAltoXML = function () {
 
-        var newXML = $(this.originalXML.firstChild).clone().get(0);
+        var newXML = $(this.originalXML).find('alto').get(0);
+        //var newXML = $(this.originalXML.firstChild).clone().get(0);
 
         // remove old strings and get lines array
-        var $textlines = $(newXML).find('TextLine').map(removeChildren);
-        
-        function removeChildren (tlIndex,tl) {
+        var $textlines = $(newXML).find('TextLine').map( function (i,tl) {
+
             $(tl).empty();
             return tl;
-        }
 
-        for (var i in this.words) {
+        });
 
-            var word = this.words[i];
+        _.map(this.words,function (word) {
+
             var $textLine = $textlines.eq(word.textLine);
             var $word = $($.parseXML('<String/>').documentElement).attr({
                 'CONTENT' : word.content,
@@ -592,7 +618,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
             $textLine.append($word);
             
-        }
+        });
 
         return newXML;
 
@@ -609,6 +635,9 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
     Alto.prototype.getWordSequence = function() {
         return _.map(this.words,_.identity);
     };
+    Alto.prototype.getSavedStringSequence = function() {
+        return _.map(this.savedWords,function(w) {return w.content;});
+    };
     Alto.prototype.getStringSequence = function() {
         return _.map(this.words,function(w) {return w.content;});
     };
@@ -620,7 +649,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         return _.map(this.words,function(e,i) {return e.language;});
     };
 
-    Alto.prototype.getChangedSequence = function() {
+    Alto.prototype.getChangedSince0Sequence = function() {
         return _.map(this.words,function(e,i) {return e.changed;});
     };
 

@@ -27,13 +27,13 @@ define(['codemirror'],function (CodeMirror) {
                 // set features of the word
                 var features = [];
                 if (config.showUnsavedChanges &&
-                    config.changedSequence[state.wordIndex]) {
+                    config.changedSinceSaveSequence[state.wordIndex]) {
 
                     features.push('changed-unsaved');
 
                 }
                 if (config.showOriginalChanges &&
-                    config.changedSequence[state.wordIndex]) {
+                    config.changedSince0Sequence[state.wordIndex]) {
 
                     features.push('changed');
 
@@ -51,6 +51,14 @@ define(['codemirror'],function (CodeMirror) {
 
                 }
 
+
+                console.log(
+                    word,
+                    config.changedSinceSaveSequence[state.wordIndex],
+                    config.changedSince0Sequence[state.wordIndex],
+                    config.languageSequence[state.wordIndex],
+                    config.highlight[state.wordIndex],
+                    '"' + features.join(' ') + '"');
                 // next word
                 state.wordIndex++;
 

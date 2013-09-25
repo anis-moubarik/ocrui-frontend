@@ -13,12 +13,12 @@
     margin-right: 2em;
 }
 
-.cm-changed {
-    color: #aaaa00;
+.cm-changed-unsaved.cm-changed,.cm-changed-unsaved {
+    color: #ffaa00;
 }
 
-.cm-changed-unsaved {
-    color: #ffaa00;
+.cm-changed {
+    color: #aaaa00;
 }
 
 .cm-language {

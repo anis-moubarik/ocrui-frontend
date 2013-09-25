@@ -1,3 +1,6 @@
 [submodule "CodeMirror"]
 	path = CodeMirror
 	url = https://github.com/marijnh/CodeMirror.git
+[submodule "async"]
+	path = async
+	url = https://github.com/caolan/async.git
