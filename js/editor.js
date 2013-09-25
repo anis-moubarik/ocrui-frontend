@@ -50,30 +50,31 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         toggleLineBreak:function(newState) {
             this.lineBreaks = newState;
             if (newState) {
-                this.cMirror.setOption('lineWrapping',false);
+                this.setCMOption('lineWrapping',false);
             } else {
-                this.cMirror.setOption('lineWrapping',true);
+                this.setCMOption('lineWrapping',true);
             }
             this.setValueFromAlto();
+        },
+        setCMOption:function(opt,val) {
+            this.cMirror.setOption(opt,val);
+            this.cMirror.doc.frontier = this.cMirror.doc.first;
+            this.cMirror.setOption('mode',this.cmConfig.mode); // refresh
             this.cMirror.replaceSelection(this.cMirror.getSelection());
         },
         highlightEditorWord:function(newState) {
-            this.cMirror.setOption('showHighlight',newState);
-            this.cMirror.replaceSelection(this.cMirror.getSelection());
+            this.setCMOption('showHighlight',newState);
         },
         showSavedChanges:function(newState) {
             console.log('show unsaved changes',newState);
-            this.cMirror.setOption('showUnsavedChanges',newState);
-            this.cMirror.replaceSelection(this.cMirror.getSelection());
+            this.setCMOption('showUnsavedChanges',newState);
         },
         showOriginalChanges:function(newState) {
             console.log('show original changes',newState);
-            this.cMirror.setOption('showOriginalChanges',newState);
-            this.cMirror.replaceSelection(this.cMirror.getSelection());
+            this.setCMOption('showOriginalChanges',newState);
         },
         showLanguage:function(newState) {
-            this.cMirror.setOption('showLanguage',newState);
-            this.cMirror.replaceSelection(this.cMirror.getSelection());
+            this.setCMOption('showLanguage',newState);
         },
         virtualKeyboard: function(data) {
             this.cMirror.replaceSelection(data);
@@ -219,7 +220,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
 
             that.cMirror.setOption('highlight',this.words);
             this.suppressChanged = true;
-            this.cMirror.doc.frontier = 0;
+            this.cMirror.doc.frontier = this.cMirror.doc.first;
             this.cMirror.replaceSelection(this.cMirror.getSelection());
             this.suppressChanged = false;
 
