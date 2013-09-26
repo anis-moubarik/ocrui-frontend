@@ -41,12 +41,17 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
 
     var View = mybackbone.View.extend({
         initialize: function() {
-            conf.buttons.map(this.registerButton);
-            conf.shortcuts.map(this.registerKeyboardShortcut);
+            // we must wait for editor before firing initial cbs
+            // BUG: race condition if user clicks between toolbar render
+            // and editor render
+            this._editorRendered = $.Deferred();
+            conf.buttons.map(_.bind(this.registerButton,this));
+            conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
         },
         el : '#toolbar',
         myEvents: {
-            'changeMode': 'changeMode'
+            'changeMode': 'changeMode',
+            'editorRendered': 'editorRendered'
         },
         events: {
             'click button': 'handleClick'
@@ -54,6 +59,9 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
         myModes: ['page','document'],
         setViewActive: function (mode) {
             this.render();
+        },
+        editorRendered: function () {
+            this._editorRendered.resolve();
         },
         registerKeyboardShortcut: function (shortcut) {
             if (shortcut.which in keyboardShortcuts) {
@@ -77,7 +85,9 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
             }
             buttons [id] = data;
             if (data.toggle && (!data.suppressInitialCB)) {
-                events.trigger(data.event,data.active);
+                this._editorRendered.done( function () {
+                    events.trigger(data.event,data.active);
+                });
             }
         },
         handleClick: function (ev) {

@@ -12,13 +12,15 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
             this.set('pageIndex',options.pageNumber-1);
             this.alto = new libalto.Alto();
         },
-        refreshAfterSave: function () {
+        refreshAfterSave: function (doc) {
 
             console.log('possibly refreshing alto ' + this.id);
             var self = this;
 
             if (this.isDirty()) {
 
+                var p = this.get('pageNumber')
+                this.currentUrl = doc.getAltoUrl(p);
                 this.fetch()
                     .done ( function () {
                         events.trigger('altoRefreshed',self);
@@ -130,7 +132,7 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
                     }
 
                     console.log('loaded ' + name + ' alto');
-                    console.log('loaded ' + name + ' alto');
+
                     method.apply(self.alto,[parsed]);
 
                     // TODO: this happens twice, but so what
@@ -191,11 +193,11 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
 
     var altos = {};
 
-    events.on('saved', function () {
+    events.on('saved', function (doc) {
 
         for (var id in altos) {
 
-            altos[id].refreshAfterSave();
+            altos[id].refreshAfterSave(doc);
 
         }
 

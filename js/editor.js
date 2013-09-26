@@ -5,7 +5,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
     var View = mybackbone.View.extend({
 
         initialize: function () {
-            var that = this;
+            var self = this;
             this.cmConfig = {
                 value: "",
                 lineWrapping: true,
@@ -25,8 +25,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 events.delayOrIgnore('setupHighlightChange',undefined,100);
             });
             this.cMirror.on('change',function (instance) {
-                if (that.suppressChanged) return ;
-                that.changed(instance);
+                if (self.suppressChanged) return ;
+                self.changed(instance);
             });
 
         },
@@ -51,6 +51,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         altoRefreshed:function(alto) {
             // happens after save
             console.log('editor got ' + alto.id);
+            this.setAlto(alto);
         },
         toggleLineBreak:function(newState) {
             this.lineBreaks = newState;
@@ -216,14 +217,14 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         setupHighlightChange: function () {
 
             var wordIndexes = this.getCurrentWordIndexes();
-            var that = this;
+            var self = this;
             var words = _.map(wordIndexes,function (v,k) {
 
-                return that.alto.getNthWord(v);
+                return self.alto.getNthWord(v);
 
             });
 
-            that.cMirror.setOption('highlight',this.words);
+            self.cMirror.setOption('highlight',this.words);
             this.suppressChanged = true;
             this.cMirror.doc.frontier = this.cMirror.doc.first;
             this.cMirror.replaceSelection(this.cMirror.getSelection());
@@ -233,12 +234,12 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
 
         },
         changePage: function(attributes) {
-            var that = this;
+            var self = this;
             this.attributes = attributes;
             alto.get(attributes).then(
                 function(myAlto) {
                     /* if (this.attributes != attributes) return;*/
-                    that.setAlto(myAlto);
+                    self.setAlto(myAlto);
                 },
                 function(msg) {
                     events.trigger('editorRenderError',{

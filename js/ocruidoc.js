@@ -15,7 +15,7 @@ define(['jquery','mybackbone','events','conf','base64'],function (
         dirtyPages: function() {
             var dirtyPages = [];
             for (var i in this.currentPages) {
-                var pageNumber = i + 1;
+                var pageNumber = parseInt(i,10) + 1;
                 var page = this.currentPages[i];
                 if (page === undefined) { continue; }
                 var alto = page.alto;
@@ -25,7 +25,9 @@ define(['jquery','mybackbone','events','conf','base64'],function (
             return dirtyPages;
         },
         registerAlto: function(pageNumber,alto) {
-            var myPage = this.currentPages[pageNumber - 1];
+            var i = pageNumber - 1;
+            console.log('register',i,typeof(i));
+            var myPage = this.currentPages[i];
             if (myPage) {
                 myPage.alto = alto;
             } else {
@@ -98,6 +100,7 @@ define(['jquery','mybackbone','events','conf','base64'],function (
         saveDirtyPages : function () { 
 
             var dirtyPages = this.dirtyPages();
+            var savedForReregister = this.currentPages;
             var self = this;
 
             if (dirtyPages.length == 0) {
@@ -115,8 +118,6 @@ define(['jquery','mybackbone','events','conf','base64'],function (
                 var i = p.get('pageNumber');
 
                 var xml = p.getAsAltoXML();
-                window.xx = xml
-                console.log(xml);
                 var xmlString = (new XMLSerializer()).serializeToString(xml);
                 var b64String = base64.encode(xmlString);
 
@@ -149,7 +150,14 @@ define(['jquery','mybackbone','events','conf','base64'],function (
                     self.fetch({currentOnly:true})
                         .done( function () {
 
-                            events.trigger('saved');
+                            for (var i in savedForReregister) {
+                                var alto = savedForReregister[i].alto;
+                                var pn = parseInt(i)+1
+                                console.log('reregister',i,typeof(i));
+                                if (alto) self.registerAlto(pn,alto);
+                            }
+
+                            events.trigger('saved',self);
                             console.log('doc refreshed');
 
                         });
@@ -204,8 +212,8 @@ define(['jquery','mybackbone','events','conf','base64'],function (
     }
 
     events.on('pageDirtyStateChanged', function (data) {
-        getCurrent().done(function (mets) {
-            events.trigger('documentDirtyStateChanged',mets.isDirty());
+        getCurrent().done(function (ocruidoc) {
+            events.trigger('documentDirtyStateChanged',ocruidoc.isDirty());
         });
     });
 
