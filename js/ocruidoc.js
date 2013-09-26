@@ -1,7 +1,7 @@
 /* This is equivalent to mets files, but uses the custom ocrui backend api */
 
-define(['jquery','mybackbone','events','conf'],function (
-        $,mybackbone,events,conf) {
+define(['jquery','mybackbone','events','conf','base64'],function (
+        $,mybackbone,events,conf,base64) {
     "use strict";
 
     var DocumentModel = mybackbone.Model.extend({
@@ -58,17 +58,24 @@ define(['jquery','mybackbone','events','conf'],function (
             if (page === undefined) return undefined;
             return page.urls.text;
         },
-        fetch: function () {
+        fetch: function (options) {
 
             var self = this;
-            var def = new $.Deferred();
 
-            return $.when(
-                $.get(this.urlBase)
-                    .done( handlerFactory ('current') ),
-                $.get(this.urlBase+'?r=0')
-                    .done ( handlerFactory ('original') )
-                );
+            if ((options||{}).currentOnly) {
+                
+                return $.get(this.urlBase)
+                    .done( handlerFactory('current'));
+            } else {
+
+                return $.when(
+                    $.get(this.urlBase)
+                        .done( handlerFactory ('current') ),
+                    $.get(this.urlBase+'?r=0')
+                        .done ( handlerFactory ('original') )
+                    );
+
+            }
 
             function handlerFactory (prop) {
 
@@ -91,6 +98,14 @@ define(['jquery','mybackbone','events','conf'],function (
         saveDirtyPages : function () { 
 
             var dirtyPages = this.dirtyPages();
+            var self = this;
+
+            if (dirtyPages.length == 0) {
+                
+                console.log('nothing to save.');
+                return;
+
+            }
 
             var data = _.map(dirtyPages,function (p) {
 
@@ -103,7 +118,7 @@ define(['jquery','mybackbone','events','conf'],function (
                 window.xx = xml
                 console.log(xml);
                 var xmlString = (new XMLSerializer()).serializeToString(xml);
-                var b64String = btoa(xmlString);
+                var b64String = base64.encode(xmlString);
 
                 return '--frontier\r\n' +
                        'Content-Type: application/octet-stream\r\n' +
@@ -127,13 +142,27 @@ define(['jquery','mybackbone','events','conf'],function (
             };
 
             console.log('Now PUTing');
+
             $.ajax(options)
-                .done(function(x) {
-                    console.log('success',x);
-                })
-                .fail(function(x) {
-                    console.log('error',x);
-                });
+                .done( function (x) {
+
+                    self.fetch({currentOnly:true})
+                        .done( function () {
+
+                            events.trigger('saved');
+                            console.log('doc refreshed');
+
+                        });
+
+                    console.log('success');
+
+                } )
+                .fail( function (x) {
+
+                    console.log('error');
+                    events.trigger('saveFailed');
+
+                } );
 
         }
 

@@ -8,8 +8,24 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
             this.currentUrl = options.doc.getAltoUrl(options.pageNumber);
             this.originalUrl = options.doc.getOriginalAltoUrl(options.pageNumber);
             options.doc.registerAlto(options.pageNumber,this);
+            this.id = options.id;
             this.set('pageIndex',options.pageNumber-1);
             this.alto = new libalto.Alto();
+        },
+        refreshAfterSave: function () {
+
+            console.log('possibly refreshing alto ' + this.id);
+            var self = this;
+
+            if (this.isDirty()) {
+
+                this.fetch()
+                    .done ( function () {
+                        events.trigger('altoRefreshed',self);
+                    } );
+
+            }
+
         },
         isDirty: function() {
             return this.alto.isDirty();
@@ -70,26 +86,36 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
 
             return strings.join('');
         },
-        fetch: function () {
+        fetch: function (options) {
 
             var self = this;
             var def = new $.Deferred();
 
             console.log(this.currentUrl);
             console.log(this.originalUrl);
-            return $.when(
-                $.get(this.currentUrl)
-                    .done( handlerFactory (this.alto.setCurrentXML,'current') ),
-                $.get(this.originalUrl)
-                    .done ( handlerFactory (this.alto.setOriginalXML,'original') )
-                )
-                .done( function () {
-                    
-                    console.log('done');
-                    window.oo = self.alto.originalXML;
-                    window.cc = self.alto.currentXML;
-                    window.aa = self.alto;
-                });
+
+            if ((options||{}).currentOnly) {
+                
+                return $.get(this.currentUrl)
+                    .done( handlerFactory(this.alto.setCurrentXML,'current') );
+
+            } else {
+
+                return $.when(
+                    $.get(this.currentUrl)
+                        .done( handlerFactory (
+                                this.alto.setCurrentXML,'current'
+                            ) ),
+                    $.get(this.originalUrl)
+                        .done ( handlerFactory (
+                                this.alto.setOriginalXML,'original'
+                            ) )
+                    )
+                    .done( function () {
+                        console.log('alto loading done');
+                    } );
+
+            }
 
             function handlerFactory (method,name,url) {
 
@@ -164,6 +190,16 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
     }
 
     var altos = {};
+
+    events.on('saved', function () {
+
+        for (var id in altos) {
+
+            altos[id].refreshAfterSave();
+
+        }
+
+    });
 
     function getAltoId(options) {
         return options.docId+'/'+options.pageNumber;

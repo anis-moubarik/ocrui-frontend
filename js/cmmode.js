@@ -52,6 +52,7 @@ define(['codemirror'],function (CodeMirror) {
                 }
 
 
+                /*
                 console.log(
                     word,
                     config.changedSinceSaveSequence[state.wordIndex],
@@ -59,6 +60,7 @@ define(['codemirror'],function (CodeMirror) {
                     config.languageSequence[state.wordIndex],
                     config.highlight[state.wordIndex],
                     '"' + features.join(' ') + '"');
+                */
                 // next word
                 state.wordIndex++;
 

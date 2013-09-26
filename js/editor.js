@@ -45,8 +45,13 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             'showSavedChanges':'showSavedChanges',
             'highlightEditorWord':'highlightEditorWord',
             'toggleLineBreak':'toggleLineBreak',
+            'altoRefreshed':'altoRefreshed',
         },
         myModes: ['page'],
+        altoRefreshed:function(alto) {
+            // happens after save
+            console.log('editor got ' + alto.id);
+        },
         toggleLineBreak:function(newState) {
             this.lineBreaks = newState;
             if (newState) {
