@@ -49,8 +49,14 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         },
         myModes: ['page'],
         altoRefreshed:function(alto) {
+
             // happens after save
-            this.setAlto(alto);
+            if (alto.get('pageNumber') == this.attributes.pageNumber) {
+
+                this.setAlto(alto);
+
+            }
+
         },
         toggleLineBreak:function(newState) {
             this.lineBreaks = newState;
