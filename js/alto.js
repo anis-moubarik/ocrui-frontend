@@ -14,19 +14,18 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
         },
         refreshAfterSave: function (doc) {
 
-            console.log('possibly refreshing alto ' + this.id);
             var self = this;
 
-            if (this.isDirty()) {
+            if (!this.isDirty()) return;
 
-                var p = this.get('pageNumber')
-                this.currentUrl = doc.getAltoUrl(p);
-                this.fetch()
-                    .done ( function () {
-                        events.trigger('altoRefreshed',self);
-                    } );
-
-            }
+            var p = this.get('pageNumber')
+            console.log('refresh after save',p);
+            this.currentUrl = doc.getAltoUrl(p);
+            this.fetch()
+                .done ( function () {
+                    events.trigger('pageDirtyStateChanged');
+                    events.trigger('altoRefreshed',self);
+                } );
 
         },
         isDirty: function() {
@@ -93,9 +92,6 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
             var self = this;
             var def = new $.Deferred();
 
-            console.log(this.currentUrl);
-            console.log(this.originalUrl);
-
             if ((options||{}).currentOnly) {
                 
                 return $.get(this.currentUrl)
@@ -114,7 +110,6 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
                             ) )
                     )
                     .done( function () {
-                        console.log('alto loading done');
                     } );
 
             }
@@ -131,7 +126,7 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
                         parsed = null;
                     }
 
-                    console.log('loaded ' + name + ' alto');
+                    //console.log('loaded ' + name + ' alto');
 
                     method.apply(self.alto,[parsed]);
 
@@ -193,7 +188,7 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
 
     var altos = {};
 
-    events.on('saved', function (doc) {
+    events.on('documentSaved', function (doc) {
 
         for (var id in altos) {
 

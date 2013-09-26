@@ -26,7 +26,7 @@ define(['jquery','mybackbone','events','conf','base64'],function (
         },
         registerAlto: function(pageNumber,alto) {
             var i = pageNumber - 1;
-            console.log('register',i,typeof(i));
+            //console.log('register',i,typeof(i));
             var myPage = this.currentPages[i];
             if (myPage) {
                 myPage.alto = alto;
@@ -110,7 +110,55 @@ define(['jquery','mybackbone','events','conf','base64'],function (
 
             }
 
-            var data = _.map(dirtyPages,function (p) {
+            var data = _.map(dirtyPages,makeMimePart).join("");
+            var options = {
+
+                data : data + '--frontier--\r\n',
+                type:'POST',
+                headers: {
+                    'X-Authenticated-User':'1'
+                },
+                url: this.urlBase,
+                contentType: 'multipart/form-data; boundary=frontier',
+                processData: false
+            };
+
+            //console.log('Now PUTing');
+
+            $.ajax(options)
+                .done( saveOk )
+                .fail( saveFail );
+
+            function saveFail (x) {
+
+                console.log('error');
+                events.trigger('saveFailed');
+
+            }
+
+            function saveOk (x) {
+
+                self.fetch({currentOnly:true})
+                    .done( reloadOk );
+                console.log('success');
+
+            }
+
+            function reloadOk() {
+
+                for (var i in savedForReregister) {
+                    var alto = savedForReregister[i].alto;
+                    var pn = parseInt(i)+1
+                    if (alto) self.registerAlto(pn,alto);
+                }
+
+                events.trigger('documentSaved',self);
+                //console.log('doc refreshed');
+
+            }
+
+
+            function makeMimePart (p) {
 
                 // BUG: pageNumber should be what comes out from ocruidoc i
                 // guess. Now it works if pages are numbered continuously
@@ -128,49 +176,7 @@ define(['jquery','mybackbone','events','conf','base64'],function (
                        '"; filename="' + i + '"\r\n' + '\r\n' +
                        b64String + '\r\n';
 
-            });
-
-            var options = {
-
-                data : data + '--frontier--\n',
-                type:'POST',
-                headers: {
-                    'X-Authenticated-User':'1'
-                },
-                url: this.urlBase,
-                contentType: 'multipart/form-data; boundary=frontier',
-                processData: false
             };
-
-            console.log('Now PUTing');
-
-            $.ajax(options)
-                .done( function (x) {
-
-                    self.fetch({currentOnly:true})
-                        .done( function () {
-
-                            for (var i in savedForReregister) {
-                                var alto = savedForReregister[i].alto;
-                                var pn = parseInt(i)+1
-                                console.log('reregister',i,typeof(i));
-                                if (alto) self.registerAlto(pn,alto);
-                            }
-
-                            events.trigger('saved',self);
-                            console.log('doc refreshed');
-
-                        });
-
-                    console.log('success');
-
-                } )
-                .fail( function (x) {
-
-                    console.log('error');
-                    events.trigger('saveFailed');
-
-                } );
 
         }
 
@@ -204,7 +210,7 @@ define(['jquery','mybackbone','events','conf','base64'],function (
             function () {promise.resolve(doc);},
             function (err) {
                 promise.reject("Cannot load document.");
-                console.log(err);
+                //console.log(err);
             }
         );
 
@@ -213,7 +219,9 @@ define(['jquery','mybackbone','events','conf','base64'],function (
 
     events.on('pageDirtyStateChanged', function (data) {
         getCurrent().done(function (ocruidoc) {
-            events.trigger('documentDirtyStateChanged',ocruidoc.isDirty());
+            var dirty = ocruidoc.isDirty();
+            console.log('documentDirtyStateChanged',_.map(documents[currentDocId].dirtyPages(),function (x) {return x.get('pageNumber');}));
+            events.trigger('documentDirtyStateChanged',dirty);
         });
     });
 

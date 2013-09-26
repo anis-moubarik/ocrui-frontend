@@ -91,9 +91,8 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         }
     }
 
-    function ContentUpdateProcess( alto, newString ) {
+    function ContentUpdateProcess( alto, newStrings ) {
 
-        var newStrings = newString.split(/\s+/);
         if (newStrings[0] === "") newStrings.splice(0,1);
         var lastI = newStrings.length-1;
         if (newStrings[lastI] === "") newStrings.splice(lastI,1);
@@ -390,6 +389,13 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         this.words = this.constructWords(xml);
         this.savedWords = this.constructWords(xml);
         this.layoutBoxes = this.constructLayoutBoxes(this.words);
+
+        // This is necessary to refresh sane state after saving a
+        // page not currently visible.
+        if (this.originalXML) {
+            this.updateStringsContent(this.getStringSequence());
+        }
+
     };
 
     Alto.prototype.constructWords = function(xml) {
@@ -510,7 +516,15 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
         // Create new current structure from string content and
         // original alto structure
 
-        var process = new ContentUpdateProcess( this, content );
+        var strings = content.split(/\s+/);
+        this.updateStringsContent (strings);
+
+    }
+
+    Alto.prototype.updateStringsContent = function (strings) {
+        // Create new current structure from array of strings and
+        // original alto structure
+        var process = new ContentUpdateProcess( this, strings );
         this.words = process.targetWords;
         this.dirtySinceSave = process.dirtySinceSave;
         this.dirtySince0 = process.dirtySince0;

@@ -50,7 +50,6 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         myModes: ['page'],
         altoRefreshed:function(alto) {
             // happens after save
-            console.log('editor got ' + alto.id);
             this.setAlto(alto);
         },
         toggleLineBreak:function(newState) {
@@ -72,11 +71,9 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.setCMOption('showHighlight',newState);
         },
         showSavedChanges:function(newState) {
-            console.log('show unsaved changes',newState);
             this.setCMOption('showUnsavedChanges',newState);
         },
         showOriginalChanges:function(newState) {
-            console.log('show original changes',newState);
             this.setCMOption('showOriginalChanges',newState);
         },
         showLanguage:function(newState) {
