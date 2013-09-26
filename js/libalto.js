@@ -19,7 +19,7 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
             // oi indexes diff.o
             if (_.isString(diff.n[ni])) {
 
-                // This is either add replace
+                // This is either add or replace
                 if (_.isString(diff.o[oi])) {
                     seq.push('replace');
                     oi ++;
@@ -40,6 +40,13 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
             }
         }
+
+        // There might still be deletes at the end so handle them
+        while (_.isString(diff.o[oi])) {
+            seq.push('delete');
+            oi ++;
+        }
+
         return seq;
     }
 
@@ -212,15 +219,21 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
             //  i indexes edit edit sequence
             // wi indexes just created word objects
+            var e = seq[i];
 
-            if ((seq[i] == 'add') || (seq[i] == 'replace')) {
+            if ((e == 'add') || (e == 'replace')) {
 
                 this.targetWords[wi].changedSinceSave = true;
+
+            }
+
+            if (e != 'match') {
+
                 this.dirtySinceSave = true;
 
             }
 
-            if (seq[i] != 'delete') {
+            if (e != 'delete') {
 
                 wi++;
 
@@ -228,7 +241,6 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         }
 
-        
     }
 
     ContentUpdateProcess.prototype.queueEdit = function(string, word) {
