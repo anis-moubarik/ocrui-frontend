@@ -612,9 +612,18 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
         });
 
-        _.map(this.words,function (word) {
+        // These are needed if we get words that are not part of any lines
+        // ( = editing a empty page)
+        var $overflow;
 
-            var $textLine = $textlines.eq(word.textLine);
+
+        _.map(this.words,word2XML);
+        
+        return newXML;
+
+        function word2XML(word) {
+
+            var $textLine = getTextLine (word.textLine);
             var $word = $($.parseXML('<String/>').documentElement).attr({
                 'CONTENT' : word.content,
                 'LANGUAGE' : word.language,
@@ -644,9 +653,31 @@ define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
 
             $textLine.append($word);
             
-        });
+        }
 
-        return newXML;
+        function getTextLine (i) {
+
+            if (i < $textlines.length) {
+
+                return $textlines.eq(i);
+
+            } else {
+
+                if (!$overflow) {
+
+                    var $ps = $(newXML).find('PrintSpace');
+                    var $block = $($.parseXML('<TextBlock/>').documentElement);
+                    $overflow = $($.parseXML('<TextLine/>').documentElement);
+                    $ps.append($block);
+                    $block.append($overflow);
+                        
+                }
+
+                return $overflow;
+
+            }
+
+        }
 
     };
 
