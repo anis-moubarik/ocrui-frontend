@@ -13,12 +13,12 @@
     margin-right: 2em;
 }
 
-.cm-changed-unsaved.cm-changed,.cm-changed-unsaved {
+.cm-changed-unsaved {
     color: #ffaa00;
 }
 
 .cm-changed {
-    color: #aaaa00;
+    font-style: italic;
 }
 
 .cm-language {

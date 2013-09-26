@@ -26,7 +26,6 @@ define(['jquery','mybackbone','events','conf','base64'],function (
         },
         registerAlto: function(pageNumber,alto) {
             var i = pageNumber - 1;
-            //console.log('register',i,typeof(i));
             var myPage = this.currentPages[i];
             if (myPage) {
                 myPage.alto = alto;
@@ -140,7 +139,6 @@ define(['jquery','mybackbone','events','conf','base64'],function (
 
                 self.fetch({currentOnly:true})
                     .done( reloadOk );
-                console.log('success');
 
             }
 
@@ -153,7 +151,6 @@ define(['jquery','mybackbone','events','conf','base64'],function (
                 }
 
                 events.trigger('documentSaved',self);
-                //console.log('doc refreshed');
 
             }
 
@@ -220,7 +217,6 @@ define(['jquery','mybackbone','events','conf','base64'],function (
     events.on('pageDirtyStateChanged', function (data) {
         getCurrent().done(function (ocruidoc) {
             var dirty = ocruidoc.isDirty();
-            console.log('documentDirtyStateChanged',_.map(documents[currentDocId].dirtyPages(),function (x) {return x.get('pageNumber');}));
             events.trigger('documentDirtyStateChanged',dirty);
         });
     });

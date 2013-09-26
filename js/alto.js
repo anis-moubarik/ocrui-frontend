@@ -19,7 +19,6 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
             if (!this.isDirty()) return;
 
             var p = this.get('pageNumber')
-            console.log('refresh after save',p);
             this.currentUrl = doc.getAltoUrl(p);
             this.fetch()
                 .done ( function () {
