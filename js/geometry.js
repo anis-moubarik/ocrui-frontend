@@ -6,16 +6,24 @@ define(['jquery','events'], function($,events) {
     var currentGeometry = {};
 
     function changeLayout(vert) {
-        if (vert) {
-            vertical = true;
-            $('#facsimile-container').attr('class','horizontal span12');
-            $('#editor').attr('class','horizontal span12');
+        var $els = $('#facsimile-container,#editor');
 
+        if (vert) {
+
+            vertical = true;
+            $els.removeClass('vertical');
+            $els.removeClass('span6');
+            $els.addClass('horizontal');
+            $els.addClass('span12');
 
         } else {
+
             vertical = false;
-            $('#facsimile-container').attr('class','vertical span6');
-            $('#editor').attr('class','vertical span6');
+            $els.addClass('vertical');
+            $els.addClass('span6');
+            $els.removeClass('horizontal');
+            $els.removeClass('span12');
+
         }
         resizeHandler ();
     }
