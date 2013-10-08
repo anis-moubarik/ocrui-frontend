@@ -1,5 +1,8 @@
 casper.echo( "OC-68: Klikattaessa faksimiilia editorin kursori siityy oikeaan kohtaan" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 
 var cursor;
 

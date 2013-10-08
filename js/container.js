@@ -1,5 +1,5 @@
-define(['underscore','jquery','events','mybackbone','mousetailstack','utils'],
-        function (_,$,events,mybackbone,mousetailstack,utils) {
+define(['underscore','jquery','events','mybackbone','mousetailstack','libwords'],
+        function (_,$,events,mybackbone,mousetailstack,libwords) {
     "use strict";
 
     var CoordinateManager = {
@@ -42,12 +42,12 @@ define(['underscore','jquery','events','mybackbone','mousetailstack','utils'],
             // coordinates are >= -margin and
             // <= this.pageWidth*scale - this.horizontalPixels + margin
 
-            top = utils.bounded(
+            top = bounded(
                 top,
                 this.getWorldTop(),
                 this.getWorldBottom() - this.getViewportHeight()
             );
-            left = utils.bounded(
+            left = bounded(
                 left,
                 this.getWorldLeft(),
                 this.getWorldRight() - this.getViewportWidth()
@@ -327,7 +327,7 @@ define(['underscore','jquery','events','mybackbone','mousetailstack','utils'],
                 return;
             }
 
-            var hl = utils.getCombinedBoundingBox(highlight);
+            var hl = libwords.getCombinedBoundingBox(highlight);
 
             // combined box is still in alto coordinates so scale and then
             // think about scrolling
@@ -574,6 +574,16 @@ define(['underscore','jquery','events','mybackbone','mousetailstack','utils'],
         }
 
     });
+
+    function bounded(value,min,max) {
+        if (min !== undefined) {
+            value = _.max([value,min]);
+        }
+        if (max !== undefined) {
+            value = _.min([value,max]);
+        }
+        return value;
+    }
 
 
     return {

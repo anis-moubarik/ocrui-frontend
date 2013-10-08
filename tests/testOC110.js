@@ -1,5 +1,8 @@
 casper.echo( "OC-110: tavutettu sana jakautuu oikein kahdeksi highlight boksiksi" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 casper.start(settings.defaultPageUrl);
 
 casper.then(function() {

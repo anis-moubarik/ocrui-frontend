@@ -1,5 +1,8 @@
 casper.echo( "OC-63: HTML-sivun komonentit ovat paikallaan" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 casper.start(settings.defaultPageUrl);
 
 casper.then(function() {

@@ -1,5 +1,8 @@
 casper.echo( "OC-74: Aluksi renderöityy joku kuva ja mouse down -> move -> up sekvenssin jälkeen renderöityy sama kuva eri paikkaan" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 var fs = require('fs');
 var expected1 = btoa(fs.read('images/canvas.png','b'));
 var expected2 = btoa(fs.read('images/canvas-panned.png','b'));

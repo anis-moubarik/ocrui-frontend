@@ -1,5 +1,5 @@
-define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'],
-        function (_,$,libalto,mybackbone,mets,utils,events,async) {
+define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordconv'],
+        function (_,$,libwords,mybackbone,mets,events,wordconv) {
     "use strict";
 
     var AltoModel = mybackbone.Model.extend({
@@ -10,7 +10,12 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
             options.doc.registerAlto(options.pageNumber,this);
             this.id = options.id;
             this.set('pageIndex',options.pageNumber-1);
-            this.alto = new libalto.Alto();
+            this.originalWords = [];
+            this.savedWords = [];
+            this.editorWords = [];
+            this.previousWords = [];
+            this.changedSinceSave = false;
+            this.changedSince0 = false;
         },
         refreshAfterSave: function (doc) {
 
@@ -22,50 +27,65 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
             this.currentUrl = doc.getAltoUrl(p);
             this.fetch()
                 .done ( function () {
+                    console.log('fetch done');
                     events.trigger('pageDirtyStateChanged');
                     events.trigger('altoRefreshed',self);
                 } );
 
         },
         isDirty: function() {
-            return this.alto.isDirty();
+            return this.changedSince0;
         },
         isDirty0: function() {
-            return this.alto.isDirty0();
+            return this.changedSinceSave;
         },
         getWordAt: function(x,y) {
-            return this.alto.getWordAt(x,y);
+            return libwords.getWordAt(this.editorWords,x,y);
         },
-        updateStringContent: function (content) {
-            var rv = this.alto.updateStringContent(content);
+        updateStringsContent: function (strings) {
+
+            var out = libwords.transform(
+                    this.originalWords,
+                    this.savedWords,
+                    this.previousWords,
+                    strings
+            );
+            this.previousWords = this.editorWords;
+            this.editorWords = out.words;
+            this.changedSince0 = out.changedSince0;
+            this.changedSinceSave = out.changedSinceSave;
             events.trigger('pageDirtyStateChanged');
-            return rv;
+
         },
         setNthWordLanguage: function(index,language) {
-            return this.alto.setNthWordLanguage(index,language);
+            this.editorWords[index].language = language;
+            return this.words[index];
         },
+
         getNthWord: function(index) {
-            return this.alto.getNthWord(index);
+            return this.editorWords[index];
         },
         getAsAltoXML: function() {
-            return this.alto.getAsAltoXML();
+
+            return wordconv.words2alto(this.editorWords,this.originalXML);
+
         },
         getChangedSince0Sequence: function() {
-            return this.alto.getChangedSince0Sequence();
+            return libwords.getChangedSince0Sequence(this.editorWords);
         },
         getChangedSinceSaveSequence: function() {
-            return this.alto.getChangedSinceSaveSequence();
+            return libwords.getChangedSinceSaveSequence(this.editorWords);
         },
         getLanguageSequence: function() {
-            return this.alto.getLanguageSequence();
+            return libwords.getLanguageSequence(this.editorWords);
         },
         getLayoutBoxes: function() {
-            return this.alto.getLayoutBoxes();
+            return this.layoutBoxes;
         },
         getString: function(lineBreaks) {
             var previousTextBlock = 0;
             var previousTextLine = 0;
-            var words = this.alto.getWordSequence();
+            var words = libwords.getWordSequence(this.editorWords);
             var strings = _.map(words,function (w,i) {
 
                 var rv;
@@ -93,54 +113,65 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
 
             if ((options||{}).currentOnly) {
                 
-                return $.get(this.currentUrl)
-                    .done( handlerFactory(this.alto.setCurrentXML,'current') );
+                return altoLoader('current');
 
             } else {
 
-                return $.when(
-                    $.get(this.currentUrl)
-                        .done( handlerFactory (
-                                this.alto.setCurrentXML,'current'
-                            ) ),
-                    $.get(this.originalUrl)
-                        .done ( handlerFactory (
-                                this.alto.setOriginalXML,'original'
-                            ) )
-                    )
-                    .done( function () {
-                    } );
+                var $def1 = altoLoader( 'current' );
+                var $def2 = altoLoader( 'original' );
+
+                return $.when( $def1, $def2 );
 
             }
 
-            function handlerFactory (method,name,url) {
+            function altoLoader (version) {
 
-                return function (data) {
+                var url = (version == 'current') ?
+                          self.currentUrl :
+                          self.originalUrl;
+                return $.get(url).done( function (data) {
 
-                    var parsed;
+                    var parsed = null;
 
                     try {
-                        parsed = $.parseXML(data)
-                    } catch (er) {
-                        parsed = null;
+                        parsed = $.parseXML(data);
+                    } catch (er) { }
+
+                    if (version == 'current') {
+
+                        self.currentXML = parsed;
+                        self.savedWords = wordconv.alto2words(parsed);
+                        self.editorWords = self.savedWords;
+                        self.previousWords = self.savedWords;
+                        self.layoutBoxes = self.constructLayoutBoxes(
+                            self.savedWords );
+
+                    } else {
+
+                        self.originalXML = parsed;
+                        self.originalWords = wordconv.alto2words(parsed);
+
                     }
 
-                    //console.log('loaded ' + name + ' alto');
+                    if (self.originalXML && self.currentXML) {
 
-                    method.apply(self.alto,[parsed]);
+                        var strings = _.map(self.savedWords, getContent)
+                        self.updateStringsContent(strings);
+                        var page = $(data).find('Page');
+                        var width = parseInt(page.attr("WIDTH"),10);
+                        var height = parseInt(page.attr("HEIGHT"),10);
+                        events.trigger(
+                            'setPageGeometry',
+                            {width:width,height:height}
+                            );
 
-                    // TODO: this happens twice, but so what
-                    var page = $(data).find('Page');
-                    var width = parseInt(page.attr("WIDTH"),10);
-                    var height = parseInt(page.attr("HEIGHT"),10);
-                    events.trigger(
-                        'setPageGeometry',
-                        {width:width,height:height}
-                        );
+                    }
 
-                }
+                });
 
             }
+
+            function getContent(w) { return w.content; }
 
             function sorter (a,b) {
                 var aN = parseInt(a.number,10);
@@ -149,6 +180,30 @@ define(['underscore','jquery','libalto','mybackbone','ocruidoc','utils','events'
             };
 
         },
+
+        constructLayoutBoxes : function(words) {
+            var layoutBoxes = Math.max.apply(null,
+                _.map(words, function (w) { return w.textBlock; })
+            );
+
+            var boxes = [];
+            for (var i = 0; i <= layoutBoxes; i++ ) {
+                var myWords = _.filter(words,
+                    function (w) {return w.textBlock == i;}
+                );
+
+                var layoutBox = libwords.getCombinedBoundingBox(myWords);
+                layoutBox.index = i;
+                layoutBox.fromIndex = Math.min.apply(null,
+                    _.map(myWords, function(w) { return w.index; })
+                );
+                layoutBox.toIndex = Math.max.apply(null,
+                    _.map(myWords, function(w) { return w.index; })
+                );
+                boxes.push(layoutBox);
+            }
+            return boxes;
+        }
 
     });
 

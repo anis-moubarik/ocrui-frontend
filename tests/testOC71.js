@@ -1,5 +1,8 @@
 casper.echo( "OC-71: Tekstiä editoitaessa, highlightboksit jakautuvat oikein sanoja splitatessa / mergetessä" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 casper.start(settings.defaultPageUrl);
 
 casper.then(function() {

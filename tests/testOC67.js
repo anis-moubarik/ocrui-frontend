@@ -1,5 +1,8 @@
 casper.echo( "OC-67: Siirrettäessä kursoria editorissa faksimiilin highlight siirtyy oikeaan kohtaan" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 
 casper.start(settings.defaultPageUrl);
 

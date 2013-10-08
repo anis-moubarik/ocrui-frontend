@@ -1,5 +1,8 @@
 casper.echo( "OC-70: Tekstiä editoitaessa muutetut sanat renderöidään omalla tyylillään" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 
 casper.start(settings.defaultPageUrl);
 

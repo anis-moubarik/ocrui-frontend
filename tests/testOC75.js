@@ -1,5 +1,8 @@
 casper.echo( "OC-75: Zoom: Zoom button renderöi faksimiilin zoomatussa muodossa" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 var fs = require('fs');
 var expected1 = btoa(fs.read('images/canvas.png','b'));
 var expected2 = btoa(fs.read('images/canvas-zoomed.png','b'));

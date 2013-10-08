@@ -159,7 +159,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
 
             if (!this.alto) return;
 
-            this.alto.updateStringContent(content);
+            this.alto.updateStringsContent(content.split(/\s+/));
             this.configureCMMode();
             this.setupHighlightChange();
         },

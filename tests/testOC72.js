@@ -1,5 +1,8 @@
 casper.echo( "OC-72: Sivun vaihto toimii. Uusi sivunumero näkyy oikein ja valitun sivun teksti ja faksimiili renderöityvät oikein." );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 
 var myButton = "#page-next";
 

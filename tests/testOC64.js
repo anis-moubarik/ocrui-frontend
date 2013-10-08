@@ -1,5 +1,8 @@
 casper.echo( "OC-64: Editoitavan itemin tekijä ja otsikko näkyvät oikein" );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 var selector = '#bib-info';
 var selector2 = selector + ' a';
 

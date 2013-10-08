@@ -4,7 +4,6 @@ require.config({
         "bootstrap": "../lib/bootstrap/js/bootstrap",
         "codemirror": "../CodeMirror/lib/codemirror",
         "jquery": "../lib/jquery",
-        "async": "../async/lib/async",
         "base64": "../lib/base64",
         "mustache": "../lib/mustache",
         "underscore": "../lib/underscore-min",
@@ -61,7 +60,7 @@ require(
         'compatibility',
         'dialog',
         'browser',
-        'document'
+        'document',
     ], function($, geometry,events) {
 
         try {

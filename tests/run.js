@@ -8,6 +8,7 @@ if (!phantom.casperLoaded) {
 var settings     = require('./settings');
 var mytests      = require('./mytests');
 
+var require      = patchRequire(require);
 var fs           = require('fs');
 var colorizer    = require('colorizer');
 var utils        = require('utils');

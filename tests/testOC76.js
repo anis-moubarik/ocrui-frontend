@@ -1,5 +1,8 @@
 casper.echo( "OC-76: Työkalupalkki: Buttonit ja widgetit löytyvät dom-puusta. Show changes -toggle-nappulan tila vaihtuu klikatessa." );
 
+var settings     = require('./settings');
+var mytests      = require('./mytests');
+
 
 var myButton = "#show-original-changes";
 

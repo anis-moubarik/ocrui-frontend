@@ -1,4 +1,4 @@
-define(['jquery','underscore','jsdiff','utils'],function ($,_,jsdiff,utils) {
+define([],function () {
     "use strict";
 
     // IE8...
