@@ -13,7 +13,6 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
             this.originalWords = [];
             this.savedWords = [];
             this.editorWords = [];
-            this.previousWords = [];
             this.changedSinceSave = false;
             this.changedSince0 = false;
         },
@@ -47,10 +46,9 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
             var out = libwords.transform(
                     this.originalWords,
                     this.savedWords,
-                    this.previousWords,
+                    this.editorWords,
                     strings
             );
-            this.previousWords = this.editorWords;
             this.editorWords = out.targetWords;
             this.changedSince0 = out.dirtySince0;
             this.changedSinceSave = out.dirtySinceSave;
@@ -142,7 +140,6 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
                         self.currentXML = parsed;
                         self.savedWords = wordconv.alto2words(parsed);
                         self.editorWords = self.savedWords;
-                        self.previousWords = self.savedWords;
                         self.layoutBoxes = self.constructLayoutBoxes(
                             self.savedWords );
 

@@ -105,20 +105,25 @@ define(['underscore','jsdiff'],function (_,jsdiff) {
             for (var i = 0; i < seq.length; i++) {
 
                 var currentEdit = seq[i];
-                var currentWord = oldWords[wi];
-                var currentString = newStrings[si];
-                var targetWord = transformState.targetWords[si];
-                var targetWordEnvironment = (transformState.targetWords[si-1])
-                        || (transformState.targetWords[si+1]) || {};
+
+                handler( currentEdit, // replace, match, add or delete
+                    oldWords[wi],   // current word from the original
+                                    // sequence, this will point to
+                                    // next original world in case of an add
+                    newStrings[si], // current string from new strings. Points
+                                    // to next string in case of a delete
+                    transformState.targetWords[si], // This is valid only if
+                                    // target words are already created.
+                                    // undefined for the first pass
+                    ( (transformState.targetWords[si-1]) ||
+                      (transformState.targetWords[si+1]) || {} ) // Either
+                                    // previous word, next word or {}
+                                    // if neither exist
+                );
 
                 if (currentEdit != 'add') wi ++;
 
                 if (currentEdit != 'delete') si ++;
-
-                handler( currentEdit, currentWord,
-                        currentString, targetWord,
-                        targetWordEnvironment
-                );
 
             }
 
@@ -129,6 +134,7 @@ define(['underscore','jsdiff'],function (_,jsdiff) {
                                     currentString, targetWord,
                                     targetWordEnvironment) {
 
+            //console.log(currentEdit, currentWord);
             if ((currentEdit == 'match') || (currentEdit == 'replace')) {
 
                 targetWord.language = currentWord.language;
@@ -232,7 +238,7 @@ define(['underscore','jsdiff'],function (_,jsdiff) {
                     transformState.wordStack.splice(0,0,precedingWord);
                 }
 
-                if ((nextWord) && (nextWord.textLine == transformState.textLineIndex())) {
+                if ((nextWord) && (nextWord.textLine == textLineIndex())) {
                     transformState.stringStack.push(nextWord.content);
                     transformState.wordStack.push(nextWord);
                     nextWordUsed = true;

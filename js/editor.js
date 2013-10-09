@@ -60,9 +60,16 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         },
         setCMOption:function(opt,val) {
             this.cMirror.setOption(opt,val);
+            this.refreshCM();
+        },
+        refreshCM:function() {
+
+            // No idea what is the proper way, but these three lines together
+            // seem to make it work always
             this.cMirror.doc.frontier = this.cMirror.doc.first;
-            this.cMirror.setOption('mode',this.cmConfig.mode); // refresh
+            this.cMirror.setOption('mode',this.cmConfig.mode);
             this.cMirror.replaceSelection(this.cMirror.getSelection());
+
         },
         toggleLineBreak:function(newState) {
 
@@ -95,7 +102,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 var i = wordIndexes[wordIndexIndex];
                 this.alto.setNthWordLanguage(i,selected);
             }
-            this.cMirror.replaceSelection(this.cMirror.getSelection());
+            this.configureCMMode();
+            this.refreshCM();
             this.cMirror.focus();
         },
         refocus: function(ev) {
