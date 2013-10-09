@@ -83,7 +83,7 @@ define(['jquery','underscore'],function ($,_) {
 
         });
 
-        console.log(words);
+        //console.log(words);
         return words;
 
     }

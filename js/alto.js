@@ -51,9 +51,9 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
                     strings
             );
             this.previousWords = this.editorWords;
-            this.editorWords = out.words;
-            this.changedSince0 = out.changedSince0;
-            this.changedSinceSave = out.changedSinceSave;
+            this.editorWords = out.targetWords;
+            this.changedSince0 = out.dirtySince0;
+            this.changedSinceSave = out.dirtySinceSave;
             events.trigger('pageDirtyStateChanged');
 
         },

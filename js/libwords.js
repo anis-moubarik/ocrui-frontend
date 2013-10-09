@@ -54,301 +54,303 @@ define(['underscore','jsdiff'],function (_,jsdiff) {
 
     function transform (originalWords, savedWords, previousWords, strings) {
 
-        // Create new words structure from array of strings
-        // the two three required word structures original, saved
-        // and previous. Original is needed for bounding box construction
-        // saved to track dirty words and previous to track attributes should
-        // as language of a word.
+        // Create new words structure from array of strings and a number
+        // of word structures.
+        //
+        // Basic algorithm is to loop over three edit sequences. Edit
+        // sequence is a sequence of 'match', 'add', 'replace' and 'delete'
+        // verbs to identify a set steps required to transform one string
+        // into another. The sequence is built using diff-algorithm.
+        //
+        // The three edit sequences are:
+        //  1. from original to current words.
+        //     This is to split bounding boxes between words.
+        //     This is the complicated part of the algorithm.
+        //  2. from last saved to current words. This is used to figure
+        //     out which words to mark changed since save
+        //  3. from previous to current words. Previous means the version that
+        //     was just displayed before the last keystroke or so.
+        //     This is used to track word attributes such as language.
 
-        var process = new ContentUpdateProcess( originalWords, savedWords, previousWords, strings );
+        var transformState = {
+            targetWords : [],   // New words array to be created
+            stringStack : [],   // stack of pending words to add
+            wordStack : [],     // stack of pending element indexes to replace
+            inLineIndex : 0,
+            dirtySince0 : false,
+            dirtySinceSave : false
+        }
+        strings = _.filter(strings,_.identity); // strip empty strings.
+            // these sometime occur in the beginning
+            // and end of the array at least.
 
-        return {
-            changedSince0 : process.dirtySince0,
-            changedSinceSave : process.dirtySinceSave,
-            words : process.targetWords
+        iterateOverEditSequence(originalWords, strings, handleOriginalEdit);
+        processPending(); // there might be still some pending words to handle
+        iterateOverEditSequence(savedWords, strings, handleSavedEdit);
+        iterateOverEditSequence(previousWords, strings, handlePreviousEdit);
+
+        return transformState;
+
+
+        function iterateOverEditSequence(oldWords, newStrings, handler) {
+
+            // This iterates over a edit sequence between oldWords and
+
+            var oldStrings = getStringSequence(oldWords);
+            var diff = jsdiff.diff(oldStrings,_.clone(newStrings));
+            var seq = getEditSequence(diff);
+            var si = 0;
+            var wi = 0;
+
+            for (var i = 0; i < seq.length; i++) {
+
+                var currentEdit = seq[i];
+                var currentWord = oldWords[wi];
+                var currentString = newStrings[si];
+                var targetWord = transformState.targetWords[si];
+                var targetWordEnvironment = (transformState.targetWords[si-1])
+                        || (transformState.targetWords[si+1]) || {};
+
+                if (currentEdit != 'add') wi ++;
+
+                if (currentEdit != 'delete') si ++;
+
+                handler( currentEdit, currentWord,
+                        currentString, targetWord,
+                        targetWordEnvironment
+                );
+
+            }
+
         }
 
-    };
 
-    function ContentUpdateProcess( originalWords, savedWords, previousWords, newStrings ) {
+        function handlePreviousEdit(currentEdit, currentWord,
+                                    currentString, targetWord,
+                                    targetWordEnvironment) {
 
-        if (newStrings[0] === "") newStrings.splice(0,1);
-        var lastI = newStrings.length-1;
-        if (newStrings[lastI] === "") newStrings.splice(lastI,1);
+            if ((currentEdit == 'match') || (currentEdit == 'replace')) {
 
-        var originalStrings = getStringSequence(originalWords);
+                targetWord.language = currentWord.language;
 
-        var diff = jsdiff.diff(originalStrings,_.map(newStrings,_.identity));
-        var seq = getEditSequence(diff);
-        this.dirtySince0 = _.reduce(seq,function(prev,cur){
-            return prev || cur != 'match';
-        },false);
+            } else if (currentEdit == 'add') {
 
-        this.targetWords = []; // New words array to be created
-        this.stringStack = []; // stack of pending words to add
-        this.wordStack = []; // stack of pending element indexes to replace
+                targetWord.language = targetWordEnvironment.language;
 
-        var si = 0;
-        var wi = 0;
+            }
 
-        this.inLineIndex = 0;
+        }
+  
+        function handleOriginalEdit(currentEdit, currentWord,
+                                    currentString, targetWord,
+                                    targetWordEnvironment) {
 
-        for (var i = 0; i < seq.length; i++) {
-
-            var currentWord = originalWords[wi];
-            var currentString = newStrings[si];
-            var currentEdit = seq[i];
-            var oldWi = wi;
-
+            /*
+            console.log(currentEdit, currentWord, currentString, targetWord,
+                        targetWordEnvironment);
+            */
             if (currentEdit == 'match') {
 
-                si ++;
-                wi ++;
-                if (this.processPending(currentWord) !== null) {
+                var processResult = processPending(currentWord);
+
+                if (processResult !== null) {
 
                     // add the matching word if pending edits didn't
                     // use its bounding box and it didin't get added
-                    // in this.processPending()
-                    var previousTextLineIndex = this.textLineIndex();
-                    this.targetWords.push(
-                        this.dupWordWithSideEffects(currentWord,false)
+                    // in processPending()
+                    var previousTextLineIndex = textLineIndex();
+                    transformState.targetWords.push(
+                        dupWordWithSideEffects(currentWord,false)
                     );
-                    this.inLineIndex ++;
+                    transformState.inLineIndex ++;
+
                     if (previousTextLineIndex != currentWord.textLine) {
-                        this.inLineIndex = 0;
+
+                        transformState.inLineIndex = 0;
+
                     }
 
                 }
 
             } else if (currentEdit == 'replace') {
 
-                wi ++;
-                si ++;
-                this.queueEdit( currentString, currentWord);
+                queueEdit( currentString, currentWord);
+                transformState.dirtySince0 = true;
 
             } else if (currentEdit == 'delete') {
 
-                wi ++;
-                this.queueEdit( undefined, currentWord);
+                queueEdit( undefined, currentWord);
+                transformState.dirtySince0 = true;
 
             } else if (currentEdit == 'add') {
 
-                si ++;
-                this.queueEdit( currentString, undefined);
+                queueEdit( currentString, undefined);
+                transformState.dirtySince0 = true;
 
             }
 
         }
 
-        this.processPending();
+        function handleSavedEdit(currentEdit, currentWord,
+                                    currentString, targetWord,
+                                    targetWordEnvironment) {
 
-        // Handle langauages
-        var previousStrings = getStringSequence(previousWords);
-        var currentLangs = getLanguageSequence(previousWords);
-        var diff = jsdiff.diff(previousStrings,_.map(newStrings,_.identity));
-        var seq = getEditSequence(diff);
+            if ((currentEdit == 'add') || (currentEdit == 'replace')) {
 
-        var wi = 0;
-        var li = 0;
+                targetWord.changedSinceSave = true;
 
-        for (var i = 0; i < seq.length; i++) {
-            //  i indexes edit edit sequence
-            // wi indexes just created word objects
-            // li indexes previous languages
+            }
 
-            if ((seq[i] == 'match') || (seq[i] == 'replace')) {
+            if (currentEdit != 'match') {
 
-                
-                this.targetWords[wi].language = currentLangs[li];
-                wi ++;
-                li ++;
+                transformState.dirtySinceSave = true;
 
-            } else if (seq[i] == 'delete') {
+            }
 
-                li ++;
+        }
 
-            } else if (seq[i] == 'add') {
 
-                if (li > 0) {
-                    this.targetWords[wi].language = currentLangs[li - 1];
+        function processPending (nextWord) {
+
+            var nextWordUsed = false;
+
+            if (    (transformState.stringStack.length === 0) &&
+                    (transformState.wordStack.length === 0) ) {
+
+                return nextWord; // nothing to do
+
+            }
+
+            // If there are no elements to replace try to use preceding and
+            // subsequent words to get bounding box from.
+
+            if (transformState.wordStack.length === 0) {
+
+                if (transformState.targetWords.length > 0) {
+                    var precedingWord = transformState.targetWords.pop();
+                    transformState.stringStack.splice(0,0,precedingWord.content);
+                    transformState.wordStack.splice(0,0,precedingWord);
                 }
-                wi ++;
 
+                if ((nextWord) && (nextWord.textLine == transformState.textLineIndex())) {
+                    transformState.stringStack.push(nextWord.content);
+                    transformState.wordStack.push(nextWord);
+                    nextWordUsed = true;
+                }
             }
+
+            var boundingBoxes = _.filter(transformState.wordStack,isNonNullBB);
+
+            // add words if they are too few
+            while (transformState.wordStack.length < transformState.stringStack.length) {
+                transformState.wordStack.splice(0,0,dummyWord());
+                transformState.inLineIndex ++;
+            }
+
+            // remove words if they are too many
+            while (transformState.wordStack.length > transformState.stringStack.length) {
+                transformState.wordStack.splice(0,1);
+                transformState.inLineIndex --;
+            }
+
+            // Set new content strings
+            for (var i = 0; i < transformState.wordStack.length; i++) {
+                transformState.wordStack[i].content = transformState.stringStack[i];
+            }
+
+            splitBoundingBoxes (transformState.wordStack, boundingBoxes);
+
+            // Finally copy new words to target.
+            Array.prototype.push.apply(transformState.targetWords,transformState.wordStack);
+
+            transformState.stringStack = [];
+            transformState.wordStack = [];
+
+            return nextWordUsed ? null : nextWord;
 
         }
-  
-        // handle changed since save
-        var savedStrings = getStringSequence(savedWords);
-        var diff = jsdiff.diff(_.map(savedStrings,_.identity),_.map(newStrings,_.identity));
-        var seq = getEditSequence(diff);
 
-        var wi = 0;
+        function dummyWord (changed) {
 
-        this.dirtySinceSave = _.reduce(seq,function(prev,cur){
-            return prev || cur != 'match';
-        },false);
+            return {
+                content: '',
+                index: wordIndex(),
+                textBlock: textBlockIndex(),
+                textLine: textLineIndex(),
+                inLineIndex: transformState.inLineIndex,
+                language: null,
+                changed: true,
+                hpos: null,
+                vpos: null,
+                width: null,
+                height: null
 
-        for (var i = 0; i < seq.length; i++) {
+            };
 
-            //  i indexes edit edit sequence
-            // wi indexes just created word objects
-            var e = seq[i];
+        }
 
-            if ((e == 'add') || (e == 'replace')) {
+        function wordIndex () {
 
-                this.targetWords[wi].changedSinceSave = true;
+            return transformState.targetWords.length;
 
+        }
+
+        function textBlockIndex () {
+
+            var l = transformState.targetWords.length;
+
+            return ( l == 0 ) ? 0 : transformState.targetWords[l - 1].textBlock;
+
+        }
+
+        function textLineIndex () {
+            // Current line edits will be sticked into. It is either the
+            // line of words in current wordStack or the line of last
+            // targetWord or defaults to 0.
+            if (transformState.wordStack.length > 0) {
+                return transformState.wordStack[0].textLine;
+            } else if (transformState.targetWords.length > 0) {
+                return transformState.targetWords[transformState.targetWords.length - 1].textLine;	
+            } else {
+                return 0;
+            }
+            
+        }
+
+        function dupWordWithSideEffects (original,changed) {
+
+            var dup = _.extend({},original);
+            if (changed) {
+                dup.changed = true;
+                transformState.inLineIndex ++;
+            } else {
+                dup.changed = false;
+            }
+            dup.index = wordIndex();
+            dup.inLineIndex = transformState.inLineIndex;
+
+            return dup;
+
+        }
+
+        function queueEdit (string, word) {
+
+            // push edit and process earlier stack if this is a new line
+            if ( (word !== undefined) && (textLineIndex() != word.textLine) ) {
+                processPending(word);
             }
 
-            if (e != 'delete') {
+            if (string !== undefined) {
+                transformState.stringStack.push(string);
+            }
 
-                wi++;
-
+            if (word !== undefined) {
+                transformState.wordStack.push(dupWordWithSideEffects(word,true));
             }
 
         }
 
     }
-
-    ContentUpdateProcess.prototype.queueEdit = function(string, word) {
-
-        // push edit and process earlier stack if this is a new line
-
-        if ( (word !== undefined) && (this.textLineIndex() != word.textLine) ) {
-            this.processPending(word);
-        }
-
-        if (string !== undefined) {
-            this.stringStack.push(string);
-        }
-
-        if (word !== undefined) {
-            this.wordStack.push(this.dupWordWithSideEffects(word,true));
-        }
-
-    };
-
-    ContentUpdateProcess.prototype.processPending = function(nextWord) {
-
-        var nextWordUsed = false;
-
-        if (    (this.stringStack.length === 0) &&
-                (this.wordStack.length === 0) ) {
-
-            return nextWord; // nothing to do
-
-        }
-
-        // If there are no elements to replace try to use preceding and
-        // subsequent words to get bounding box from.
-
-        if (this.wordStack.length === 0) {
-
-            if (this.targetWords.length > 0) {
-                var precedingWord = this.targetWords.pop();
-                this.stringStack.splice(0,0,precedingWord.content);
-                this.wordStack.splice(0,0,precedingWord);
-            }
-
-            if ((nextWord) && (nextWord.textLine == this.textLineIndex())) {
-                this.stringStack.push(nextWord.content);
-                this.wordStack.push(nextWord);
-                nextWordUsed = true;
-            }
-        }
-
-        var boundingBoxes = _.filter(this.wordStack,isNonNullBB);
-
-        // add words if they are too few
-        while (this.wordStack.length < this.stringStack.length) {
-            this.wordStack.splice(0,0,this.dummyWord());
-            this.inLineIndex ++;
-        }
-
-        // remove words if they are too many
-        while (this.wordStack.length > this.stringStack.length) {
-            this.wordStack.splice(0,1);
-            this.inLineIndex --;
-        }
-
-        // Set new content strings
-        for (var i = 0; i < this.wordStack.length; i++) {
-            this.wordStack[i].content = this.stringStack[i];
-        }
-
-        splitBoundingBoxes (this.wordStack, boundingBoxes);
-
-        // Finally copy new words to target.
-        Array.prototype.push.apply(this.targetWords,this.wordStack);
-
-        this.stringStack = [];
-        this.wordStack = [];
-
-        if (nextWordUsed) {
-            return null;
-        } else {
-            return nextWord;
-        }
-
-    };
-
-    ContentUpdateProcess.prototype.wordIndex = function () {
-        return this.targetWords.length;
-    };
-
-    ContentUpdateProcess.prototype.textBlockIndex = function () {
-        if (this.targetWords.length==0) return 0;
-        return this.targetWords[this.targetWords.length - 1].textBlock;
-    };
-
-    ContentUpdateProcess.prototype.textLineIndex = function () {
-		// Current line edits will be sticked into. It is either the
-		// line of words in current wordStack or the line of last
-		// targetWord or defaults to 0.
-        if (this.wordStack.length > 0) {
-			return this.wordStack[0].textLine;
-		} else if (this.targetWords.length > 0) {
-			return this.targetWords[this.targetWords.length - 1].textLine;	
-        } else {
-			return 0;
-		}
-        
-    };
-
-    ContentUpdateProcess.prototype.dummyWord = function (changed) {
-        return {
-            content: '',
-            index: this.wordIndex(),
-            textBlock: this.textBlockIndex(),
-            textLine: this.textLineIndex(),
-            inLineIndex: this.inLineIndex,
-            language: null,
-            changed: true,
-            hpos: null,
-            vpos: null,
-            width: null,
-            height: null
-
-        };
-    };
-
-    ContentUpdateProcess.prototype.dupWordWithSideEffects
-                = function(original,changed) {
-
-        var dup = _.extend({},original);
-        if (changed) {
-            dup.changed = true;
-            this.inLineIndex ++;
-        } else {
-            dup.changed = false;
-        }
-        dup.index = this.wordIndex();
-        dup.inLineIndex = this.inLineIndex;
-
-        return dup;
-
-    };
 
     function getEditSequence (diff) {
         /*
