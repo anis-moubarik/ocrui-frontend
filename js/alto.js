@@ -59,7 +59,7 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
         },
         setNthWordLanguage: function(index,language) {
             this.editorWords[index].language = language;
-            return this.words[index];
+            return this.editorWords[index];
         },
 
         getNthWord: function(index) {

@@ -99,7 +99,7 @@ define([],function () {
                 icon:'icon-align-left',
                 title:'Line break after each text line',
                 modes:['page'],
-                event:'toggleLinebreaks',
+                event:'toggleLineBreak',
             },
 
             {

@@ -58,20 +58,18 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             }
 
         },
-        toggleLineBreak:function(newState) {
-            this.lineBreaks = newState;
-            if (newState) {
-                this.setCMOption('lineWrapping',false);
-            } else {
-                this.setCMOption('lineWrapping',true);
-            }
-            this.setValueFromAlto();
-        },
         setCMOption:function(opt,val) {
             this.cMirror.setOption(opt,val);
             this.cMirror.doc.frontier = this.cMirror.doc.first;
             this.cMirror.setOption('mode',this.cmConfig.mode); // refresh
             this.cMirror.replaceSelection(this.cMirror.getSelection());
+        },
+        toggleLineBreak:function(newState) {
+
+            this.lineBreaks = newState;
+            this.setCMOption('lineWrapping', newState ? false : true);
+            this.setValueFromAlto();
+
         },
         highlightEditorWord:function(newState) {
             this.setCMOption('showHighlight',newState);
