@@ -33,10 +33,10 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
 
         },
         isDirty: function() {
-            return this.changedSince0;
+            return this.changedSinceSave;
         },
         isDirty0: function() {
-            return this.changedSinceSave;
+            return this.changedSince0;
         },
         getWordAt: function(x,y) {
             return libwords.getWordAt(this.editorWords,x,y);
@@ -52,6 +52,7 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
             this.editorWords = out.targetWords;
             this.changedSince0 = out.dirtySince0;
             this.changedSinceSave = out.dirtySinceSave;
+            //console.log(out);
             events.trigger('pageDirtyStateChanged');
 
         },
@@ -155,8 +156,11 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
                         var strings = _.map(self.savedWords, getContent)
                         self.updateStringsContent(strings);
                         var page = $(data).find('Page');
-                        var width = parseInt(page.attr("WIDTH"),10);
-                        var height = parseInt(page.attr("HEIGHT"),10);
+                        var printSpace = $(data).find('PrintSpace');
+                        var width = parseInt(page.attr("WIDTH"),10)
+                                ||  parseInt(printSpace.attr("WIDTH"),10);
+                        var height = parseInt(page.attr("HEIGHT"),10)
+                                ||  parseInt(printSpace.attr("HEIGHT"),10);
                         events.trigger(
                             'setPageGeometry',
                             {width:width,height:height}

@@ -209,6 +209,7 @@ define(['underscore','jsdiff'],function (_,jsdiff) {
 
             if (currentEdit != 'match') {
 
+                //console.log(currentEdit,currentString);
                 transformState.dirtySinceSave = true;
 
             }
