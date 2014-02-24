@@ -172,12 +172,12 @@ define([],function () {
         "languages": [
             {
                 "code":"fi",
-                "name":"Suomi",
+                "name":"Finnish",
                 "keyboard":lkbd
             },
             {
                 "code":"ers",
-                "name":"Ersä",
+                "name":"Erzya",
                 "keyboard":kkbd
             },
             {
@@ -187,28 +187,38 @@ define([],function () {
             },
             {
                 "code":"veps",
-                "name":"Vepsä",
+                "name":"Veps",
                 "keyboard":lkbd,
             },
             {
                 "code":"ingrian",
-                "name":"Inkeroinen",
+                "name":"Ingrian",
                 "keyboard":lkbd
             },
             {
                 "code":"meadowmari",
-                "name":"Niittymari",
+                "name":"Meadow Mari",
                 "keyboard":kkbd
             },
             {
                 "code":"hillmari",
-                "name":"Vuorimari",
+                "name":"Hill Mari",
                 "keyboard":kkbd
             },
             {
                 "code":"ru",
-                "name":"Venäjä",
+                "name":"Russian",
                 "keyboard":kkbd
+            },
+            {
+                "code": "oldfi",
+                "name": "Old Literature Finnish",
+                "keyboard": lkbd
+            },
+            {
+                "code": "la",
+                "name": "Latin",
+                "keyboard": lkbd
             }
         ],
         "urls": {
