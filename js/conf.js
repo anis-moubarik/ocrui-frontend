@@ -5,6 +5,10 @@ define([],function () {
     var lkbd = [
         "A", "a", "Ä", "ä", "Å", "å", "B", "в", "C", "c", "Ç", "ç", "D", "d", "Ə", "ә", "E", "e", "F", "f", "G", "g", "Y", "y", "I", "i", "J", "j", "K", "k", "L", "l", "M", "m", "N", "n", "O", "o", "Ö", "ö", "P", "p", "R", "r", "S", "s", "Ş", "ş", "T", "t", "U", "u", "V", "v", "X", "x", "Z", "z", "Ƶ", "ƶ", "Ь", "ь", "rx", "lh"
     ];
+    var latinkbd = [
+        "A", "a", "B", "b", "C", "c", "D", "d", "E", "e", "F", "f", "G", "g", "H", "h", "I", "i", "J", "j", "K", "k", "L", "l", "M", "m", "N", "n", "O", "o",
+        "P", "p", "Q", "q", "R", "r", "S", "s", "T", "t", "U", "u", "V", "v", "W", "w", "X", "x", "Y", "y", "Z", "z"
+    ];
 
     return {
 
@@ -182,7 +186,7 @@ define([],function () {
             },
             {
                 "code":"moks",
-                "name":"Mokša",
+                "name":"Moksha",
                 "keyboard":kkbd
             },
             {
@@ -212,13 +216,13 @@ define([],function () {
             },
             {
                 "code": "oldfi",
-                "name": "Old Literature Finnish",
+                "name": "Old Literary Finnish",
                 "keyboard": lkbd
             },
             {
                 "code": "la",
                 "name": "Latin",
-                "keyboard": lkbd
+                "keyboard": latinkbd
             }
         ],
         "urls": {
