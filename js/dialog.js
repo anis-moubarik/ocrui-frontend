@@ -31,7 +31,7 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
             }
 
             $.ajax(options)
-                .done(this.isRendered.modal('hide'));
+                .done(this.isRendered.modal('hide'))
         },
         dropMessages: function() {
             this.errors = [];

@@ -72,7 +72,7 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             'documentDirtyStateChanged' : 'documentDirtyStateChanged',
             'saveDocument' : 'saveDocument',
             'pageNext': 'pageNext',
-            'pagePrevious': 'pagePrevious',
+            'pagePrevious': 'pagePrevious'
         },
         events: {
             'click #page-next': 'pageNext',
