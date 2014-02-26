@@ -12,7 +12,9 @@ require.config({
         "backbone": "../lib/backbone",
         "jsdiff": "../lib/jsdiff",
         "spin": "../lib/spin",
-        "mousewheel": "../lib/jquery-mousewheel"
+        "mousewheel": "../lib/jquery-mousewheel",
+        "text": "../lib/text"
+
     },
     'shim': {
         'codemirror': {
