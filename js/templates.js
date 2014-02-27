@@ -2,8 +2,6 @@ define([], function () {
 
     var templates = {
 
-        "toolbar": ' {{#widgets}} <div class="{{classes}}" id="{{id}}"> </div> {{/widgets}} {{#buttons}} <button type="button" class="{{classes}}" id="{{id}}" {{{extra}}} title="{{title}}"> {{#icon}} <i class="{{icon}}"> </i> {{/icon}} {{#text}} {{text}} {{/text}} </button> {{/buttons}}',
-
         "page-selector": ' <button class="btn" id="page-previous" title="Previous page"> <i class="icon-arrow-left"> </i> </button> <input type="text" class="span1" id="page-number" title="Page number" value="{{pageNumber}}"/> <button class="btn disabled" title="Number of pages">/ {{pages}}</button> <button class="btn" id="page-next" title="Next page"> <i class="icon-arrow-right"> </i> </button> ',
 
         "bib-info": ' <div class="dropdown"> <a class="dropdown-toggle bib-info" data-toggle="dropdown" data-target="#">{{author}}: {{title}}</a> <div class="more-bib-info dropdown-menu" role="menu" aria-labelledby="dLabel"> <h2> marcxml</h2> <p> {{marcxml}} </p> </div> </div>',

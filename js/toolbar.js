@@ -1,5 +1,5 @@
-define(['jquery','underscore','events','mustache','mybackbone','templates','conf'],
-        function ($,_,events,mustache,mybackbone,templates,conf) {
+define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html"],
+        function ($,_,events,mustache,mybackbone,conf,toolbartpl) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -130,8 +130,7 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
             };
             context.widgets.sort(itemSort);
             context.buttons.sort(itemSort);
-            var tpl = templates.get('toolbar');
-            this.$el.html(mustache.render(tpl,context));
+            this.$el.html(mustache.render(toolbartpl,context));
 
             for (var i in widgets) {
                 //if (widgets[i].modes)
