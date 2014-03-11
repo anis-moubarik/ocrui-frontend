@@ -7,6 +7,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
     var keyboardShortcuts = {};
     var widgets = {};
     var buttons = {};
+    var totalusers = 0;
 
     function itemSort(a,b) {
         if ( ( a.index === undefined ) && (b.index === undefined) ) return 0;
@@ -39,6 +40,19 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         }
     });
 
+    function ping(){
+        var uid = document.URL.split("#")[1].split("/")[0];
+        var options = {
+            type:'GET',
+            url: "/api/id/"+uid+"/ping"
+        }
+        $.ajax(options)
+            .done(function(data){
+                console.log("ping: "+data.total)
+                totalusers = data.total;
+                view.render();
+            })
+    }
     var View = mybackbone.View.extend({
         initialize: function() {
             // we must wait for editor before firing initial cbs
@@ -47,6 +61,12 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             this._editorRendered = $.Deferred();
             conf.buttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
+            ping();
+            (function(view){
+                window.setInterval(function(){
+                    ping();
+                }, 30000);
+            })(this)
         },
         el : '#toolbar',
         myEvents: {
@@ -107,6 +127,9 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             var myEvent = 'button-'+id+'-clicked';
             events.trigger(myEvent);
         },
+        handlePing: function(){
+            alert("PINGED!!")
+        },
         render: function() {
             
             var that = this;
@@ -126,8 +149,14 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                         title: b.title,
                         text: b.text
                     };
+
                 })
             };
+            if(totalusers == 1){
+                $.extend(context, {userediting: {number: totalusers}});
+            }else{
+                $.extend(context, {usersediting: {number: totalusers}});
+            }
             context.widgets.sort(itemSort);
             context.buttons.sort(itemSort);
             this.$el.html(mustache.render(toolbartpl,context));
@@ -146,7 +175,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
     var view = new View();
     return {
         view : view,
-        registerWidget : registerWidget,
+        registerWidget : registerWidget
     };
 
 });
