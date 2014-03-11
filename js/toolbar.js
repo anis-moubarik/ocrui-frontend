@@ -41,7 +41,10 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
     });
 
     function ping(){
-        var uid = document.URL.split("#")[1].split("/")[0];
+        var re = new RegExp("[0-9a-f]{32}");
+        var uidarr = re.exec(document.URL);
+        var uid = uidarr[0]
+        console.log(uidarr)
         var options = {
             type:'GET',
             url: "/api/id/"+uid+"/ping"
