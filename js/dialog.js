@@ -37,6 +37,7 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
             this.errors = [];
         },
         pushEventLogin: function(error){
+            this.errors.push(JSON.stringify(error));
             this.renderLoginDialog();
         },
         pushEvent: function(error) {
@@ -73,10 +74,11 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
             if(this.isRendered !== undefined) {
                 this.isRendered.modal('hide');
             }
+            var error = String(this.errors.pop());
             var context = {
                 'dialogs': [
                     {
-                        'header': "Error saving.",
+                        'header': "Error "+error+".",
                         'id': 'messageDialog',
                         'messages': this.errors,
                         'buttons': [

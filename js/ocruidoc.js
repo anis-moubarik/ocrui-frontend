@@ -136,7 +136,7 @@ define(['jquery','mybackbone','events','conf','base64'],function (
 
                 console.log('error');
                 if(x === "401"){
-                    events.trigger('saveFailed401', "");
+                    events.trigger('saveFailed401', 'Saving');
                 }else if(x === "403"){
                     events.trigger('saveFailed', "You do not have the permissions to save the file!");
                 }else{

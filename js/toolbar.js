@@ -47,11 +47,15 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         console.log(uidarr)
         var options = {
             type:'GET',
-            url: "/api/id/"+uid+"/ping"
+            url: "/api/id/"+uid+"/ping",
+            statusCode: {
+                401: function() {events.trigger("saveFailed401", 'pinging the backend')},
+                403: function() {events.trigger("saveFailed", 'Forbidden')}
+            }
         }
         $.ajax(options)
             .done(function(data){
-                console.log("ping: "+data.total)
+                console.log(data)
                 totalusers = data.total;
                 view.render();
             })
