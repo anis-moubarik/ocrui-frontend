@@ -8,6 +8,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
     var widgets = {};
     var buttons = {};
     var totalusers = 0;
+    var editors = {};
 
     function itemSort(a,b) {
         if ( ( a.index === undefined ) && (b.index === undefined) ) return 0;
@@ -57,6 +58,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             .done(function(data){
                 console.log(data)
                 totalusers = data.total;
+                editors = data.users;
                 view.render();
             })
     }
@@ -163,6 +165,11 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 $.extend(context, {userediting: {number: totalusers}});
             }else{
                 $.extend(context, {usersediting: {number: totalusers}});
+            }
+            for(var editor in editors){
+                $.extend(context, {userbox: {user: editor}});
+                console.log(editors)
+                console.log("moi")
             }
             context.widgets.sort(itemSort);
             context.buttons.sort(itemSort);
