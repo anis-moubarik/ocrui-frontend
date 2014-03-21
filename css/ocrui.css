@@ -14,6 +14,10 @@
 }
 
 .cm-changed-unsaved {
+    color: #ee212b !important;
+}
+
+.cm-changed {
     color: #18c229;
 }
 
