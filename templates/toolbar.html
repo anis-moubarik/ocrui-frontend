@@ -1,14 +1,20 @@
 {{#widgets}}
-<div class="{{classes}}" id="{{id}}">
+    <div class="{{classes}}" id="{{id}}">
 
-</div>
+    </div>
 {{/widgets}}
 {{#buttons}}
-<button type="button" class="{{classes}}" id="{{id}}" {{{extra}}} title="{{title}}"> {{#icon}} <i class="{{icon}}"> </i> {{/icon}} {{#text}} {{text}} {{/text}} </button>
+    <button type="button" class="{{classes}}" id="{{id}}" {{{extra}}} title="{{title}}"> {{#icon}} <i class="{{icon}}"> </i> {{/icon}} {{#text}} {{text}} {{/text}} </button>
 {{/buttons}}
 {{#usersediting}}
-<div class="btn-group pull-right"><h4>{{number}} users are editing this document right now.</h4></div>
+    <div class="btn-group pull-right"><h4>{{number}} users are editing this document right now.</h4></div>
 {{/usersediting}}
 {{#userediting}}
-<div class="btn-group pull-right"><h4>{{number}} user is editing this document right now.</h4></div>
+    <div class="btn-group pull-right"><h4>{{number}} user is editing this document right now.</h4></div>
 {{/userediting}}
+{{#userbox}}
+    <a href="">jee</a>
+{{/userbox}}
+{{#downloadxml}}
+    <a href="#" class="pull-right" id="downloadxml">Download XML</a>
+{{/downloadxml}}

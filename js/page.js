@@ -106,10 +106,10 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
         documentDirtyStateChanged: function(dirty) {
             if (dirty) {
                 this.dirty = true;
-                $('#save').addClass('btn-warning');
+                $('#save').addClass('btn-success');
             } else {
                 this.dirty = false;
-                $('#save').removeClass('btn-warning');
+                $('#save').removeClass('btn-success');
             }
         },
         changePage: function(data) {

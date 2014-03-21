@@ -14,11 +14,7 @@
 }
 
 .cm-changed-unsaved {
-    color: #ffaa00;
-}
-
-.cm-changed {
-    font-style: italic;
+    color: #18c229;
 }
 
 .cm-language {
@@ -97,7 +93,7 @@
 }
 
 #editor.dirty {
-    outline: 1px solid #ffaa00;
+    outline: 1px solid #18c229;
 }
 
 #boxes {
