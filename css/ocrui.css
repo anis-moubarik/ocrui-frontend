@@ -152,3 +152,10 @@
 body {
     overflow:hidden;
 }
+
+#userbox {
+    background-color: #000000;
+    border: none;
+    height: 12px;
+    width: 12px;
+}

@@ -7,13 +7,14 @@ require.config({
         "base64": "../lib/base64",
         "mustache": "../lib/mustache",
         "underscore": "../lib/underscore-min",
-        "jquery-ui": "../lib/jquery-ui-1.10.0.custom/js/jquery-ui-1.10.0.custom.min",
+        "jquery-ui": "../lib/jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.min",
         "jquery-appear": "../lib/jquery-appear",
         "backbone": "../lib/backbone",
         "jsdiff": "../lib/jsdiff",
         "spin": "../lib/spin",
         "mousewheel": "../lib/jquery-mousewheel",
-        "text": "../lib/text"
+        "text": "../lib/text",
+        "qtip": "../lib/jquery.qtip.custom/jquery.qtip"
 
     },
     'shim': {
@@ -63,6 +64,7 @@ require(
         'dialog',
         'browser',
         'document',
+        'qtip'
     ], function($, geometry,events) {
 
         try {

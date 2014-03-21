@@ -1,5 +1,5 @@
-define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html"],
-        function ($,_,events,mustache,mybackbone,conf,toolbartpl) {
+define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html", "qtip"],
+        function ($,_,events,mustache,mybackbone,conf,toolbartpl, qtip) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -7,8 +7,19 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
     var keyboardShortcuts = {};
     var widgets = {};
     var buttons = {};
-    var totalusers = 0;
+    var colors = [];
     var editors = {};
+
+    function initColors() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.round(Math.random() * 15)];
+        }
+        for(var i = 0; i < 10; i++){
+            colors[i] = color;
+        }
+    }
 
     function itemSort(a,b) {
         if ( ( a.index === undefined ) && (b.index === undefined) ) return 0;
@@ -57,7 +68,6 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         $.ajax(options)
             .done(function(data){
                 console.log(data)
-                totalusers = data.total;
                 editors = data.users;
                 view.render();
             })
@@ -70,6 +80,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             this._editorRendered = $.Deferred();
             conf.buttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
+            initColors();
             ping();
             (function(view){
                 window.setInterval(function(){
@@ -136,11 +147,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             var myEvent = 'button-'+id+'-clicked';
             events.trigger(myEvent);
         },
-        handlePing: function(){
-            alert("PINGED!!")
-        },
         render: function() {
-            
             var that = this;
             var context = {
                 widgets: _.map(widgets,function(w) { return w; }),
@@ -161,15 +168,14 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
 
                 })
             };
-            if(totalusers == 1){
-                $.extend(context, {userediting: {number: totalusers}});
-            }else{
-                $.extend(context, {usersediting: {number: totalusers}});
-            }
+            var i = 0;
             for(var editor in editors){
-                $.extend(context, {userbox: {user: editor}});
-                console.log(editors)
-                console.log("moi")
+                $.extend(context, {userbox: {user: editor, color: colors[i]}});
+                if(i > 10){
+                    i = 0;
+                }else{
+                    i++;
+                }
             }
             context.widgets.sort(itemSort);
             context.buttons.sort(itemSort);
@@ -181,7 +187,11 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 view.setElement('#' + i);
                 view.render();
             }
-
+            $("#userbox").qtip({
+                content:{
+                    attr: 'data-tooltip'
+                }
+            });
             //this.$el.button(); // enable bootstrap button code
         }
     });
