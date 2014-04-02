@@ -29,7 +29,16 @@ define([],function () {
                 event:'toggleShowLayout',
             }
             */
-
+            {
+                id: 'download-xml',
+                index: 44,
+                toggle: false,
+                active: false,
+                icon: 'icon-download',
+                title: 'Download page XML',
+                modes: ['page'],
+                event: 'downloadXml'
+            },
             {
                 id:'show-highlight',
                 index: 33,
@@ -109,7 +118,7 @@ define([],function () {
                 icon:'icon-align-left',
                 title:'Line break after each text line',
                 modes:['page'],
-                event:'toggleLineBreak',
+                event:'toggleLineBreak'
             },
 
             {
@@ -120,7 +129,7 @@ define([],function () {
                 icon:'icon-star',
                 title:'Highlight word under cursor in editor',
                 modes:['page'],
-                event:'highlightEditorWord',
+                event:'highlightEditorWord'
             },
 
             {
@@ -131,7 +140,7 @@ define([],function () {
                 icon:'icon-check',
                 title:'Show unsaved changes',
                 modes:['page'],
-                event:'showSavedChanges',
+                event:'showSavedChanges'
             },
 
             {
@@ -142,7 +151,7 @@ define([],function () {
                 icon:'icon-edit',
                 title:'Show changes made to original',
                 modes:['page'],
-                event:'showOriginalChanges',
+                event:'showOriginalChanges'
             },
 
             {

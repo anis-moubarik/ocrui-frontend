@@ -72,7 +72,8 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             'documentDirtyStateChanged' : 'documentDirtyStateChanged',
             'saveDocument' : 'saveDocument',
             'pageNext': 'pageNext',
-            'pagePrevious': 'pagePrevious'
+            'pagePrevious': 'pagePrevious',
+            'downloadXml': 'downloadXml'
         },
         events: {
             'click #page-next': 'pageNext',
@@ -103,6 +104,23 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
 
         },
 
+        downloadXml: function(){
+            var re = new RegExp("[0-9a-f\/]{35}");
+            var uidarr = re.exec(document.URL);
+            var uid = uidarr[0].split("/")[0];
+            var page = uidarr[0].split("/")[1];
+            console.log(page)
+            var options = {
+                type:'GET',
+                url: "/api/id/"+uid+"/pages/"+page
+            };
+            $.ajax(options)
+                .done(function(data){
+                    console.log(data.urls.text)
+                    location.href = data.urls.text;
+            });
+
+        },
         documentDirtyStateChanged: function(dirty) {
             if (dirty) {
                 this.dirty = true;
