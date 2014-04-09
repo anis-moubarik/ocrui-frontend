@@ -69,7 +69,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             .done(function(data){
                 console.log(data)
                 editors = data.users;
-                view.render();
+                view.render("ping");
             })
     }
     var View = mybackbone.View.extend({
@@ -147,7 +147,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             var myEvent = 'button-'+id+'-clicked';
             events.trigger(myEvent);
         },
-        render: function() {
+        render: function(opt) {
             var that = this;
             var context = {
                 widgets: _.map(widgets,function(w) { return w; }),

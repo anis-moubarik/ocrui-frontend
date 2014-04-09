@@ -45,7 +45,19 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             });
     });
 
+    function getUid(){
+        var re = new RegExp("[0-9a-f\/]{35}");
+        var uidarr = re.exec(document.URL);
+        var uid = uidarr[0].split("/")[0];
+        return uid;
+    };
 
+    function getPage(){
+        var re = new RegExp("[0-9a-f\/]{35}");
+        var uidarr = re.exec(document.URL);
+        var page = uidarr[0].split("/")[1];
+        return page;
+    }
 
 
     var View = mybackbone.View.extend({
@@ -73,7 +85,8 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
             'saveDocument' : 'saveDocument',
             'pageNext': 'pageNext',
             'pagePrevious': 'pagePrevious',
-            'downloadXml': 'downloadXml'
+            'downloadXml': 'downloadXml',
+            'goBackToCollection': 'goBackToCollection'
         },
         events: {
             'click #page-next': 'pageNext',
@@ -104,11 +117,23 @@ define(['underscore','jquery','events','toolbar','mustache','mybackbone','templa
 
         },
 
+        goBackToCollection: function(){
+            var uid = getUid();
+
+            var options = {
+                type: 'GET',
+                url: "/api/id/"+uid
+            };
+            $.ajax(options)
+                .done(function(data){
+                    var parent = data.parent;
+                    location.href = "/id/"+parent;
+                });
+        },
+
         downloadXml: function(){
-            var re = new RegExp("[0-9a-f\/]{35}");
-            var uidarr = re.exec(document.URL);
-            var uid = uidarr[0].split("/")[0];
-            var page = uidarr[0].split("/")[1];
+            var uid = getUid();
+            var page = getPage();
             console.log(page)
             var options = {
                 type:'GET',

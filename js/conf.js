@@ -50,16 +50,14 @@ define([],function () {
                 event: 'toggleShowHighlight'
             },
             {
-                id:'show-index',
-                index: 4,
-                toggle:true,
-                suppressInitialCB: true,
-                icon:'icon-chevron-left',
-                title:'Show index',
-                modes:['page','document'],
-                event: 'setDocumentOrPageMode'
+                id:'back',
+                index: 3,
+                toggle: false,
+                icon: 'icon-backward',
+                title: 'Go back to the collection',
+                modes:['page'],
+                event: 'goBackToCollection'
             },
-
             {
                 id:'zoom-in',
                 index: 11,
