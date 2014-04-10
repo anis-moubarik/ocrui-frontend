@@ -45,7 +45,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             'showSavedChanges':'showSavedChanges',
             'highlightEditorWord':'highlightEditorWord',
             'toggleLineBreak':'toggleLineBreak',
-            'altoRefreshed':'altoRefreshed',
+            'altoRefreshed':'altoRefreshed'
         },
         myModes: ['page'],
         altoRefreshed:function(alto) {

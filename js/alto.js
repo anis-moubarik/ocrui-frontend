@@ -60,6 +60,10 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
             this.editorWords[index].language = language;
             return this.editorWords[index];
         },
+        setNthWordTag: function(index, tag) {
+            this.editorWords[index].tag = tag;
+            return this.editorWords[index];
+        },
 
         getNthWord: function(index) {
             return this.editorWords[index];
