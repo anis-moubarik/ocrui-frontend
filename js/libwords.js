@@ -138,10 +138,12 @@ define(['underscore','jsdiff'],function (_,jsdiff) {
             if ((currentEdit == 'match') || (currentEdit == 'replace')) {
 
                 targetWord.language = currentWord.language;
+                targetWord.tag = currentWord.tag;
 
             } else if (currentEdit == 'add') {
 
                 targetWord.language = targetWordEnvironment.language;
+                targetWord.tag = targetWordEnvironment.tag;
 
             }
 
@@ -536,6 +538,10 @@ define(['underscore','jsdiff'],function (_,jsdiff) {
         return _.map(words,function(e,i) {return e.language;});
     }
 
+    function getTagSequence (words) {
+        return _.map(words, function(e,i) {return e.tag});
+    }
+
     function getChangedSince0Sequence (words) {
         return _.map(words,function(e,i) {return e.changed;});
     }
@@ -548,6 +554,7 @@ define(['underscore','jsdiff'],function (_,jsdiff) {
         getWordSequence : getWordSequence,
         getStringSequence : getStringSequence,
         getLanguageSequence : getLanguageSequence,
+        getTagSequence : getTagSequence,
         getChangedSince0Sequence : getChangedSince0Sequence,
         getChangedSinceSaveSequence : getChangedSinceSaveSequence,
         getCombinedBoundingBox : getCombinedBoundingBox,

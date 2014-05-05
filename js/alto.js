@@ -82,6 +82,10 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
         getLanguageSequence: function() {
             return libwords.getLanguageSequence(this.editorWords);
         },
+        getTagSequence: function() {
+            console.log(this.editorWords);
+            return libwords.getTagSequence(this.editorWords);
+        },
         getLayoutBoxes: function() {
             return this.layoutBoxes;
         },

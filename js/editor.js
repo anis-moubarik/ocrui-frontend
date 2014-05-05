@@ -13,6 +13,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 changedSince0Sequence: [],
                 changedSinceSaveSequence: [],
                 languageSequence: [],
+                tagSequence: [],
                 highlight: {}
             };
             this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
@@ -45,7 +46,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             'showSavedChanges':'showSavedChanges',
             'highlightEditorWord':'highlightEditorWord',
             'toggleLineBreak':'toggleLineBreak',
-            'altoRefreshed':'altoRefreshed'
+            'altoRefreshed':'altoRefreshed',
+            'requestTagChange': 'requestTagChange'
         },
         myModes: ['page'],
         altoRefreshed:function(alto) {
@@ -106,6 +108,16 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.refreshCM();
             this.cMirror.focus();
         },
+        requestTagChange: function(selected) {
+            var wordIndexes = this.getCurrentWordIndexes();
+            for (var wi in wordIndexes) {
+                var i = wordIndexes[wi];
+                this.alto.setNthWordTag(i, selected);
+            }
+            this.configureCMMode();
+            this.refreshCM();
+            this.cMirror.focus();
+        },
         refocus: function(ev) {
             this.cMirror.focus();
         },
@@ -159,6 +171,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.cmConfig.changedSince0Sequence
                 = this.alto.getChangedSince0Sequence();
             this.cmConfig.languageSequence = this.alto.getLanguageSequence();
+            this.cmConfig.tagSequence = this.alto.getTagSequence();
         },
         changed: function (instance) {
             var content = instance.getValue();

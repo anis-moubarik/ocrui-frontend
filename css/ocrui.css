@@ -25,6 +25,10 @@
     font-weight: bold;
 }
 
+.cm-tag {
+    color: #0000C0;
+}
+
 .cm-highlight {
     background: rgba(255,255,0,0.2);
 }

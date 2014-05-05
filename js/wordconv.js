@@ -31,6 +31,7 @@ define(['jquery','underscore'],function ($,_) {
                         inLineIndex: sIndex,
                         content: s.getAttribute('CONTENT'),
                         language: s.getAttribute('LANGUAGE'),
+                        tag: s.getAttribute('TAG'),
                         changed: s.getAttribute('CHANGED') ?
                             true : false,
                         hpos: parseInt(s.getAttribute('HPOS'),10),
@@ -120,6 +121,7 @@ define(['jquery','underscore'],function ($,_) {
             var $word = $($.parseXML('<String/>').documentElement).attr({
                 'CONTENT' : word.content,
                 'LANGUAGE' : word.language,
+                'TAG' : word.tag,
                 'CHANGED' : word.changed,
                 'HPOS' : word.hpos,
                 'VPOS' : word.vpos,

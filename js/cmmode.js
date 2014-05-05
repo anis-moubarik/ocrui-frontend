@@ -44,6 +44,9 @@ define(['codemirror'],function (CodeMirror) {
                     features.push('language');
 
                 }
+                if (config.showTag && config.tagSequence[state.wordIndex]){
+                    features.push('tag');
+                }
                 if (config.showHighlight &&
                     config.highlight[state.wordIndex]) {
 
