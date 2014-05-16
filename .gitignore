@@ -1,4 +1,6 @@
+.DS_Store
 .*.swp
 items
 npm-debug.log
 tests/failed.png
+.idea/
