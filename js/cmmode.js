@@ -8,6 +8,7 @@ define(['codemirror'],function (CodeMirror) {
             startState: function() {
                 return {
                     language:'fi',
+                    tag: "",
                     wordIndex:0
                 };
             },
@@ -40,11 +41,10 @@ define(['codemirror'],function (CodeMirror) {
                 }
                 if (config.showLanguage &&
                     config.languageSequence[state.wordIndex]) {
-
                     features.push('language');
 
                 }
-                if (config.showTag && config.tagSequence[state.wordIndex]){
+                if (config.tagSequence[state.wordIndex]){
                     features.push('tag');
                 }
                 if (config.showHighlight &&
@@ -55,13 +55,14 @@ define(['codemirror'],function (CodeMirror) {
                 }
 
 
-                /*
-                console.log(
+
+                /*console.log(
                     word,
                     config.changedSinceSaveSequence[state.wordIndex],
                     config.changedSince0Sequence[state.wordIndex],
                     config.languageSequence[state.wordIndex],
                     config.highlight[state.wordIndex],
+                    config.tagSequence[state.wordIndex],
                     '"' + features.join(' ') + '"');
                 */
                 // next word

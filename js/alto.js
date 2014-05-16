@@ -61,7 +61,9 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
             return this.editorWords[index];
         },
         setNthWordTag: function(index, tag) {
+            this.changedSinceSave = true;
             this.editorWords[index].tag = tag;
+            events.trigger("saveDocument");
             return this.editorWords[index];
         },
 
@@ -83,7 +85,6 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
             return libwords.getLanguageSequence(this.editorWords);
         },
         getTagSequence: function() {
-            console.log(this.editorWords);
             return libwords.getTagSequence(this.editorWords);
         },
         getLayoutBoxes: function() {

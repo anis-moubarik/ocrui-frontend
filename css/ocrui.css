@@ -26,7 +26,8 @@
 }
 
 .cm-tag {
-    color: #0000C0;
+    color: #0011c2 !important;
+    font-weight: bold;
 }
 
 .cm-highlight {

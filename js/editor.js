@@ -42,12 +42,17 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             'setupHighlightChange':'setupHighlightChange',
             'pageDirtyStateChanged':'pageDirtyStateChanged',
             'showLanguage':'showLanguage',
+            'showTag': 'showTag',
             'showOriginalChanges':'showOriginalChanges',
             'showSavedChanges':'showSavedChanges',
             'highlightEditorWord':'highlightEditorWord',
             'toggleLineBreak':'toggleLineBreak',
             'altoRefreshed':'altoRefreshed',
-            'requestTagChange': 'requestTagChange'
+            'tagWord': 'tagWord',
+            'tagTheWord': 'tagTheWord'
+        },
+        events: {
+            'mouseover .cm-tag': 'mouseoverTag'
         },
         myModes: ['page'],
         altoRefreshed:function(alto) {
@@ -73,6 +78,9 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.cMirror.replaceSelection(this.cMirror.getSelection());
 
         },
+        mouseoverTag:function(event){
+            console.log(event.currentTarget)
+        },
         toggleLineBreak:function(newState) {
 
             this.lineBreaks = newState;
@@ -92,6 +100,9 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         showLanguage:function(newState) {
             this.setCMOption('showLanguage',newState);
         },
+        showTag:function(newState) {
+            this.setCMOption('showTag',newState);
+        },
         virtualKeyboard: function(data) {
             this.cMirror.replaceSelection(data);
             this.cMirror.focus();
@@ -108,12 +119,17 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.refreshCM();
             this.cMirror.focus();
         },
-        requestTagChange: function(selected) {
+        tagWord: function(ev){
             var wordIndexes = this.getCurrentWordIndexes();
-            for (var wi in wordIndexes) {
-                var i = wordIndexes[wi];
-                this.alto.setNthWordTag(i, selected);
+            var i = 0;
+            for (var wordIndexIndex in wordIndexes) {
+                i = wordIndexes[wordIndexIndex];
             }
+            events.trigger('showTagDialog', i);
+        },
+        tagTheWord: function(tagArray){
+            console.log(tagArray.index + " " + tagArray.tag);
+            this.alto.setNthWordTag(tagArray.index, tagArray.tag);
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();

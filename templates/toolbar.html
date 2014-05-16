@@ -11,8 +11,8 @@
         {{#userbox}}
             <button style="background-color: {{color}}" data-tooltip="User {{user}} is editing." type="button" alt="User {{user}} is editing this document." id="userbox"></button>
         {{/userbox}}
+        {{#tag}}
+            <p>Tag: {{Tag}}</p>
+        {{/tag}}
     </div>
 </div>
-{{#downloadxml}}
-    <a href="#" class="pull-right" id="downloadxml">Download XML</a>
-{{/downloadxml}}

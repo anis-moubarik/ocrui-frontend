@@ -56,7 +56,6 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         var re = new RegExp("[0-9a-f]{32}");
         var uidarr = re.exec(document.URL);
         var uid = uidarr[0]
-        console.log(uidarr)
         var options = {
             type:'GET',
             url: "/api/id/"+uid+"/ping",
@@ -100,6 +99,11 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         setViewActive: function (mode) {
             this.render();
         },
+        handleTag: function(event){
+            var ch = event.currentTarget.getAttribute('data-character');
+            console.log(ch)
+            events.trigger("tagWord")
+        },
         editorRendered: function () {
             this._editorRendered.resolve();
         },
@@ -139,7 +143,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 var toggled = !($(ev.currentTarget).hasClass("active"));
                 events.trigger(b.event,toggled);
             } else {
-                events.trigger(b.event);
+                events.trigger(b.event, ev);
             }
 
             events.trigger('refocus');

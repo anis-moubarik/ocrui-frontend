@@ -13,7 +13,7 @@ define([],function () {
         "A",  "Ä", "B", "D",  "Ḑ", "E", "F", "G", "H", "I", "J", "K", "L", "Ļ", "M", "N", "Ņ", "O", "Ȯ", "Õ", "P", "R", "Ŗ", "S", "Š", "T", "Ț", "U", "V", "Z", "Ž", "C", "Q", "W", "X", "Y",
         "a", "ä", "b", "d", "ḑ", "e", "f", "g", "h", "i", "j", "k", "l", "ļ", "m", "n", "ņ", "o", "ȯ", "õ", "p", "r", "ŗ", "s", "š", "t", "ț", "u", "v", "z", "ž", "c", "q", "w", "x", "y",
         "Ā", "Ǟ", "Ē", "Ī", "Ō", "Ȱ", "Ȭ", "Ū",
-        "ā", "ǟ", "ē", "ī", "ō", "ȱ", "ȭ", "ū", "&#173;"
+        "ā", "ǟ", "ē", "ī", "ō", "ȱ", "ȭ", "ū", "&shy;"
     ];
 
     return {
@@ -108,7 +108,15 @@ define([],function () {
                 modes:["page"],
                 event: 'saveDocument'
             },
-
+            {
+                id:'tag',
+                index: 63,
+                toggle:false,
+                text:'Tag',
+                title:'Tag',
+                modes:['page'],
+                event:'tagWord'
+            },
             {
                 id:'toggle-linebreaks',
                 index: 21,
@@ -162,7 +170,7 @@ define([],function () {
                 title:'Show language of words',
                 modes:['page'],
                 event:'showLanguage'
-            },
+            }
 
 
         ],
@@ -211,7 +219,7 @@ define([],function () {
             {
                 "code":"veps",
                 "name":"Veps",
-                "keyboard":lkbd,
+                "keyboard":lkbd
             },
             {
                 "code":"ingrian",
