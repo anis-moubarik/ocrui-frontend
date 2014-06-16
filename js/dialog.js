@@ -7,7 +7,6 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
             var that = this;
             this.errors = [];
             this.index = 0;
-
         },
         el : '#dialog',
         myEvents: {
@@ -113,11 +112,13 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
             if (this.isRendered !== undefined)  {
                 this.isRendered.modal('hide');
             }
+            console.log(this.word);
             var context = {
                 'dialogs': [
                     {
                         'header': 'Tag',
                         'id':'tagDialog',
+                        'Word': "test",
                         'messages': null,
                         'buttons': [
                             {

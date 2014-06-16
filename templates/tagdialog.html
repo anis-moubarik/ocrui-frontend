@@ -5,8 +5,9 @@
     </div>
     <div class="modal-body">
         {{#messages}} <p>{{.}}</p> {{/messages}}
+        <p>Word: {{Word}}</p>
         <form id="loginform" method="post">
-            Tag:<br> <input type="text" name="tag" id="textareatag" size="15" /> <br>
+            Tag:<br> <input type="text" name="tag" id="textareatag" size="15" value="{{Tag}}"/> <br>
             <input class="btn" type="submit" value="Save Tag" id="savetag" />
         </form>
     </div>

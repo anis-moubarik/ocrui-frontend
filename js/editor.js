@@ -1,5 +1,5 @@
-define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'],
-    function (_,$,events,CodeMirror,alto,mybackbone) {
+define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode', 'dialog'],
+    function (_,$,events,CodeMirror,alto,mybackbone, dialog) {
     "use strict";
 
     var View = mybackbone.View.extend({
