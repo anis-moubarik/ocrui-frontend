@@ -168,7 +168,7 @@ define([],function () {
                 event: 'pageNext'
             },
         ],
-        "selected_language": "mor",
+        "selected_language": "fi",
         "languages": [
             {
                 "code":"fi",
@@ -188,7 +188,7 @@ define([],function () {
             {
                 "code":"veps",
                 "name":"Vepsä",
-                "keyboard":lkbd,
+                "keyboard":lkbd
             },
             {
                 "code":"ingrian",

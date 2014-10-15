@@ -60,7 +60,7 @@ require(
         'compatibility',
         'dialog',
         'browser',
-        'document',
+        'document'
     ], function($, geometry,events) {
 
         try {
