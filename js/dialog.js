@@ -118,7 +118,6 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
                     {
                         'header': 'Tag',
                         'id':'tagDialog',
-                        'Word': "test",
                         'messages': null,
                         'buttons': [
                             {

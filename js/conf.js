@@ -194,7 +194,7 @@ define([],function () {
                 event: 'pageNext'
             },
         ],
-        "selected_language": "mor",
+        "selected_language": "Finnish",
         "languages": [
             {
                 "code":"liv",

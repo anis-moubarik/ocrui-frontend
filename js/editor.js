@@ -52,7 +52,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             'tagTheWord': 'tagTheWord'
         },
         events: {
-            'mouseover .cm-tag': 'mouseoverTag'
+            'mouseover .cm-tag': 'mouseoverTag',
+            'mouseout .cm-tag': 'mouseoutTag'
         },
         myModes: ['page'],
         altoRefreshed:function(alto) {
@@ -79,7 +80,24 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
 
         },
         mouseoverTag:function(event){
-            console.log(event.currentTarget)
+            console.log(event.currentTarget.innerHTML)
+
+            //For some reason for each doesn't work here
+            //Loop through the words on a page and show a tooltip when a tagged word is hovered over
+            var tagIndex = 0;
+            for(var i = 0; i < this.alto.editorWords.length; i++){
+                if(this.alto.editorWords[i].content == $.trim(event.currentTarget.innerHTML)){
+                    tagIndex = i;
+                    break;
+                }
+            }
+            $("#tagt").html("Tag: "+this.alto.getTagSequence()[tagIndex]);
+            $("#tagt").fadeIn(200);
+
+        },
+        mouseoutTag:function(event){
+            console.log("Mmm");
+            $("#tagt").fadeOut(100);
         },
         toggleLineBreak:function(newState) {
 
