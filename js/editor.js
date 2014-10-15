@@ -91,12 +91,15 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                     break;
                 }
             }
-            $("#tagt").html("Tag: "+this.alto.getTagSequence()[tagIndex]);
+
+            var offset = $(event.currentTarget).offset();
+
+            $("#tagtcontainer").css({'top':offset.top-23,'left':offset.left+25});
+            $("#tagt").html("<p id='taginfo'>Tag: "+this.alto.getTagSequence()[tagIndex]+"</p>");
             $("#tagt").fadeIn(200);
 
         },
         mouseoutTag:function(event){
-            console.log("Mmm");
             $("#tagt").fadeOut(100);
         },
         toggleLineBreak:function(newState) {
