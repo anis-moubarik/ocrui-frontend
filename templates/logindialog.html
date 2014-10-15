@@ -1,0 +1,19 @@
+{{#dialogs}}
+<div class="modal hide" id="{{id}}">
+    <div class="modal-header">
+        <h3>{{header}}</h3>
+    </div>
+    <div class="modal-body">
+        {{#messages}} <p>{{.}}</p> {{/messages}}
+        <p>Please login to continue.</p>
+        <form id="loginform" method="post">
+            Username: <input type="text" name="username" id="username" size="15" /> <br>
+            Password: <input type="password" name="password" id="password" size="15" /> <br>
+            <input type="submit" value="Login" id="modallogin" />
+        </form>
+    </div>
+    <div class="modal-footer">
+        {{#buttons}} <button class="{{classes}}" {{{extra}}} id="{{id}}"> {{name}} </button> {{/buttons}}
+    </div>
+</div>
+{{/dialogs}}

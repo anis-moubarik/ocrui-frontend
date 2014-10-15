@@ -1,5 +1,5 @@
-define(['jquery','underscore','events','mustache','mybackbone','templates','conf'],
-        function ($,_,events,mustache,mybackbone,templates,conf) {
+define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html", "qtip"],
+        function ($,_,events,mustache,mybackbone,conf,toolbartpl, qtip) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -7,6 +7,19 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
     var keyboardShortcuts = {};
     var widgets = {};
     var buttons = {};
+    var colors = [];
+    var editors = {};
+
+    function initColors() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.round(Math.random() * 15)];
+        }
+        for(var i = 0; i < 10; i++){
+            colors[i] = color;
+        }
+    }
 
     function itemSort(a,b) {
         if ( ( a.index === undefined ) && (b.index === undefined) ) return 0;
@@ -39,6 +52,26 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
         }
     });
 
+    function ping(){
+        var re = new RegExp("[0-9a-f]{32}");
+        var uidarr = re.exec(document.URL);
+        var uid = uidarr[0]
+        console.log(uidarr)
+        var options = {
+            type:'GET',
+            url: "/api/id/"+uid+"/ping",
+            statusCode: {
+                401: function() {events.trigger("saveFailed401", 'pinging the backend')},
+                403: function() {events.trigger("saveFailed", 'Forbidden')}
+            }
+        }
+        $.ajax(options)
+            .done(function(data){
+                console.log(data)
+                editors = data.users;
+                view.render("ping");
+            })
+    }
     var View = mybackbone.View.extend({
         initialize: function() {
             // we must wait for editor before firing initial cbs
@@ -47,6 +80,13 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
             this._editorRendered = $.Deferred();
             conf.buttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
+            initColors();
+            ping();
+            (function(view){
+                window.setInterval(function(){
+                    ping();
+                }, 30000);
+            })(this)
         },
         el : '#toolbar',
         myEvents: {
@@ -107,8 +147,7 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
             var myEvent = 'button-'+id+'-clicked';
             events.trigger(myEvent);
         },
-        render: function() {
-            
+        render: function(opt) {
             var that = this;
             var context = {
                 widgets: _.map(widgets,function(w) { return w; }),
@@ -126,12 +165,21 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
                         title: b.title,
                         text: b.text
                     };
+
                 })
             };
+            var i = 0;
+            for(var editor in editors){
+                $.extend(context, {userbox: {user: editor, color: colors[i]}});
+                if(i > 10){
+                    i = 0;
+                }else{
+                    i++;
+                }
+            }
             context.widgets.sort(itemSort);
             context.buttons.sort(itemSort);
-            var tpl = templates.get('toolbar');
-            this.$el.html(mustache.render(tpl,context));
+            this.$el.html(mustache.render(toolbartpl,context));
 
             for (var i in widgets) {
                 //if (widgets[i].modes)
@@ -139,7 +187,11 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
                 view.setElement('#' + i);
                 view.render();
             }
-
+            $("#userbox").qtip({
+                content:{
+                    attr: 'data-tooltip'
+                }
+            });
             //this.$el.button(); // enable bootstrap button code
         }
     });
@@ -147,7 +199,7 @@ define(['jquery','underscore','events','mustache','mybackbone','templates','conf
     var view = new View();
     return {
         view : view,
-        registerWidget : registerWidget,
+        registerWidget : registerWidget
     };
 
 });

@@ -5,6 +5,16 @@ define([],function () {
     var lkbd = [
         "A", "a", "Ä", "ä", "Å", "å", "B", "в", "C", "c", "Ç", "ç", "D", "d", "Ə", "ә", "E", "e", "F", "f", "G", "g", "Y", "y", "I", "i", "J", "j", "K", "k", "L", "l", "M", "m", "N", "n", "O", "o", "Ö", "ö", "P", "p", "R", "r", "S", "s", "Ş", "ş", "T", "t", "U", "u", "V", "v", "X", "x", "Z", "z", "Ƶ", "ƶ", "Ь", "ь", "rx", "lh"
     ];
+    var latinkbd = [
+        "A", "a", "B", "b", "C", "c", "D", "d", "E", "e", "F", "f", "G", "g", "H", "h", "I", "i", "J", "j", "K", "k", "L", "l", "M", "m", "N", "n", "O", "o",
+        "P", "p", "Q", "q", "R", "r", "S", "s", "T", "t", "U", "u", "V", "v", "W", "w", "X", "x", "Y", "y", "Z", "z"
+    ];
+    var livkbd = [
+        "A",  "Ä", "B", "D",  "Ḑ", "E", "F", "G", "H", "I", "J", "K", "L", "Ļ", "M", "N", "Ņ", "O", "Ȯ", "Õ", "P", "R", "Ŗ", "S", "Š", "T", "Ț", "U", "V", "Z", "Ž", "C", "Q", "W", "X", "Y",
+        "a", "ä", "b", "d", "ḑ", "e", "f", "g", "h", "i", "j", "k", "l", "ļ", "m", "n", "ņ", "o", "ȯ", "õ", "p", "r", "ŗ", "s", "š", "t", "ț", "u", "v", "z", "ž", "c", "q", "w", "x", "y",
+        "Ā", "Ǟ", "Ē", "Ī", "Ō", "Ȱ", "Ȭ", "Ū",
+        "ā", "ǟ", "ē", "ī", "ō", "ȱ", "ȭ", "ū"
+    ];
 
     return {
 
@@ -19,7 +29,16 @@ define([],function () {
                 event:'toggleShowLayout',
             }
             */
-
+            {
+                id: 'download-xml',
+                index: 44,
+                toggle: false,
+                active: false,
+                icon: 'icon-download',
+                title: 'Download page XML',
+                modes: ['page'],
+                event: 'downloadXml'
+            },
             {
                 id:'show-highlight',
                 index: 33,
@@ -31,16 +50,14 @@ define([],function () {
                 event: 'toggleShowHighlight'
             },
             {
-                id:'show-index',
-                index: 4,
-                toggle:true,
-                suppressInitialCB: true,
-                icon:'icon-chevron-left',
-                title:'Show index',
-                modes:['page','document'],
-                event: 'setDocumentOrPageMode'
+                id:'back',
+                index: 3,
+                toggle: false,
+                icon: 'icon-backward',
+                title: 'Go back to the collection',
+                modes:['page'],
+                event: 'goBackToCollection'
             },
-
             {
                 id:'zoom-in',
                 index: 11,
@@ -99,7 +116,7 @@ define([],function () {
                 icon:'icon-align-left',
                 title:'Line break after each text line',
                 modes:['page'],
-                event:'toggleLineBreak',
+                event:'toggleLineBreak'
             },
 
             {
@@ -110,7 +127,7 @@ define([],function () {
                 icon:'icon-star',
                 title:'Highlight word under cursor in editor',
                 modes:['page'],
-                event:'highlightEditorWord',
+                event:'highlightEditorWord'
             },
 
             {
@@ -121,7 +138,7 @@ define([],function () {
                 icon:'icon-check',
                 title:'Show unsaved changes',
                 modes:['page'],
-                event:'showSavedChanges',
+                event:'showSavedChanges'
             },
 
             {
@@ -132,7 +149,7 @@ define([],function () {
                 icon:'icon-edit',
                 title:'Show changes made to original',
                 modes:['page'],
-                event:'showOriginalChanges',
+                event:'showOriginalChanges'
             },
 
             {
@@ -171,44 +188,59 @@ define([],function () {
         "selected_language": "fi",
         "languages": [
             {
+                "code":"liv",
+                "name": "Livonian",
+                "keyboard": livkbd
+            },
+            {
                 "code":"fi",
-                "name":"Suomi",
+                "name":"Finnish",
                 "keyboard":lkbd
             },
             {
                 "code":"ers",
-                "name":"Ersä",
+                "name":"Erzya",
                 "keyboard":kkbd
             },
             {
                 "code":"moks",
-                "name":"Mokša",
+                "name":"Moksha",
                 "keyboard":kkbd
             },
             {
                 "code":"veps",
-                "name":"Vepsä",
+                "name":"Veps",
                 "keyboard":lkbd
             },
             {
                 "code":"ingrian",
-                "name":"Inkeroinen",
+                "name":"Ingrian",
                 "keyboard":lkbd
             },
             {
                 "code":"meadowmari",
-                "name":"Niittymari",
+                "name":"Meadow Mari",
                 "keyboard":kkbd
             },
             {
                 "code":"hillmari",
-                "name":"Vuorimari",
+                "name":"Hill Mari",
                 "keyboard":kkbd
             },
             {
                 "code":"ru",
-                "name":"Venäjä",
+                "name":"Russian",
                 "keyboard":kkbd
+            },
+            {
+                "code": "oldfi",
+                "name": "Old Literary Finnish",
+                "keyboard": lkbd
+            },
+            {
+                "code": "la",
+                "name": "Latin",
+                "keyboard": latinkbd
             }
         ],
         "urls": {

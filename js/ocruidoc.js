@@ -119,7 +119,11 @@ define(['jquery','mybackbone','events','conf','base64'],function (
                 },
                 url: this.urlBase,
                 contentType: 'multipart/form-data; boundary=frontier',
-                processData: false
+                processData: false,
+                statusCode: {
+                    401: function() {saveFail("401")},
+                    403: function() {saveFail("403")}
+                }
             };
 
             //console.log('Now PUTing');
@@ -131,7 +135,13 @@ define(['jquery','mybackbone','events','conf','base64'],function (
             function saveFail (x) {
 
                 console.log('error');
-                events.trigger('saveFailed');
+                if(x === "401"){
+                    events.trigger('saveFailed401', 'Saving');
+                }else if(x === "403"){
+                    events.trigger('saveFailed', "You do not have the permissions to save the file!");
+                }else{
+                    events.trigger('saveFailed', 'Could not save the file!')
+                }
 
             }
 

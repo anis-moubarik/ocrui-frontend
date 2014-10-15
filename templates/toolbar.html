@@ -1,0 +1,18 @@
+{{#widgets}}
+    <div class="{{classes}}" id="{{id}}">
+
+    </div>
+{{/widgets}}
+{{#buttons}}
+    <button type="button" class="{{classes}}" id="{{id}}" {{{extra}}} title="{{title}}"> {{#icon}} <i class="{{icon}}"> </i> {{/icon}} {{#text}} {{text}} {{/text}} </button>
+{{/buttons}}
+<div class="pull-right btn-toolbar">
+    <div class="btn-group">
+        {{#userbox}}
+            <button style="background-color: {{color}}" data-tooltip="User {{user}} is editing." type="button" alt="User {{user}} is editing this document." id="userbox"></button>
+        {{/userbox}}
+    </div>
+</div>
+{{#downloadxml}}
+    <a href="#" class="pull-right" id="downloadxml">Download XML</a>
+{{/downloadxml}}

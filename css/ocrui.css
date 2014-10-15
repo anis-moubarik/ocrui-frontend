@@ -14,11 +14,11 @@
 }
 
 .cm-changed-unsaved {
-    color: #ffaa00;
+    color: #ee212b !important;
 }
 
 .cm-changed {
-    font-style: italic;
+    color: #18c229;
 }
 
 .cm-language {
@@ -97,7 +97,7 @@
 }
 
 #editor.dirty {
-    outline: 1px solid #ffaa00;
+    outline: 1px solid #ee212b;
 }
 
 #boxes {
@@ -151,4 +151,11 @@
 
 body {
     overflow:hidden;
+}
+
+#userbox {
+    background-color: #000000;
+    border: none;
+    height: 12px;
+    width: 12px;
 }
