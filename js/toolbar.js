@@ -7,18 +7,11 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
     var keyboardShortcuts = {};
     var widgets = {};
     var buttons = {};
-    var colors = [];
     var editors = {};
+    var colors = [];
 
-    function initColors() {
-        var letters = '0123456789ABCDEF'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++ ) {
-            color += letters[Math.round(Math.random() * 15)];
-        }
-        for(var i = 0; i < 10; i++){
-            colors[i] = color;
-        }
+    function randColor() {
+        return "#"+Math.floor(Math.random()*16777215).toString(16);
     }
 
     function itemSort(a,b) {
@@ -68,6 +61,11 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             .done(function(data){
                 console.log(data)
                 editors = data.users;
+                for(var editor in editors){
+                    if(colors[editor] == null) {
+                        colors[editor] = randColor();
+                    }
+                }
                 view.render("ping");
             })
     }
@@ -79,7 +77,6 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             this._editorRendered = $.Deferred();
             conf.buttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
-            initColors();
             ping();
             (function(view){
                 window.setInterval(function(){
@@ -170,17 +167,15 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                         text: b.text
                     };
 
+                }),
+                userbox: _.map(editors, function(e, key){
+                    return {
+                        user: key,
+                        color: colors[key]
+                    };
                 })
             };
-            var i = 0;
-            for(var editor in editors){
-                $.extend(context, {userbox: {user: editor, color: colors[i]}});
-                if(i > 10){
-                    i = 0;
-                }else{
-                    i++;
-                }
-            }
+            console.log(context);
             context.widgets.sort(itemSort);
             context.buttons.sort(itemSort);
             this.$el.html(mustache.render(toolbartpl,context));
@@ -191,7 +186,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 view.setElement('#' + i);
                 view.render();
             }
-            $("#userbox").qtip({
+            $(".userbox").qtip({
                 content:{
                     attr: 'data-tooltip'
                 }

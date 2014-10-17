@@ -158,11 +158,15 @@ body {
     overflow:hidden;
 }
 
-#userbox {
+.userbox {
     background-color: #000000;
     border: none;
     height: 12px;
     width: 12px;
+}
+
+.userbox:not(:last-child){
+    margin-right: 5px;
 }
 
 #taginfo {
