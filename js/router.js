@@ -38,7 +38,6 @@ define(['events','backbone'], function (events,Backbone) {
         },
         
         page: function (docId,pageId,viewport) {
-
             this.previousDocId = this.currentDocId;
             this.currentDocId = docId;
             this.previousPageNumber = this.currentPageNumber;
