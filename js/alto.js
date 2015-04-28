@@ -64,6 +64,8 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
         },
         setNthWordTag: function(index, tag) {
             this.editorWords[index].tag = tag;
+            this.changedSince0 = true;
+            this.changedSinceSave = true;
             return this.editorWords[index];
         },
 

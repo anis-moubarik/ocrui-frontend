@@ -132,11 +132,10 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         },
         requestLanguageChange: function(selected) {
             var wordIndexes = this.getCurrentWordIndexes();
-            /*for (var wordIndexIndex in wordIndexes) {
+            for (var wordIndexIndex in wordIndexes) {
                 var i = wordIndexes[wordIndexIndex];
                 this.alto.setNthWordLanguage(i,selected);
-            }*/
-            this.alto.setNthWordLanguage(this.getCurrentWordIndexes(), selected);
+            }
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
