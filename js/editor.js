@@ -150,7 +150,12 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         },
         tagTheWord: function(tagArray){
             console.log(tagArray.index + " " + tagArray.tag);
-            this.alto.setNthWordTag(tagArray.index, tagArray.tag);
+            var wordIndexes = this.getCurrentWordIndexes();
+            for (var wi in wordIndexes){
+                var i = wordIndexes[wi];
+                this.alto.setNthWordTag(i, tagArray.tag);
+            }
+            //this.alto.setNthWordTag(tagArray.index, tagArray.tag);
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
