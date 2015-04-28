@@ -132,11 +132,11 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         },
         requestLanguageChange: function(selected) {
             var wordIndexes = this.getCurrentWordIndexes();
-            for (var wordIndexIndex in wordIndexes) {
+            /*for (var wordIndexIndex in wordIndexes) {
                 var i = wordIndexes[wordIndexIndex];
                 this.alto.setNthWordLanguage(i,selected);
-            }
-            events.trigger("saveDocument");
+            }*/
+            this.alto.setNthWordLanguage(this.getCurrentWordIndexes(), selected);
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
@@ -152,13 +152,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         tagTheWord: function(tagArray){
             console.log(tagArray.index + " " + tagArray.tag);
             var wordIndexes = this.getCurrentWordIndexes();
-            var tag = tagArray.tag;
-            for (var wi in wordIndexes){
-                var i = wordIndexes[wi];
-                this.alto.setNthWordTag(i, tag);
-            }
-            //this.alto.setNthWordTag(tagArray.index, tagArray.tag);
-            events.trigger("saveDocument");
+            this.alto.setNthWordTag(tagArray.index, tagArray.tag);
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
