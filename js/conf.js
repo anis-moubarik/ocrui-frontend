@@ -266,7 +266,7 @@ define([],function () {
             },
             {
                 "code": "yrk",
-                "name": "nenets",
+                "name": "Nenets",
                 "keyboard": nenetskbd
 
             },
