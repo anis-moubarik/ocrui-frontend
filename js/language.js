@@ -2,9 +2,10 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','conf
         function (_,$,events,templates,mustache,mybackbone,conf) {
     "use strict";
 
+    var _langselection = {};
+
     var View = mybackbone.View.extend({
         initialize:function() {
-
         },
         el: '#vkeyboard',
         events: {
@@ -53,6 +54,7 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','conf
                 selectedName: conf.selected_language,
                 chars: []
             };
+            console.log(context);
             var isAnySelected = false;
             context.languages = _.map(conf.languages, function(e) {
                     var o = {
@@ -72,7 +74,6 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','conf
                 name: '',
                 selected: isAnySelected ? ' ' : 'selected'
                 });
-
             for (var i in conf.languages) {
                 var l = conf.languages[i];
                 if (l.code==conf.selected_language) {

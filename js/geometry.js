@@ -63,6 +63,7 @@ define(['jquery','events'], function($,events) {
             $('#facsimile-container').height(availableH);
             $('#document').css('max-height',availableH);
             $('#spinner').height(availableH);
+            $('#tagtooltip').height(availableH);
             currentGeometry = data;
             events.trigger('setGeometry',data);
         }

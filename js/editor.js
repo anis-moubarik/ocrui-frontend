@@ -1,5 +1,5 @@
-define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'],
-    function (_,$,events,CodeMirror,alto,mybackbone) {
+define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode', 'dialog'],
+    function (_,$,events,CodeMirror,alto,mybackbone, dialog) {
     "use strict";
 
     var View = mybackbone.View.extend({
@@ -13,6 +13,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 changedSince0Sequence: [],
                 changedSinceSaveSequence: [],
                 languageSequence: [],
+                tagSequence: [],
                 highlight: {}
             };
             this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
@@ -41,11 +42,18 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             'setupHighlightChange':'setupHighlightChange',
             'pageDirtyStateChanged':'pageDirtyStateChanged',
             'showLanguage':'showLanguage',
+            'showTag': 'showTag',
             'showOriginalChanges':'showOriginalChanges',
             'showSavedChanges':'showSavedChanges',
             'highlightEditorWord':'highlightEditorWord',
             'toggleLineBreak':'toggleLineBreak',
-            'altoRefreshed':'altoRefreshed'
+            'altoRefreshed':'altoRefreshed',
+            'tagWord': 'tagWord',
+            'tagTheWord': 'tagTheWord'
+        },
+        events: {
+            'mouseover .cm-tag': 'mouseoverTag',
+            'mouseout .cm-tag': 'mouseoutTag'
         },
         myModes: ['page'],
         altoRefreshed:function(alto) {
@@ -71,6 +79,29 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.cMirror.replaceSelection(this.cMirror.getSelection());
 
         },
+        mouseoverTag:function(event){
+            console.log(event.currentTarget.innerHTML)
+
+            //For some reason for each doesn't work here
+            //Loop through the words on a page and show a tooltip when a tagged word is hovered over
+            var tagIndex = 0;
+            for(var i = 0; i < this.alto.editorWords.length; i++){
+                if(this.alto.editorWords[i].content == $.trim(event.currentTarget.innerHTML)){
+                    tagIndex = i;
+                    break;
+                }
+            }
+
+            var offset = $(event.currentTarget).offset();
+
+            $("#tagtcontainer").css({'top':offset.top-23,'left':offset.left+25});
+            $("#tagt").html("<p id='taginfo'>Tag: "+this.alto.getTagSequence()[tagIndex]+"</p>");
+            $("#tagt").fadeIn(200);
+
+        },
+        mouseoutTag:function(event){
+            $("#tagt").fadeOut(100);
+        },
         toggleLineBreak:function(newState) {
 
             this.lineBreaks = newState;
@@ -90,6 +121,9 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         showLanguage:function(newState) {
             this.setCMOption('showLanguage',newState);
         },
+        showTag:function(newState) {
+            this.setCMOption('showTag',newState);
+        },
         virtualKeyboard: function(data) {
             this.cMirror.replaceSelection(data);
             this.cMirror.focus();
@@ -102,6 +136,21 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 var i = wordIndexes[wordIndexIndex];
                 this.alto.setNthWordLanguage(i,selected);
             }
+            this.configureCMMode();
+            this.refreshCM();
+            this.cMirror.focus();
+        },
+        tagWord: function(ev){
+            var wordIndexes = this.getCurrentWordIndexes();
+            var i = 0;
+            for (var wordIndexIndex in wordIndexes) {
+                i = wordIndexes[wordIndexIndex];
+            }
+            events.trigger('showTagDialog', i);
+        },
+        tagTheWord: function(tagArray){
+            console.log(tagArray.index + " " + tagArray.tag);
+            this.alto.setNthWordTag(tagArray.index, tagArray.tag);
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
@@ -159,6 +208,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             this.cmConfig.changedSince0Sequence
                 = this.alto.getChangedSince0Sequence();
             this.cmConfig.languageSequence = this.alto.getLanguageSequence();
+            this.cmConfig.tagSequence = this.alto.getTagSequence();
         },
         changed: function (instance) {
             var content = instance.getValue();

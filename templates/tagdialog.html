@@ -5,11 +5,10 @@
     </div>
     <div class="modal-body">
         {{#messages}} <p>{{.}}</p> {{/messages}}
-        <p>Please login to continue.</p>
+        <p>Word: {{Word}}</p>
         <form id="loginform" method="post">
-            Username: <input type="text" name="username" id="username" size="15" /> <br>
-            Password: <input type="password" name="password" id="password" size="15" /> <br>
-            <input type="submit" class="btn" value="Login" id="modallogin" />
+            Tag:<br> <input type="text" name="tag" id="textareatag" size="15" value="{{Tag}}"/> <br>
+            <input class="btn" type="submit" value="Save Tag" id="savetag" />
         </form>
     </div>
     <div class="modal-footer">
