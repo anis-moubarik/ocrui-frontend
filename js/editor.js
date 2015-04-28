@@ -138,6 +138,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             }
             this.alto.changedSinceSave = true;
             this.refreshCM();
+            this.configureCMMode();
             this.cMirror.focus();
         },
         tagWord: function(ev){
