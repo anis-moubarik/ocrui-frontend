@@ -136,7 +136,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 var i = wordIndexes[wordIndexIndex];
                 this.alto.setNthWordLanguage(i,selected);
             }
-            this.alto.changedSinceSave = true.
+            this.alto.changedSinceSave = true;
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
@@ -152,7 +152,11 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
         tagTheWord: function(tagArray){
             console.log(tagArray.index + " " + tagArray.tag);
             var wordIndexes = this.getCurrentWordIndexes();
-            this.alto.setNthWordTag(tagArray.index, tagArray.tag);
+            for (var wi in wordIndexes){
+                var i = wordIndexes[wi];
+                this.alto.setNthWordTag(i, tagArray.tag);
+            }
+            this.alto.changedSinceSave = true;
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
