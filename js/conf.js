@@ -274,6 +274,10 @@ define([],function () {
                 "code": "sel",
                 "name": "Selkup",
                 "keyboard": selkbd
+            },
+            {
+                "code": "ignore",
+                "name": "Ignore"
             }
         ],
         "urls": {
