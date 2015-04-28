@@ -136,6 +136,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 var i = wordIndexes[wordIndexIndex];
                 this.alto.setNthWordLanguage(i,selected);
             }
+            events.trigger("saveDocument");
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
