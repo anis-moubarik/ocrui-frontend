@@ -60,7 +60,6 @@ define(['underscore','jquery','libwords','mybackbone','ocruidoc','events','wordc
             this.editorWords[index].language = language;
             this.changedSince0 = true;
             this.changedSinceSave = true;
-            events.trigger("saveDocument");
             return this.editorWords[index];
         },
         setNthWordTag: function(index, tag) {
