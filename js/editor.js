@@ -153,8 +153,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             var wordIndexes = this.getCurrentWordIndexes();
             var tag = tagArray.tag;
             for (var wi in wordIndexes){
-                var i = wordIndexes[wi];
-                this.alto.setNthWordTag(i, tag);
+                //var i = wordIndexes[wi];
+                this.alto.setNthWordTag(wi, tag);
             }
             //this.alto.setNthWordTag(tagArray.index, tagArray.tag);
             this.configureCMMode();
