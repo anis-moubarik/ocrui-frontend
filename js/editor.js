@@ -137,6 +137,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 this.alto.setNthWordLanguage(i,selected);
             }
             this.alto.changedSinceSave = true;
+            this.refreshCM();
             this.cMirror.focus();
         },
         tagWord: function(ev){
