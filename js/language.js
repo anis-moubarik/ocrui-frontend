@@ -42,7 +42,6 @@ define(['underscore','jquery','events','templates','mustache','mybackbone','conf
             ev.stopPropagation();
             conf.selected_language=l;
             events.trigger('requestLanguageChange',l);
-            events.trigger("saveDocument");
             this.render();
 
         },

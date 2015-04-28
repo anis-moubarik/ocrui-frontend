@@ -157,6 +157,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 this.alto.setNthWordTag(i, tag);
             }
             //this.alto.setNthWordTag(tagArray.index, tagArray.tag);
+            events.trigger("saveDocument");
             this.configureCMMode();
             this.refreshCM();
             this.cMirror.focus();
