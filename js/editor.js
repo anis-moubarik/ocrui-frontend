@@ -151,6 +151,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             console.log(tagArray.index + " " + tagArray.tag);
             this.alto.setNthWordTag(tagArray.index, tagArray.tag);
             this.alto.changedSinceSave = true;
+            this.refreshCM();
             this.cMirror.focus();
         },
         refocus: function(ev) {
