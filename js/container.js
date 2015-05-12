@@ -317,7 +317,7 @@ define(['underscore','jquery','events','mybackbone','mousetailstack','libwords']
             events.trigger('cursorToCoordinate',pageCoords);
         },
         changePage: function() {
-            this.initialHighlightSet = false;
+            this.initialHighlightSet = true;
         },
         possiblyScrollToHighlight: function(highlight) {
             if (highlight === []) return;
