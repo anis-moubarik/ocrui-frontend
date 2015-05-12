@@ -29,7 +29,6 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 if (self.suppressChanged) return ;
                 self.changed(instance);
             });
-            this.cMirror.setOption('highlight',"nuorille");
 
         },
         el: '#editor',
@@ -284,6 +283,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 return self.alto.getNthWord(v);
 
             });
+
+            console.log(this.words);
 
             self.cMirror.setOption('highlight',this.words);
             this.suppressChanged = true;
