@@ -29,6 +29,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 if (self.suppressChanged) return ;
                 self.changed(instance);
             });
+            this.cMirror.setOption('highlight',"nuorille");
 
         },
         el: '#editor',

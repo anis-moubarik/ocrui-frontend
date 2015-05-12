@@ -77,7 +77,6 @@ require(
         }
 
         $(document).ready(function() {
-
             events.trigger('appReady');
 
         });

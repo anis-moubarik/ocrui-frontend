@@ -108,14 +108,14 @@ define(['jquery','events','mybackbone','container','alto'],
                     hpos: w.hpos,
                     vpos: w.vpos,
                     width: w.width,
-                    height: w.height,
+                    height: w.height
                 });
                 if (w.hyphenated) {
                     this.highlight.push({
                         hpos: w.hpos2,
                         vpos: w.vpos2,
                         width: w.width2,
-                        height: w.height2,
+                        height: w.height2
                     });
                 }
             }
