@@ -30,6 +30,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 self.changed(instance);
             });
 
+            self.cMirror.setOption('highlight',{17: true});
+
         },
         el: '#editor',
         myEvents: {
