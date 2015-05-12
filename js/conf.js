@@ -175,7 +175,7 @@ define([],function () {
                 id:'highlight-editor-word',
                 index: 22,
                 toggle:true,
-                active:false,
+                active:true,
                 icon:'icon-star',
                 title:'Highlight word under cursor in editor',
                 modes:['page'],
