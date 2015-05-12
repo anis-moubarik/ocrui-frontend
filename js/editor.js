@@ -280,13 +280,13 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
 
             var wordIndexes = this.getCurrentWordIndexes();
             var self = this;
+            console.log(wordIndexes);
             var words = _.map(wordIndexes,function (v,k) {
 
                 return self.alto.getNthWord(v);
 
             });
 
-            console.log(this.words);
 
             self.cMirror.setOption('highlight',this.words);
             this.suppressChanged = true;
