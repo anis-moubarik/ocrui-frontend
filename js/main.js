@@ -36,6 +36,36 @@ require.config({
     }
 });
 
+$.fn.selectRange = function(start, end) {
+    return this.each(function() {
+        if(this.setSelectionRange) {
+            this.focus();
+            this.setSelectionRange(start, end);
+        } else if(this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    });
+};
+
+$.fn.getCursorPosEnd = function() {
+    var pos = 0;
+    var input = this.get(0);
+    // IE Support
+    if (document.selection) {
+        input.focus();
+        var sel = document.selection.createRange();
+        pos = sel.text.length;
+    }
+    // Firefox support
+    else if (input.selectionStart || input.selectionStart == '0')
+        pos = input.selectionEnd;
+    return pos;
+};
+
 require(
     [
         "jquery",
@@ -78,6 +108,30 @@ require(
 
         $(document).ready(function() {
             events.trigger('appReady');
+            var textarea = $('.CodeMirror');
 
+            var SAR = {};
+
+            SAR.find = function(){
+                var txt = textarea.val();
+                var strSearchTerm = "tyhjä";
+
+                txt = txt.toLowerCase();
+                strSearchTerm = strSearchTerm.toLowerCase();
+
+                var cursorPos = textarea.getCursorPosEnd();
+                var termPos = txt.indexOf(strSearchTerm, cursorPos);
+
+                if(termPos != -1){
+                    textarea.selectRange(termPos, termPos+strSearchTerm.length);
+                }else{
+                    termPos = txt.indexOf(strSearchTerm);
+                    if(termPos != -1){
+                        textarea.selectRange(termPos, termPos+strSearchTerm.length)
+                    }else{
+                        console.log("not found");
+                    }
+                }
+            }
         });
 });
