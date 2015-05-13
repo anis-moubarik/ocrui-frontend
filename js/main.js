@@ -108,30 +108,6 @@ require(
 
         $(document).ready(function() {
             events.trigger('appReady');
-            var textarea = $('.CodeMirror');
 
-            var SAR = {};
-
-            SAR.find = function(){
-                var txt = textarea.val();
-                var strSearchTerm = "tyhjä";
-
-                txt = txt.toLowerCase();
-                strSearchTerm = strSearchTerm.toLowerCase();
-
-                var cursorPos = textarea.getCursorPosEnd();
-                var termPos = txt.indexOf(strSearchTerm, cursorPos);
-
-                if(termPos != -1){
-                    textarea.selectRange(termPos, termPos+strSearchTerm.length);
-                }else{
-                    termPos = txt.indexOf(strSearchTerm);
-                    if(termPos != -1){
-                        textarea.selectRange(termPos, termPos+strSearchTerm.length)
-                    }else{
-                        console.log("not found");
-                    }
-                }
-            }
         });
 });
