@@ -233,7 +233,6 @@ define(['jquery','mybackbone','events','conf','base64'],function (
 
     events.on('changeDocument', function (data) {
         currentDocId = data.docId;
-        console.log(data);
         get(data.docId).then(
             function(doc) {
                 events.trigger('changeMets',doc);
