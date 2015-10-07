@@ -147,12 +147,13 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             for (var wordIndexIndex in wordIndexes) {
                 i = wordIndexes[wordIndexIndex];
             }
-            events.trigger('showTagDialog', {index: i, ev: ev});
+            events.trigger('showTagDialog', i);
         },
         tagTheWord: function(tagArray){
             console.log(tagArray.index + " " + tagArray.tag);
             this.alto.setNthWordTag(tagArray.index, tagArray.tag);
             this.alto.changedSinceSave = true;
+            events.trigger("saveDocument");
             this.cMirror.focus();
         },
         refocus: function(ev) {
