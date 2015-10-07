@@ -112,7 +112,7 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
             if (this.isRendered !== undefined)  {
                 this.isRendered.modal('hide');
             }
-            console.log(this.word);
+            console.log(index);
             var context = {
                 'dialogs': [
                     {
