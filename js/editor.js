@@ -147,7 +147,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             for (var wordIndexIndex in wordIndexes) {
                 i = wordIndexes[wordIndexIndex];
             }
-            events.trigger('showTagDialog', i, ev);
+            events.trigger('showTagDialog', {index: i, ev: ev});
         },
         tagTheWord: function(tagArray){
             console.log(tagArray.index + " " + tagArray.tag);
