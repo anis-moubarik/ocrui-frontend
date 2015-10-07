@@ -107,12 +107,12 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
             this.isRendered = $('#messageDialog');
             this.isRendered.modal();
         },
-        renderTagDialog: function(index) {
+        renderTagDialog: function(index, ev) {
             this.index = index;
             if (this.isRendered !== undefined)  {
                 this.isRendered.modal('hide');
             }
-            console.log(index);
+            console.log($(ev.target).find(':selected').attr('value'));
             var context = {
                 'dialogs': [
                     {
