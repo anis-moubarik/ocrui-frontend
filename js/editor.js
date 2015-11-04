@@ -32,6 +32,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             });
 
             self.cMirror.setOption('highlight',{17: true});
+            self.cMirror.setOption('readOnly', true);
 
         },
         el: '#editor',
