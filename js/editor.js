@@ -341,7 +341,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
     });
 
     return {
-        view:  View
+        view:  new View()
     };
 
 });
