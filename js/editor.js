@@ -21,11 +21,10 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 .done(function(data){
                     console.log(data)
                     if(data.code == 13){
-                        console.log("ReadOnly");
-                        $('#save').hide();
                         readonly = true;
                     }
                     view.render("ping");
+                    console.log(readonly)
                     this.cmConfig = {
                         value: "",
                         lineWrapping: true,
