@@ -1,5 +1,5 @@
-define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html", "qtip"],
-        function ($,_,events,mustache,mybackbone,conf,toolbartpl, qtip) {
+define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html", "qtip", "editor"],
+        function ($,_,events,mustache,mybackbone,conf,toolbartpl, qtip, editor) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -64,6 +64,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 if(data.code == 13){
                     console.log("ReadOnly");
                     readonly = true;
+                    editor.view.setCMOption("readOnly", true);
                 }
                 editors = data.users;
                 for(var editor in editors){
@@ -72,6 +73,8 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                     }
                 }
                 view.render(readonly);
+
+
             })
     }
     var View = mybackbone.View.extend({
