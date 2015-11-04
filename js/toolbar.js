@@ -58,7 +58,6 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             }
         }
         var readonly = false;
-        ed.view.setCMOption("readOnly", true);
         $.ajax(options)
             .done(function(data){
                 console.log(data)
