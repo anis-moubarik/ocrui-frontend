@@ -64,11 +64,9 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
 
             mybuttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
-            (function(view){
-                window.setInterval(function(){
-                    this.ping();
-                }, 30000);
-            })(this)
+            window.setInterval(function(){
+                this.ping();
+            }, 30000);
         },
         ping: function(){
             var re = new RegExp("[0-9a-f]{32}");
