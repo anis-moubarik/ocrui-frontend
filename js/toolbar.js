@@ -64,6 +64,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 if(data.code == 13){
                     console.log("ReadOnly");
                     readonly = true;
+                    events.trigger('setReadOnly');
                 }
 
 
@@ -81,10 +82,10 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             // we must wait for editor before firing initial cbs
             // BUG: race condition if user clicks between toolbar render
             // and editor render
-            ping();
             this._editorRendered = $.Deferred();
             conf.buttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
+            ping();
             (function(view){
                 window.setInterval(function(){
                     ping();

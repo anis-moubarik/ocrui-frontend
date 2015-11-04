@@ -32,7 +32,6 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             });
 
             self.cMirror.setOption('highlight',{17: true});
-            self.cMirror.setOption('readOnly', true);
 
         },
         el: '#editor',
@@ -53,7 +52,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             'toggleLineBreak':'toggleLineBreak',
             'altoRefreshed':'altoRefreshed',
             'tagWord': 'tagWord',
-            'tagTheWord': 'tagTheWord'
+            'tagTheWord': 'tagTheWord',
+            'setReadOnly': 'setReadOnly'
         },
         events: {
             'mouseover .cm-tag': 'mouseoverTag',
@@ -102,6 +102,9 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
             $("#tagt").html("<p id='taginfo'>Tag: "+this.alto.getTagSequence()[tagIndex]+"</p>");
             $("#tagt").fadeIn(200);
 
+        },
+        setReadOnly: function(){
+            this.setCMOption('readOnly', true);
         },
         mouseoutTag:function(event){
             $("#tagt").fadeOut(100);
