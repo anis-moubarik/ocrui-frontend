@@ -159,7 +159,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             var buttonArray = buttons;
             if(opt){
                 buttonArray = _.filter(buttons, function(obj){
-                    return obj.id == "save";
+                    return obj.id != "save";
                 });
             }
             var context = {
