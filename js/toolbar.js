@@ -58,7 +58,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
 
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
             conf.buttons.map(_.bind(this.registerButton,this));
-            var p = this.ping();
+            var p = this.ping;
             window.setInterval(function(){
                 p();
             }, 30000);
