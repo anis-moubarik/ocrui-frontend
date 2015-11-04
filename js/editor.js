@@ -5,6 +5,9 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
     var View = mybackbone.View.extend({
 
         initialize: function () {
+            var re = new RegExp("[0-9a-f]{32}");
+            var uidarr = re.exec(document.URL);
+            var uid = uidarr[0]
             var options = {
                 type:'GET',
                 url: "/api/id/"+uid+"/ping",
