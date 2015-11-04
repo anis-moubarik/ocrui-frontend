@@ -36,7 +36,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                         highlight: {},
                         readOnly: readonly
                     };
-                    this.cMirror = new CodeMirror(self.$el.get(0), this.cmConfig);
+                    self.cMirror = new CodeMirror(self.$el.get(0), this.cmConfig);
                 });
             // suppress default codemirror bindings
             CodeMirror.commands.goPageUp = function () { };
