@@ -14,7 +14,8 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 changedSinceSaveSequence: [],
                 languageSequence: [],
                 tagSequence: [],
-                highlight: {}
+                highlight: {},
+                readOnly: true
             };
             this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 

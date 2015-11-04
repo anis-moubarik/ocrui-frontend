@@ -63,7 +63,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 if(data.code == 13){
                     console.log("ReadOnly");
                     $('#save').hide();
-                    console.log(this.cMirror)
+
                 }
                 editors = data.users;
                 for(var editor in editors){
@@ -83,7 +83,6 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             conf.buttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
 
-            $('#save').hide();
             (function(view){
                 window.setInterval(function(){
                     ping();
