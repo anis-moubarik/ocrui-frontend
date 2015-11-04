@@ -58,6 +58,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             }
         }
         var readonly = false;
+        ed.setCMOption("readOnly", true);
         $.ajax(options)
             .done(function(data){
                 console.log(data)
@@ -65,7 +66,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                     console.log("ReadOnly");
                     readonly = true;
                 }
-                ed.view.setCMOption("readOnly", true);
+
 
                 editors = data.users;
                 for(var editor in editors){
