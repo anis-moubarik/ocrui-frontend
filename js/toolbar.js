@@ -1,5 +1,5 @@
-define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html", "qtip", "editor"],
-        function ($,_,events,mustache,mybackbone,conf,toolbartpl, qtip, editor) {
+define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html", "qtip"],
+        function ($,_,events,mustache,mybackbone,conf,toolbartpl, qtip) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -72,8 +72,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                     }
                 }
                 view.render("ping");
-            });
-        editor.setCMOption("readOnly", true);
+            })
     }
     var View = mybackbone.View.extend({
         initialize: function() {
