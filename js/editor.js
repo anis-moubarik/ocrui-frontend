@@ -17,27 +17,26 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 }
             };
             var readonly = false;
-            var self = this;
             $.ajax(options)
                 .done(function(data){
-                    console.log(data)
                     if(data.code == 13){
+                        console.log("ReadOnly");
                         readonly = true;
                     }
-                    console.log(readonly)
-                    this.cmConfig = {
-                        value: "",
-                        lineWrapping: true,
-                        mode: 'ocrui',
-                        changedSince0Sequence: [],
-                        changedSinceSaveSequence: [],
-                        languageSequence: [],
-                        tagSequence: [],
-                        highlight: {},
-                        readOnly: readonly
-                    };
-                    self.cMirror = new CodeMirror(self.$el.get(0), this.cmConfig);
                 });
+            var self = this;
+            this.cmConfig = {
+                value: "",
+                lineWrapping: true,
+                mode: 'ocrui',
+                changedSince0Sequence: [],
+                changedSinceSaveSequence: [],
+                languageSequence: [],
+                tagSequence: [],
+                highlight: {}
+            };
+            this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
+
             // suppress default codemirror bindings
             CodeMirror.commands.goPageUp = function () { };
             CodeMirror.commands.goPageDown = function () { };
