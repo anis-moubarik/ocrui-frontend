@@ -25,7 +25,6 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                         $('#save').hide();
                         readonly = true;
                     }
-                    view.render("ping");
                     var self = this;
                     this.cmConfig = {
                         value: "",
