@@ -60,13 +60,19 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         var readonly = false;
         $.ajax(options)
             .done(function(data){
-                console.log(data)
+                var mybuttons = conf.buttons;
                 if(data.code == 13){
                     console.log("ReadOnly");
                     readonly = true;
                     events.trigger('setReadOnly');
+                    mybuttons = _.filter(conf.buttons, function (obj) {
+                        return obj.id != "save" && obj.id != "tag";
+                    });
+
                 }
 
+
+                mybuttons.map(_.bind(this.registerButton,this));
 
                 editors = data.users;
                 for(var editor in editors){
@@ -85,14 +91,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             // and editor render
             var ro = ping();
             this._editorRendered = $.Deferred();
-            var mybuttons = conf.buttons;
-            if (ro) {
-                mybuttons = _.filter(conf.buttons, function (obj) {
-                    return obj.id != "save" && obj.id != "tag";
-                });
-            }
 
-            mybuttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
             (function(view){
                 window.setInterval(function(){
