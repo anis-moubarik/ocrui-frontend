@@ -55,12 +55,14 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             statusCode: {
                 401: function() {events.trigger("saveFailed401", 'pinging the backend')},
                 403: function() {events.trigger("saveFailed", 'Forbidden')},
-                200: function() {events.trigger("readOnly")}
             }
         }
         $.ajax(options)
             .done(function(data){
                 console.log(data)
+                if(data.code == 13){
+                    console.log("ReadOnly");
+                }
                 editors = data.users;
                 for(var editor in editors){
                     if(colors[editor] == null) {
