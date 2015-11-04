@@ -5,6 +5,25 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
     var View = mybackbone.View.extend({
 
         initialize: function () {
+            var options = {
+                type:'GET',
+                url: "/api/id/"+uid+"/ping",
+                statusCode: {
+                    401: function() {events.trigger("saveFailed401", 'pinging the backend')},
+                    403: function() {events.trigger("saveFailed", 'Forbidden')},
+                }
+            }
+            var readonly = false;
+            $.ajax(options)
+                .done(function(data){
+                    console.log(data)
+                    if(data.code == 13){
+                        console.log("ReadOnly");
+                        $('#save').hide();
+                        readonly = true;
+                    }
+                    view.render("ping");
+                });
             var self = this;
             this.cmConfig = {
                 value: "",
@@ -15,7 +34,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 languageSequence: [],
                 tagSequence: [],
                 highlight: {},
-                readOnly: true
+                readOnly: readonly
             };
             this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 
