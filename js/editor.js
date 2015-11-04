@@ -25,7 +25,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                         $('#save').hide();
                         readonly = true;
                     }
-                    var self = this;
+                    view.render("ping");
                     this.cmConfig = {
                         value: "",
                         lineWrapping: true,
@@ -39,7 +39,19 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                     };
                     this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
                 });
-
+            var self = this;
+            this.cmConfig = {
+                value: "",
+                lineWrapping: true,
+                mode: 'ocrui',
+                changedSince0Sequence: [],
+                changedSinceSaveSequence: [],
+                languageSequence: [],
+                tagSequence: [],
+                highlight: {},
+                readOnly: readonly
+            };
+            this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 
             // suppress default codemirror bindings
             CodeMirror.commands.goPageUp = function () { };
