@@ -156,31 +156,45 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         },
         render: function(opt) {
             var that = this;
-            var context = {
-                widgets: _.map(widgets,function(w) { return w; }),
-                buttons: _.map(buttons,function(b) {
-                    return {
-                        id: b.id,
-                        index: b.index,
-                        classes: 'btn' +
-                                 (b.active ? ' active' : '') +
-                                 (b.modes.indexOf(that.mode) != -1 ?
-                                  '' :
-                                  ' disabled'),
-                        extra: b.toggle && 'data-toggle="button"' || '',
-                        icon: b.icon,
-                        title: b.title,
-                        text: b.text
-                    };
+            var context;
+            if(opt === "ping"){
+                context = {
+                    userbox: _.map(editors, function (e, key) {
+                        return {
+                            user: key,
+                            color: colors[key]
+                        };
+                    })
+                }
+            }else {
+                context = {
+                    widgets: _.map(widgets, function (w) {
+                        return w;
+                    }),
+                    buttons: _.map(buttons, function (b) {
+                        return {
+                            id: b.id,
+                            index: b.index,
+                            classes: 'btn' +
+                            (b.active ? ' active' : '') +
+                            (b.modes.indexOf(that.mode) != -1 ?
+                                '' :
+                                ' disabled'),
+                            extra: b.toggle && 'data-toggle="button"' || '',
+                            icon: b.icon,
+                            title: b.title,
+                            text: b.text
+                        };
 
-                }),
-                userbox: _.map(editors, function(e, key){
-                    return {
-                        user: key,
-                        color: colors[key]
-                    };
-                })
-            };
+                    }),
+                    userbox: _.map(editors, function (e, key) {
+                        return {
+                            user: key,
+                            color: colors[key]
+                        };
+                    })
+                };
+            }
             console.log(context);
             context.widgets.sort(itemSort);
             context.buttons.sort(itemSort);
