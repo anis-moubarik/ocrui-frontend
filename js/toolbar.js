@@ -82,7 +82,8 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             this._editorRendered = $.Deferred();
             conf.buttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
-            ping();
+
+            $('#save').hide();
             (function(view){
                 window.setInterval(function(){
                     ping();
