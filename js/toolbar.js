@@ -74,19 +74,17 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                     }
                 }
                 view.render(readonly);
-
-
-            })
+            });
     }
     var View = mybackbone.View.extend({
         initialize: function() {
             // we must wait for editor before firing initial cbs
             // BUG: race condition if user clicks between toolbar render
             // and editor render
+            ping();
             this._editorRendered = $.Deferred();
             conf.buttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
-
             (function(view){
                 window.setInterval(function(){
                     ping();
