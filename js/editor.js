@@ -23,7 +23,6 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                     if(data.code == 13){
                         readonly = true;
                     }
-                    view.render("ping");
                     console.log(readonly)
                     this.cmConfig = {
                         value: "",
