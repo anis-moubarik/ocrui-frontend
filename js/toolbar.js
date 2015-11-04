@@ -64,8 +64,9 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 if(data.code == 13){
                     console.log("ReadOnly");
                     readonly = true;
-                    ed.view.setCMOption("readOnly", true);
                 }
+                ed.view.setCMOption("readOnly", true);
+
                 editors = data.users;
                 for(var editor in editors){
                     if(colors[editor] == null) {
