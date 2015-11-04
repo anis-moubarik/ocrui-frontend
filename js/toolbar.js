@@ -45,59 +45,63 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         }
     });
 
-    function ping(){
-        var re = new RegExp("[0-9a-f]{32}");
-        var uidarr = re.exec(document.URL);
-        var uid = uidarr[0]
-        var options = {
-            type:'GET',
-            url: "/api/id/"+uid+"/ping",
-            statusCode: {
-                401: function() {events.trigger("saveFailed401", 'pinging the backend')},
-                403: function() {events.trigger("saveFailed", 'Forbidden')},
-            }
-        }
-        var readonly = false;
-        $.ajax(options)
-            .done(function(data){
-                var mybuttons = conf.buttons;
-                if(data.code == 13){
-                    console.log("ReadOnly");
-                    readonly = true;
-                    events.trigger('setReadOnly');
-                    mybuttons = _.filter(conf.buttons, function (obj) {
-                        return obj.id != "save" && obj.id != "tag";
-                    });
+    /*function ping(){
 
-                }
-
-
-                mybuttons.map(_.bind(this.registerButton,this));
-
-                editors = data.users;
-                for(var editor in editors){
-                    if(colors[editor] == null) {
-                        colors[editor] = randColor();
-                    }
-                }
-                view.render(readonly);
-                return readonly;
-            });
-    }
+    }*/
     var View = mybackbone.View.extend({
         initialize: function() {
             // we must wait for editor before firing initial cbs
             // BUG: race condition if user clicks between toolbar render
             // and editor render
-            var ro = ping();
+            var ro = this.ping();
             this._editorRendered = $.Deferred();
+            var mybuttons = conf.buttons;
+            if (ro) {
+                mybuttons = _.filter(conf.buttons, function (obj) {
+                    return obj.id != "save" && obj.id != "tag";
+                });
+            }
 
+            mybuttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
             (function(view){
                 window.setInterval(function(){
-                    ping();
+                    this.ping();
                 }, 30000);
             })(this)
+        },
+        ping: function(){
+            var re = new RegExp("[0-9a-f]{32}");
+            var uidarr = re.exec(document.URL);
+            var uid = uidarr[0]
+            var options = {
+                type:'GET',
+                url: "/api/id/"+uid+"/ping",
+                statusCode: {
+                    401: function() {events.trigger("saveFailed401", 'pinging the backend')},
+                    403: function() {events.trigger("saveFailed", 'Forbidden')},
+                }
+            }
+            var readonly = false;
+            $.ajax(options)
+                .done(function(data){
+                    console.log(data)
+                    if(data.code == 13){
+                        console.log("ReadOnly");
+                        readonly = true;
+                        events.trigger('setReadOnly');
+                    }
+
+
+                    editors = data.users;
+                    for(var editor in editors){
+                        if(colors[editor] == null) {
+                            colors[editor] = randColor();
+                        }
+                    }
+                    view.render(readonly);
+                    return readonly;
+                });
         },
         el : '#toolbar',
         myEvents: {
