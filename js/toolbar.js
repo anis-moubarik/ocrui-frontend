@@ -57,6 +57,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             this._editorRendered = $.Deferred();
 
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
+            conf.buttons.map(_.bind(this.registerButton,this));
 
             window.setInterval(function(){
                 this.ping();
@@ -82,17 +83,8 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                         console.log("ReadOnly");
                         readonly = true;
                         events.trigger('setReadOnly');
+                        events.trigger("hideSaveTagButtons");
                     }
-
-                    var mybuttons = conf.buttons;
-                    if (readonly) {
-                        mybuttons = _.filter(conf.buttons, function (obj) {
-                            return obj.id != "save" && obj.id != "tag";
-                        });
-                    }
-
-                    mybuttons.map(_.bind(this.registerButton,this));
-
                     editors = data.users;
                     for(var editor in editors){
                         if(colors[editor] == null) {
@@ -106,7 +98,8 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         el : '#toolbar',
         myEvents: {
             'changeMode': 'changeMode',
-            'editorRendered': 'editorRendered'
+            'editorRendered': 'editorRendered',
+            'hideSaveTagButtons': hideSaveTagButtons
         },
         events: {
             'click button': 'handleClick'
@@ -114,6 +107,11 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         myModes: ['page','document'],
         setViewActive: function (mode) {
             this.render();
+        },
+        hideSaveTagButtons: function(){
+            this.editorRendered();
+            $("#save").hide();
+            $("#tag").hide();
         },
         handleTag: function(event){
             var ch = event.currentTarget.getAttribute('data-character');
