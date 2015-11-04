@@ -17,12 +17,16 @@ define(['jquery','events','mustache','mybackbone','templates', 'text!../template
             'saveFailed': 'pushEvent',
             'message': 'pushEvent',
             'saveFailed401': 'pushEventLogin',
-            'showTagDialog': 'renderTagDialog'
+            'showTagDialog': 'renderTagDialog',
+            'readOnly': 'readOnly'
         },
         events: {
             'click #dialog-ok': 'dropMessages',
             'click #savetag': 'saveTagClicked',
             'click #modallogin': 'loginAction'
+        },
+        readOnly: function(){
+          console.log("readonly")
         },
         loginAction: function(){
             event.preventDefault();

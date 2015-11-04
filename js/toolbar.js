@@ -54,7 +54,8 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             url: "/api/id/"+uid+"/ping",
             statusCode: {
                 401: function() {events.trigger("saveFailed401", 'pinging the backend')},
-                403: function() {events.trigger("saveFailed", 'Forbidden')}
+                403: function() {events.trigger("saveFailed", 'Forbidden')},
+                200: function() {events.trigger("readOnly")}
             }
         }
         $.ajax(options)
