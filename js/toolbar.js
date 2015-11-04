@@ -99,7 +99,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         myEvents: {
             'changeMode': 'changeMode',
             'editorRendered': 'editorRendered',
-            'hideSaveTagButtons': hideSaveTagButtons
+            'hideSaveTagButtons': 'hideSaveTagButtons'
         },
         events: {
             'click button': 'handleClick'
