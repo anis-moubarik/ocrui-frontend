@@ -15,7 +15,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                     401: function() {events.trigger("saveFailed401", 'pinging the backend')},
                     403: function() {events.trigger("saveFailed", 'Forbidden')},
                 }
-            }
+            };
             var readonly = false;
             $.ajax(options)
                 .done(function(data){
@@ -26,20 +26,21 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                         readonly = true;
                     }
                     view.render("ping");
+                    var self = this;
+                    this.cmConfig = {
+                        value: "",
+                        lineWrapping: true,
+                        mode: 'ocrui',
+                        changedSince0Sequence: [],
+                        changedSinceSaveSequence: [],
+                        languageSequence: [],
+                        tagSequence: [],
+                        highlight: {},
+                        readOnly: readonly
+                    };
+                    this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
                 });
-            var self = this;
-            this.cmConfig = {
-                value: "",
-                lineWrapping: true,
-                mode: 'ocrui',
-                changedSince0Sequence: [],
-                changedSinceSaveSequence: [],
-                languageSequence: [],
-                tagSequence: [],
-                highlight: {},
-                readOnly: readonly
-            };
-            this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
+
 
             // suppress default codemirror bindings
             CodeMirror.commands.goPageUp = function () { };
