@@ -55,15 +55,9 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             // and editor render
             var ro = this.ping();
             this._editorRendered = $.Deferred();
-            var mybuttons = conf.buttons;
-            if (ro) {
-                mybuttons = _.filter(conf.buttons, function (obj) {
-                    return obj.id != "save" && obj.id != "tag";
-                });
-            }
 
-            mybuttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
+
             window.setInterval(function(){
                 this.ping();
             }, 30000);
@@ -90,6 +84,14 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                         events.trigger('setReadOnly');
                     }
 
+                    var mybuttons = conf.buttons;
+                    if (readonly) {
+                        mybuttons = _.filter(conf.buttons, function (obj) {
+                            return obj.id != "save" && obj.id != "tag";
+                        });
+                    }
+
+                    mybuttons.map(_.bind(this.registerButton,this));
 
                     editors = data.users;
                     for(var editor in editors){
