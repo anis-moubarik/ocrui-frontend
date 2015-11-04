@@ -63,7 +63,6 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 if(data.code == 13){
                     console.log("ReadOnly");
                     $('#save').hide();
-                    editor.initialize(true);
 
                 }
                 editors = data.users;
@@ -73,7 +72,8 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                     }
                 }
                 view.render("ping");
-            })
+            });
+        editor.setCMOption("readOnly", true);
     }
     var View = mybackbone.View.extend({
         initialize: function() {
