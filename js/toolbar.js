@@ -53,14 +53,14 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             // we must wait for editor before firing initial cbs
             // BUG: race condition if user clicks between toolbar render
             // and editor render
-            var ro = this.ping();
+            this.ping();
             this._editorRendered = $.Deferred();
 
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
             conf.buttons.map(_.bind(this.registerButton,this));
-
+            var p = this.ping();
             window.setInterval(function(){
-                this.ping();
+                p();
             }, 30000);
         },
         ping: function(){
