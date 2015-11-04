@@ -75,6 +75,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                     }
                 }
                 view.render(readonly);
+                return readonly;
             });
     }
     var View = mybackbone.View.extend({
@@ -82,10 +83,17 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             // we must wait for editor before firing initial cbs
             // BUG: race condition if user clicks between toolbar render
             // and editor render
+            var ro = ping();
             this._editorRendered = $.Deferred();
-            conf.buttons.map(_.bind(this.registerButton,this));
+            var mybuttons = conf.buttons;
+            if (ro) {
+                mybuttons = _.filter(conf.buttons, function (obj) {
+                    return obj.id != "save" && obj.id != "tag";
+                });
+            }
+
+            mybuttons.map(_.bind(this.registerButton,this));
             conf.shortcuts.map(_.bind(this.registerKeyboardShortcut,this));
-            ping();
             (function(view){
                 window.setInterval(function(){
                     ping();
@@ -161,7 +169,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
             var buttonArray = buttons;
             if(opt){
                 buttonArray = _.filter(buttons, function(obj){
-                    return obj.id != "save";
+                    return obj.id != "save" && obj.id != "tag";
                 });
             }
             var context = {
