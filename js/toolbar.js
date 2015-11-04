@@ -62,6 +62,8 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 console.log(data)
                 if(data.code == 13){
                     console.log("ReadOnly");
+                    $('#save').hide();
+                    console.log(this.cMirror)
                 }
                 editors = data.users;
                 for(var editor in editors){
