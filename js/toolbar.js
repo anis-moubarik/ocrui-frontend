@@ -57,13 +57,13 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 403: function() {events.trigger("saveFailed", 'Forbidden')},
             }
         }
+        var readonly = false;
         $.ajax(options)
             .done(function(data){
                 console.log(data)
                 if(data.code == 13){
                     console.log("ReadOnly");
-                    $('#save').hide();
-
+                    readonly = true;
                 }
                 editors = data.users;
                 for(var editor in editors){
@@ -71,7 +71,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                         colors[editor] = randColor();
                     }
                 }
-                view.render("ping");
+                view.render(readonly);
             })
     }
     var View = mybackbone.View.extend({
@@ -156,47 +156,41 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
         },
         render: function(opt) {
             var that = this;
-            var context;
-            if(opt === "ping"){
-                context = {
-                    userbox: _.map(editors, function (e, key) {
-                        return {
-                            user: key,
-                            color: colors[key]
-                        };
-                    })
-                }
-            }else {
-                context = {
-                    widgets: _.map(widgets, function (w) {
-                        return w;
-                    }),
-                    buttons: _.map(buttons, function (b) {
-                        return {
-                            id: b.id,
-                            index: b.index,
-                            classes: 'btn' +
-                            (b.active ? ' active' : '') +
-                            (b.modes.indexOf(that.mode) != -1 ?
-                                '' :
-                                ' disabled'),
-                            extra: b.toggle && 'data-toggle="button"' || '',
-                            icon: b.icon,
-                            title: b.title,
-                            text: b.text
-                        };
-
-                    }),
-                    userbox: _.map(editors, function (e, key) {
-                        return {
-                            user: key,
-                            color: colors[key]
-                        };
-                    })
-                };
-                context.widgets.sort(itemSort);
-                context.buttons.sort(itemSort);
+            var buttonArray = buttons;
+            if(opt){
+                buttonArray = _.filter(buttons, function(obj){
+                    return !obj.id == save;
+                });
             }
+            var context = {
+                widgets: _.map(widgets, function (w) {
+                    return w;
+                }),
+                buttons: _.map(buttonArray, function (b) {
+                    return {
+                        id: b.id,
+                        index: b.index,
+                        classes: 'btn' +
+                        (b.active ? ' active' : '') +
+                        (b.modes.indexOf(that.mode) != -1 ?
+                            '' :
+                            ' disabled'),
+                        extra: b.toggle && 'data-toggle="button"' || '',
+                        icon: b.icon,
+                        title: b.title,
+                        text: b.text
+                    };
+
+                }),
+                userbox: _.map(editors, function (e, key) {
+                    return {
+                        user: key,
+                        color: colors[key]
+                    };
+                })
+            };
+            context.widgets.sort(itemSort);
+            context.buttons.sort(itemSort);
             console.log(context);
 
             this.$el.html(mustache.render(toolbartpl,context));
