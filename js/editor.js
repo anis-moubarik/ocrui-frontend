@@ -4,26 +4,7 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
 
     var View = mybackbone.View.extend({
 
-        initialize: function () {
-            var re = new RegExp("[0-9a-f]{32}");
-            var uidarr = re.exec(document.URL);
-            var uid = uidarr[0]
-            var options = {
-                type:'GET',
-                url: "/api/id/"+uid+"/ping",
-                statusCode: {
-                    401: function() {events.trigger("saveFailed401", 'pinging the backend')},
-                    403: function() {events.trigger("saveFailed", 'Forbidden')},
-                }
-            };
-            var readonly = false;
-            $.ajax(options)
-                .done(function(data){
-                    if(data.code == 13){
-                        console.log("ReadOnly");
-                        readonly = true;
-                    }
-                });
+        initialize: function (readonly) {
             var self = this;
             this.cmConfig = {
                 value: "",
@@ -33,9 +14,10 @@ define(['underscore','jquery','events','codemirror','alto','mybackbone','cmmode'
                 changedSinceSaveSequence: [],
                 languageSequence: [],
                 tagSequence: [],
-                highlight: {}
+                highlight: {},
+                readOnly: readonly
             };
-            this.cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
+            var cMirror = new CodeMirror(this.$el.get(0), this.cmConfig);
 
             // suppress default codemirror bindings
             CodeMirror.commands.goPageUp = function () { };

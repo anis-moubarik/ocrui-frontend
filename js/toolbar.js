@@ -1,5 +1,5 @@
-define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html", "qtip"],
-        function ($,_,events,mustache,mybackbone,conf,toolbartpl, qtip) {
+define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../templates/toolbar.html", "qtip", "editor"],
+        function ($,_,events,mustache,mybackbone,conf,toolbartpl, qtip, editor) {
     "use strict";
 
     // handle keyboard shortcuts also
@@ -63,7 +63,7 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                 if(data.code == 13){
                     console.log("ReadOnly");
                     $('#save').hide();
-                    console.log(self.cMirror);
+                    editor.initialize(true);
 
                 }
                 editors = data.users;
@@ -194,10 +194,11 @@ define(['jquery','underscore','events','mustache','mybackbone','conf', "text!../
                         };
                     })
                 };
+                context.widgets.sort(itemSort);
+                context.buttons.sort(itemSort);
             }
             console.log(context);
-            context.widgets.sort(itemSort);
-            context.buttons.sort(itemSort);
+
             this.$el.html(mustache.render(toolbartpl,context));
 
             for (var i in widgets) {
