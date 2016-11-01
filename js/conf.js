@@ -343,7 +343,7 @@ define([],function () {
                 "code": "sma",
                 "name": "Southern Sami",
                 "keyboard": smakbd
-            }
+            },
             {
                 "code": "ignore",
                 "name": "Ignore"
